@@ -12,7 +12,9 @@ import {
   FileText,
   Shield,
   BarChart3,
-  Activity
+  Activity,
+  Users,
+  UserCheck
 } from "lucide-react";
 
 const navigationItems = [
@@ -30,6 +32,16 @@ const navigationItems = [
         title: "Patient Registration",
         href: "/patient-registration",
         icon: UserPlus
+      },
+      {
+        title: "Outpatient Queue",
+        href: "/outpatient-queue",
+        icon: Users
+      },
+      {
+        title: "Doctor Portal",
+        href: "/doctor-portal",
+        icon: UserCheck
       },
       {
         title: "Appointments",
