@@ -135,7 +135,11 @@ export default function DischargeSummary({
           <div>
             <p className="font-bold mb-2">FINAL DIAGNOSIS:</p>
             <div className="border border-gray-400 min-h-[60px] p-3">
-              <p className="whitespace-pre-wrap">{finalDiagnosis}</p>
+              <textarea 
+                className="w-full h-full min-h-[60px] bg-transparent border-none outline-none resize-none print:border-none"
+                defaultValue={finalDiagnosis}
+                placeholder="Mental Health Assessment and Treatment Completed"
+              />
             </div>
           </div>
 
@@ -143,7 +147,11 @@ export default function DischargeSummary({
           <div>
             <p className="font-bold mb-2">OTHER ACUTE OR CHRONIC CONDITIONS:</p>
             <div className="border border-gray-400 min-h-[60px] p-3">
-              <p className="whitespace-pre-wrap">{otherDiagnoses}</p>
+              <textarea 
+                className="w-full h-full min-h-[60px] bg-transparent border-none outline-none resize-none print:border-none"
+                defaultValue={otherDiagnoses}
+                placeholder="Mental Status Examination, Psychological Assessment"
+              />
             </div>
           </div>
 
@@ -151,7 +159,11 @@ export default function DischargeSummary({
           <div>
             <p className="font-bold mb-2">INVESTIGATIONS:</p>
             <div className="border border-gray-400 min-h-[80px] p-3">
-              <p className="whitespace-pre-wrap">{investigations}</p>
+              <textarea 
+                className="w-full h-full min-h-[80px] bg-transparent border-none outline-none resize-none print:border-none"
+                defaultValue={investigations}
+                placeholder="Comprehensive mental health treatment with counseling and medication therapy"
+              />
             </div>
           </div>
 
@@ -159,7 +171,11 @@ export default function DischargeSummary({
           <div>
             <p className="font-bold mb-2">MANAGEMENT:</p>
             <div className="border border-gray-400 min-h-[100px] p-3">
-              <p className="whitespace-pre-wrap">{management}</p>
+              <textarea 
+                className="w-full h-full min-h-[100px] bg-transparent border-none outline-none resize-none print:border-none"
+                defaultValue={management}
+                placeholder="Treatment plan and management details"
+              />
             </div>
           </div>
 
@@ -167,7 +183,10 @@ export default function DischargeSummary({
           <div>
             <p className="font-bold mb-2">DISCHARGE DRUG:</p>
             <div className="border border-gray-400 min-h-[60px] p-3">
-              <p className="text-gray-500 italic">To be filled by attending physician</p>
+              <textarea 
+                className="w-full h-full min-h-[60px] bg-transparent border-none outline-none resize-none print:border-none"
+                placeholder="To be filled by attending physician"
+              />
             </div>
           </div>
 
@@ -175,7 +194,11 @@ export default function DischargeSummary({
           <div>
             <p className="font-bold mb-2">DISCHARGE INSTRUCTIONS:</p>
             <div className="border border-gray-400 min-h-[80px] p-3">
-              <p className="whitespace-pre-wrap">{dischargeInstructions}</p>
+              <textarea 
+                className="w-full h-full min-h-[80px] bg-transparent border-none outline-none resize-none print:border-none"
+                defaultValue={dischargeInstructions}
+                placeholder="Continue prescribed medications, attend follow-up appointments, maintain healthy lifestyle"
+              />
             </div>
           </div>
 
@@ -183,7 +206,11 @@ export default function DischargeSummary({
           <div>
             <p className="font-bold mb-2">FOLLOW-UP APPOINTMENT(S):</p>
             <div className="border border-gray-400 min-h-[60px] p-3">
-              <p className="whitespace-pre-wrap">{followUpAppointments}</p>
+              <textarea 
+                className="w-full h-full min-h-[60px] bg-transparent border-none outline-none resize-none print:border-none"
+                defaultValue={followUpAppointments}
+                placeholder="Follow-up appointment scheduled in 2 weeks"
+              />
             </div>
           </div>
 
@@ -228,7 +255,7 @@ export default function DischargeSummary({
       </div>
 
       {/* Print Styles */}
-      <style jsx>{`
+      <style>{`
         @media print {
           @page {
             margin: 0.75in;

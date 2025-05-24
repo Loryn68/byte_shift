@@ -175,6 +175,55 @@ export default function DetailedServiceBill({
                 <p>Amount Paid: Ksh.{billingRecords.filter(b => b.paymentStatus === 'paid').reduce((sum, b) => sum + Number(b.totalAmount), 0).toLocaleString()}.00</p>
                 <p>Balance Due: Ksh.{billingRecords.filter(b => b.paymentStatus === 'pending').reduce((sum, b) => sum + Number(b.totalAmount), 0).toLocaleString()}.00</p>
               </div>
+              
+              {/* Payment Methods */}
+              <div className="mt-4 p-3 border border-gray-300 bg-gray-50 print:bg-white">
+                <h5 className="font-bold mb-2">PAYMENT DETAILS</h5>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="cash" className="print:hidden" />
+                    <label htmlFor="cash" className="print:hidden">Cash Payment</label>
+                    <span className="hidden print:inline">☐ Cash Payment</span>
+                    <span className="ml-auto">Amount: Ksh._______</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="bank" className="print:hidden" />
+                    <label htmlFor="bank" className="print:hidden">Bank Transfer</label>
+                    <span className="hidden print:inline">☐ Bank Transfer</span>
+                    <div className="ml-auto flex gap-2">
+                      <span>Ref:</span>
+                      <input type="text" placeholder="Transaction No." className="border-b border-black bg-transparent text-xs w-24 print:border-none print:bg-white" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="card" className="print:hidden" />
+                    <label htmlFor="card" className="print:hidden">Card Payment</label>
+                    <span className="hidden print:inline">☐ Card Payment</span>
+                    <div className="ml-auto flex gap-2">
+                      <span>Ref:</span>
+                      <input type="text" placeholder="Card Ref No." className="border-b border-black bg-transparent text-xs w-24 print:border-none print:bg-white" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="mpesa" className="print:hidden" />
+                    <label htmlFor="mpesa" className="print:hidden">M-Pesa Payment</label>
+                    <span className="hidden print:inline">☐ M-Pesa Payment</span>
+                    <div className="ml-auto flex gap-2">
+                      <span>Code:</span>
+                      <input type="text" placeholder="M-Pesa Code" className="border-b border-black bg-transparent text-xs w-24 print:border-none print:bg-white" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="insurance" className="print:hidden" />
+                    <label htmlFor="insurance" className="print:hidden">Insurance</label>
+                    <span className="hidden print:inline">☐ Insurance</span>
+                    <div className="ml-auto flex gap-2">
+                      <span>Auth:</span>
+                      <input type="text" placeholder="Auth Code" className="border-b border-black bg-transparent text-xs w-24 print:border-none print:bg-white" />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div>
               <h4 className="font-bold mb-2">PATIENT INFORMATION</h4>
@@ -218,7 +267,7 @@ export default function DetailedServiceBill({
       </div>
 
       {/* Print Styles */}
-      <style jsx>{`
+      <style>{`
         @media print {
           @page {
             margin: 0.5in;
