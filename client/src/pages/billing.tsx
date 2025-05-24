@@ -671,8 +671,14 @@ export default function BillingPage() {
                           Mark Paid
                         </Button>
                       )}
-                      <Button variant="ghost" size="sm">
-                        View Details
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handlePrintInvoice(record)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        <Printer className="w-4 h-4 mr-1" />
+                        Print Invoice
                       </Button>
                     </div>
                   </TableCell>
@@ -682,6 +688,16 @@ export default function BillingPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Itemized Bill Modal */}
+      {selectedBilling && selectedPatient && (
+        <ItemizedBillModal
+          open={showItemizedBillModal}
+          onOpenChange={setShowItemizedBillModal}
+          billing={selectedBilling}
+          patient={selectedPatient}
+        />
+      )}
     </div>
   );
 }
