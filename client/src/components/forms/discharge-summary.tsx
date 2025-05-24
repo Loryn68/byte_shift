@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import type { Patient } from "@shared/schema";
+import logoPath from "@assets/image_1748113978202.png";
 
 interface DischargeSummaryProps {
   patient: Patient;
@@ -60,9 +61,12 @@ export default function DischargeSummary({
       <div className="p-8 max-w-4xl mx-auto print:p-4 print:max-w-none">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">CHILD MENTAL HAVEN</h1>
-            <h2 className="text-sm font-bold mb-4">COMPREHENSIVE MENTAL HEALTH / REHABILITATION INSTITUTION</h2>
+          <div className="flex items-start">
+            <img src={logoPath} alt="Child Mental Haven Logo" className="h-16 w-auto mr-4" />
+            <div>
+              <h1 className="text-3xl font-bold mb-2">CHILD MENTAL HAVEN</h1>
+              <h2 className="text-sm font-bold mb-4">COMPREHENSIVE MENTAL HEALTH / REHABILITATION INSTITUTION</h2>
+            </div>
           </div>
           <div className="text-right text-xs">
             <p>Northern Bypass Roysambu, Nairobi</p>

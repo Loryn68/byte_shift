@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Patient, Billing } from "@shared/schema";
+import logoPath from "@assets/image_1748113978202.png";
 
 interface ServiceItem {
   description: string;
@@ -72,6 +73,9 @@ export default function DetailedServiceBill({
       <div className="p-8 max-w-4xl mx-auto print:p-4 print:max-w-none font-mono text-sm">
         {/* Header */}
         <div className="text-center border-b-2 border-black pb-4 mb-6">
+          <div className="flex items-center justify-center mb-4">
+            <img src={logoPath} alt="Child Mental Haven Logo" className="h-16 w-auto" />
+          </div>
           <h1 className="text-2xl font-bold mb-1">CHILD MENTAL HAVEN</h1>
           <h2 className="text-lg font-bold mb-3">COMPREHENSIVE MENTAL HEALTH / REHABILITATION</h2>
           

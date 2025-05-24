@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import type { Patient, Prescription, Medication } from "@shared/schema";
+import logoPath from "@assets/image_1748113978202.png";
 
 interface PrescriptionFormProps {
   patient: Patient;
@@ -48,6 +49,9 @@ export default function PrescriptionForm({
       <div className="p-8 max-w-4xl mx-auto print:p-4 print:max-w-none">
         {/* Header */}
         <div className="text-center border-b-2 border-blue-600 pb-4 mb-6">
+          <div className="flex items-center justify-center mb-4">
+            <img src={logoPath} alt="Child Mental Haven Logo" className="h-16 w-auto" />
+          </div>
           <h1 className="text-3xl font-bold text-blue-800 mb-2">CHILD MENTAL HAVEN</h1>
           <h2 className="text-lg font-semibold mb-2">COMPREHENSIVE MENTAL HEALTH / REHABILITATION</h2>
           <div className="text-sm">
