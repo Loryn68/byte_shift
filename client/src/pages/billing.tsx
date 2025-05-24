@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,9 +40,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Search, Filter, DollarSign, CreditCard, Loader2, Receipt } from "lucide-react";
+import { FileText, Search, Filter, DollarSign, CreditCard, Loader2, Receipt, Printer } from "lucide-react";
 import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import ItemizedBillModal from "@/components/invoice/itemized-bill-modal";
 import type { Billing, Patient, Appointment } from "@shared/schema";
 
 const billingFormSchema = insertBillingSchema.extend({
@@ -53,6 +54,9 @@ type BillingFormData = z.infer<typeof billingFormSchema>;
 
 export default function BillingPage() {
   const [showBillingModal, setShowBillingModal] = useState(false);
+  const [showItemizedBillModal, setShowItemizedBillModal] = useState(false);
+  const [selectedBilling, setSelectedBilling] = useState<Billing | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("bills");
@@ -175,6 +179,21 @@ export default function BillingPage() {
     return patient ? `${patient.firstName} ${patient.lastName}` : "Unknown Patient";
   };
 
+  const handlePrintInvoice = (billing: Billing) => {
+    const patient = patients.find((p: Patient) => p.id === billing.patientId);
+    if (patient) {
+      setSelectedBilling(billing);
+      setSelectedPatient(patient);
+      setShowItemizedBillModal(true);
+    } else {
+      toast({
+        title: "Error",
+        description: "Patient information not found.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getTotalRevenue = () => {
     return billingRecords
       .filter((record: Billing) => record.paymentStatus === "paid")
@@ -290,7 +309,7 @@ export default function BillingPage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="">No appointment</SelectItem>
+                              <SelectItem value="none">No appointment</SelectItem>
                               {appointments.map((appointment: Appointment) => (
                                 <SelectItem key={appointment.id} value={appointment.id.toString()}>
                                   {appointment.appointmentId} - {appointment.department}
