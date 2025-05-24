@@ -13,6 +13,7 @@ import Appointments from "@/pages/appointments";
 import Laboratory from "@/pages/laboratory";
 import Pharmacy from "@/pages/pharmacy";
 import Billing from "@/pages/billing";
+import ProfessionalBilling from "@/pages/professional-billing";
 import Reports from "@/pages/reports";
 import NotFound from "@/pages/not-found";
 
@@ -36,6 +37,7 @@ function Router() {
             <Route path="/pharmacy" component={Pharmacy} />
             <Route path="/radiology" component={Laboratory} />
             <Route path="/billing" component={Billing} />
+            <Route path="/professional-billing" component={ProfessionalBilling} />
             <Route path="/insurance" component={Billing} />
             <Route path="/reports" component={Reports} />
             <Route path="/analytics" component={Reports} />

@@ -91,6 +91,11 @@ const navigationItems = [
         icon: FileText
       },
       {
+        title: "Professional Billing",
+        href: "/professional-billing",
+        icon: FileText
+      },
+      {
         title: "Insurance Management",
         href: "/insurance",
         icon: Shield
