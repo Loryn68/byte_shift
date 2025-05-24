@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Printer, Download } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Patient, Billing } from "@shared/schema";
 import logoPath from "@assets/image_1748113978202.png";
@@ -28,6 +28,18 @@ export default function DetailedServiceBill({
 }: DetailedServiceBillProps) {
   const printBill = () => {
     window.print();
+  };
+
+  const downloadBill = () => {
+    const element = document.createElement('a');
+    const filename = `Service_Bill_${patient.patientId}_${new Date().toISOString().split('T')[0]}.html`;
+    const content = document.documentElement.outerHTML;
+    const file = new Blob([content], { type: 'text/html' });
+    element.href = URL.createObjectURL(file);
+    element.download = filename;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   // Group billing records by date
@@ -61,11 +73,15 @@ export default function DetailedServiceBill({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Print Button - Hidden in print */}
-      <div className="p-4 print:hidden">
+      {/* Print & Download Buttons - Hidden in print */}
+      <div className="p-4 print:hidden flex gap-2">
         <Button onClick={printBill} className="mb-4">
           <Printer className="w-4 h-4 mr-2" />
           Print Bill
+        </Button>
+        <Button onClick={downloadBill} variant="outline" className="mb-4">
+          <Download className="w-4 h-4 mr-2" />
+          Download Bill
         </Button>
       </div>
 

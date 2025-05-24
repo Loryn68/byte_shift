@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Printer, Download } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import type { Patient, Prescription, Medication } from "@shared/schema";
 import logoPath from "@assets/image_1748113978202.png";
@@ -24,6 +24,18 @@ export default function PrescriptionForm({
     window.print();
   };
 
+  const downloadPrescription = () => {
+    const element = document.createElement('a');
+    const filename = `Prescription_${patient.patientId}_${new Date().toISOString().split('T')[0]}.html`;
+    const content = document.documentElement.outerHTML;
+    const file = new Blob([content], { type: 'text/html' });
+    element.href = URL.createObjectURL(file);
+    element.download = filename;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
   const calculateAge = (birthDate: string) => {
     const today = new Date();
     const birth = new Date(birthDate);
@@ -37,11 +49,15 @@ export default function PrescriptionForm({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Print Button - Hidden in print */}
-      <div className="p-4 print:hidden">
+      {/* Print & Download Buttons - Hidden in print */}
+      <div className="p-4 print:hidden flex gap-2">
         <Button onClick={printPrescription} className="mb-4">
           <Printer className="w-4 h-4 mr-2" />
           Print Prescription
+        </Button>
+        <Button onClick={downloadPrescription} variant="outline" className="mb-4">
+          <Download className="w-4 h-4 mr-2" />
+          Download Prescription
         </Button>
       </div>
 
