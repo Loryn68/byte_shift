@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Search, RotateCcw, RefreshCw, Edit } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { workflowManager } from "@/lib/workflow-system";
@@ -37,6 +38,8 @@ type RegistrationData = z.infer<typeof registrationSchema>;
 
 export default function PatientRegistration() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showPatientList, setShowPatientList] = useState(false);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -108,6 +111,81 @@ export default function PatientRegistration() {
     queryKey: ["/api/patients"],
   });
 
+  // Search function
+  const handleSearch = () => {
+    const query = searchQuery.toLowerCase();
+    return (registeredPatients as Patient[])
+      .filter((patient: Patient) => 
+        patient.lastName.toLowerCase().includes(query) ||
+        patient.patientId.toLowerCase().includes(query) ||
+        patient.phone.includes(query) ||
+        patient.nationalId?.includes(query)
+      )
+      .sort((a, b) => a.lastName.localeCompare(b.lastName));
+  };
+
+  // Capitalize input function
+  const capitalizeInput = (value: string) => {
+    return value.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+  };
+
+  // Update patient mutation
+  const updatePatientMutation = useMutation({
+    mutationFn: async (data: { id: number; patient: Partial<Patient> }) => {
+      return await apiRequest("PUT", `/api/patients/${data.id}`, data.patient);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Patient Updated",
+        description: "Patient record has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+      setEditingPatient(null);
+      form.reset();
+    },
+  });
+
+  // Load patient for editing
+  const loadPatientForEdit = (patient: Patient) => {
+    setEditingPatient(patient);
+    form.reset({
+      firstName: patient.firstName,
+      middleName: patient.middleName || "",
+      lastName: patient.lastName,
+      phone: patient.phone,
+      nationalId: patient.nationalId || "",
+      dateOfBirth: patient.dateOfBirth,
+      gender: patient.gender,
+      emergencyContactName: patient.emergencyContactName,
+      emergencyContactPhone: patient.emergencyContactPhone,
+      emergencyContactRelationship: patient.emergencyContactRelationship || "",
+      occupation: patient.occupation || "",
+      address: patient.address,
+      registerFor: "outpatient",
+      patientCategory: "self-pay",
+      paymentOption: "cash",
+      referralSource: "walk-in",
+    });
+  };
+
+  // Reset form
+  const resetForm = () => {
+    form.reset();
+    setEditingPatient(null);
+    setSearchQuery("");
+  };
+
+  // Refresh data
+  const refreshData = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+    toast({
+      title: "Data Refreshed",
+      description: "Patient list has been refreshed.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       {/* Header Section */}
@@ -138,29 +216,37 @@ export default function PatientRegistration() {
         {/* Left Sidebar */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <div className="space-y-2">
-            <h3 className="font-semibold text-center bg-orange-200 p-2 rounded">Registration</h3>
-            <div className="bg-orange-100 p-2 rounded text-center">
-              <div className="text-sm font-medium">Registry</div>
-            </div>
-            <div className="bg-gray-100 p-2 rounded text-center text-sm hover:bg-gray-200 cursor-pointer">Summary- View 1</div>
-            <div className="bg-gray-100 p-2 rounded text-center text-sm hover:bg-gray-200 cursor-pointer">Summary- View 2</div>
+            <h3 className="font-semibold text-center bg-orange-200 p-2 rounded">Registry</h3>
           </div>
           
           {/* Patient List */}
           <div className="mt-6">
-            <h4 className="font-medium mb-3 bg-yellow-100 p-2 rounded text-center">Load List of Registered Patients</h4>
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-2 text-xs font-medium bg-gray-50 p-2">
-                <span>OP. No.</span>
-                <span>Patient Name</span>
-              </div>
-              {registeredPatients.slice(0, 10).map((patient: Patient) => (
-                <div key={patient.id} className="grid grid-cols-2 gap-2 text-xs p-2 border rounded hover:bg-blue-50 cursor-pointer">
-                  <span className="font-medium">{patient.patientId}</span>
-                  <span>{patient.firstName} {patient.lastName}</span>
+            <Button 
+              onClick={() => setShowPatientList(!showPatientList)}
+              className="w-full mb-3 bg-yellow-500 hover:bg-yellow-600 text-black font-medium"
+            >
+              Load List of Registered Patients
+            </Button>
+            
+            {showPatientList && (
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                <div className="grid grid-cols-2 gap-2 text-xs font-medium bg-gray-50 p-2">
+                  <span>OP. No.</span>
+                  <span>Patient Name</span>
                 </div>
-              ))}
-            </div>
+                {(searchQuery ? handleSearch() : (registeredPatients as Patient[]).sort((a, b) => a.lastName.localeCompare(b.lastName)))
+                  .map((patient: Patient) => (
+                    <div 
+                      key={patient.id} 
+                      className="grid grid-cols-2 gap-2 text-xs p-2 border rounded hover:bg-blue-50 cursor-pointer"
+                      onClick={() => loadPatientForEdit(patient)}
+                    >
+                      <span className="font-medium">{patient.patientId}</span>
+                      <span>{patient.firstName} {patient.lastName}</span>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -174,11 +260,19 @@ export default function PatientRegistration() {
             <div className="flex gap-2 mt-2">
               <Input 
                 className="flex-1" 
-                placeholder="Search..." 
+                placeholder="Search by Surname/ID/Tel/OP-No..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Button variant="outline" size="sm">Search</Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowPatientList(true)}
+                className="bg-blue-600 text-white hover:bg-blue-700"
+              >
+                <Search className="w-4 h-4 mr-1" />
+                Search
+              </Button>
             </div>
           </div>
 
@@ -229,7 +323,12 @@ export default function PatientRegistration() {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input {...field} className="mt-1" required />
+                            <Input 
+                              {...field} 
+                              className="mt-1" 
+                              required 
+                              onChange={(e) => field.onChange(capitalizeInput(e.target.value))}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -244,7 +343,12 @@ export default function PatientRegistration() {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input {...field} className="mt-1" required />
+                            <Input 
+                              {...field} 
+                              className="mt-1" 
+                              required 
+                              onChange={(e) => field.onChange(capitalizeInput(e.target.value))}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
