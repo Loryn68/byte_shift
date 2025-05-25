@@ -81,23 +81,15 @@ export default function PatientRegistration() {
         isActive: true,
       };
       
-      // Use workflow manager to register patient with episode
-      const episodeType = data.registerFor === 'emergency' ? 'emergency' : 
-                         data.registerFor === 'inpatient' ? 'inpatient' : 'outpatient';
-      
-      return await workflowManager.registerPatientWithEpisode(patientData, episodeType);
+      return apiRequest("POST", "/api/patients", patientData);
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       toast({
         title: "Registration Successful",
-        description: `Patient registered with Episode: ${result.episode.episodeNumber}. ${result.nextStep}`,
+        description: "Patient registered successfully. Ready for consultation billing.",
       });
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
-      
-      // Show payment prompt
-      setShowPaymentModal(true);
-      setCurrentEpisode(result.episode);
     },
     onError: () => {
       toast({
