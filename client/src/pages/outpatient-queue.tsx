@@ -152,17 +152,30 @@ export default function OutpatientQueue() {
     createConsultationBillMutation.mutate(patient.id);
   };
 
-  const handleMarkPaid = (patient: Patient, paymentMethod: string) => {
-    const bill = billingRecords.find((bill: Billing) => 
+  const handleMarkPaid = (patient: Patient, method: string, amount?: string, transactionRef?: string) => {
+    const consultationBill = billingRecords.find((bill: Billing) => 
       bill.patientId === patient.id && 
-      bill.serviceType === "Consultation" &&
+      bill.serviceType === "Consultation" && 
       bill.paymentStatus === "pending"
     );
-    
-    if (bill) {
-      updatePaymentMutation.mutate({ billId: bill.id, paymentMethod });
+
+    if (consultationBill) {
+      updatePaymentMutation.mutate({ 
+        billId: consultationBill.id, 
+        paymentMethod: method,
+        amountPaid: amount,
+        transactionRef: transactionRef
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "No pending consultation bill found for this patient.",
+        variant: "destructive"
+      });
     }
   };
+
+
 
   const readyForDoctorPatients = filteredPatients.filter((p: Patient) => getPatientStatus(p) === "ready-for-doctor");
   const paymentPendingPatients = filteredPatients.filter((p: Patient) => getPatientStatus(p) === "payment-pending");
