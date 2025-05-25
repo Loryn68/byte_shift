@@ -51,6 +51,11 @@ import { formatDateTime, calculateAge } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { Patient, Billing, Prescription, LabTest, Medication } from "@shared/schema";
+import ClinicalSummary from "@/components/forms/clinical-summary";
+import MedicalReport from "@/components/forms/medical-report";
+import LabRequest from "@/components/forms/lab-request";
+import DischargeSummary from "@/components/forms/discharge-summary";
+import PrescriptionForm from "@/components/forms/prescription-form";
 
 const medicalReportSchema = z.object({
   patientId: z.number(),
@@ -71,6 +76,11 @@ export default function DoctorPortal() {
   const [showConsultationModal, setShowConsultationModal] = useState(false);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [showLabTestModal, setShowLabTestModal] = useState(false);
+  const [showClinicalSummary, setShowClinicalSummary] = useState(false);
+  const [showMedicalReport, setShowMedicalReport] = useState(false);
+  const [showLabRequest, setShowLabRequest] = useState(false);
+  const [showDischargeSummary, setShowDischargeSummary] = useState(false);
+  const [showPrescriptionForm, setShowPrescriptionForm] = useState(false);
   const [medicalReport, setMedicalReport] = useState<MedicalReportData | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -447,7 +457,7 @@ export default function DoctorPortal() {
               />
 
               {/* Quick Actions */}
-              <div className="flex space-x-4">
+              <div className="grid grid-cols-2 gap-4">
                 <Button
                   type="button"
                   variant="outline"
@@ -460,10 +470,46 @@ export default function DoctorPortal() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setShowLabTestModal(true)}
+                  onClick={() => setShowLabRequest(true)}
                 >
                   <FlaskConical className="w-4 h-4 mr-1" />
                   Order Lab Test
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowClinicalSummary(true)}
+                >
+                  <ClipboardList className="w-4 h-4 mr-1" />
+                  Clinical Summary
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowMedicalReport(true)}
+                >
+                  <FileText className="w-4 h-4 mr-1" />
+                  Medical Report
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowDischargeSummary(true)}
+                >
+                  <Stethoscope className="w-4 h-4 mr-1" />
+                  Discharge Summary
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowPrescriptionForm(true)}
+                >
+                  <Printer className="w-4 h-4 mr-1" />
+                  Prescription Form
                 </Button>
               </div>
 
@@ -647,6 +693,87 @@ export default function DoctorPortal() {
                 <p>Child Mental Haven - Comprehensive Mental Health Services</p>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clinical Summary Dialog */}
+      {showClinicalSummary && selectedPatient && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Clinical Summary - {selectedPatient.firstName} {selectedPatient.lastName}</h2>
+              <Button variant="ghost" onClick={() => setShowClinicalSummary(false)}>✕</Button>
+            </div>
+            <ClinicalSummary 
+              patient={selectedPatient}
+              doctorName="Dr. Medical Officer"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Medical Report Dialog */}
+      {showMedicalReport && selectedPatient && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Medical Report - {selectedPatient.firstName} {selectedPatient.lastName}</h2>
+              <Button variant="ghost" onClick={() => setShowMedicalReport(false)}>✕</Button>
+            </div>
+            <MedicalReport 
+              patient={selectedPatient}
+              doctorName="Dr. Medical Officer"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Lab Request Dialog */}
+      {showLabRequest && selectedPatient && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Laboratory Request - {selectedPatient.firstName} {selectedPatient.lastName}</h2>
+              <Button variant="ghost" onClick={() => setShowLabRequest(false)}>✕</Button>
+            </div>
+            <LabRequest 
+              patient={selectedPatient}
+              doctorName="Dr. Medical Officer"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Discharge Summary Dialog */}
+      {showDischargeSummary && selectedPatient && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Discharge Summary - {selectedPatient.firstName} {selectedPatient.lastName}</h2>
+              <Button variant="ghost" onClick={() => setShowDischargeSummary(false)}>✕</Button>
+            </div>
+            <DischargeSummary 
+              patient={selectedPatient}
+              doctorName="Dr. Medical Officer"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Prescription Form Dialog */}
+      {showPrescriptionForm && selectedPatient && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Prescription Form - {selectedPatient.firstName} {selectedPatient.lastName}</h2>
+              <Button variant="ghost" onClick={() => setShowPrescriptionForm(false)}>✕</Button>
+            </div>
+            <PrescriptionForm 
+              patient={selectedPatient}
+              doctorName="Dr. Medical Officer"
+              medications={[]}
+            />
           </div>
         </div>
       )}
