@@ -99,7 +99,7 @@ export default function RecentPatients({ patients, loading }: RecentPatientsProp
             {patients.map((patient) => {
               const initials = getPatientInitials(patient.firstName, patient.lastName);
               const age = getPatientAge(patient.dateOfBirth);
-              const timeAgo = getTimeAgo(patient.registrationDate);
+              const timeAgo = getTimeAgo(new Date(patient.registrationDate));
               
               // Generate a color based on patient ID for consistent avatar colors
               const colors = [
