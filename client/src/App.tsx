@@ -7,6 +7,7 @@ import Header from "@/components/layout/header";
 import Sidebar from "@/components/layout/sidebar";
 import Dashboard from "@/pages/dashboard";
 import PatientRegistration from "@/pages/patient-registration-new";
+import PatientFlowDashboard from "@/pages/patient-flow-dashboard";
 import OutpatientQueue from "@/pages/outpatient-queue";
 import DoctorPortal from "@/pages/doctor-portal";
 import Appointments from "@/pages/appointments";
@@ -28,6 +29,7 @@ function Router() {
             <Route path="/" component={Dashboard} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/patient-registration" component={PatientRegistration} />
+            <Route path="/patient-flow" component={PatientFlowDashboard} />
             <Route path="/outpatient-queue" component={OutpatientQueue} />
             <Route path="/doctor-portal" component={DoctorPortal} />
             <Route path="/appointments" component={Appointments} />

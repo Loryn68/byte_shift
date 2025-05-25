@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { workflowManager } from "@/lib/workflow-system";
 import logoPath from "@assets/image_1748113978202.png";
 import type { Patient } from "@shared/schema";
 
@@ -79,20 +80,29 @@ export default function PatientRegistration() {
         policyNumber: null,
         isActive: true,
       };
-      return apiRequest("POST", "/api/patients", patientData);
+      
+      // Use workflow manager to register patient with episode
+      const episodeType = data.registerFor === 'emergency' ? 'emergency' : 
+                         data.registerFor === 'inpatient' ? 'inpatient' : 'outpatient';
+      
+      return await workflowManager.registerPatientWithEpisode(patientData, episodeType);
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       toast({
-        title: "Success",
-        description: "Patient registered successfully",
+        title: "Registration Successful",
+        description: `Patient registered with Episode: ${result.episode.episodeNumber}. ${result.nextStep}`,
       });
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+      
+      // Show payment prompt
+      setShowPaymentModal(true);
+      setCurrentEpisode(result.episode);
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to register patient",
+        title: "Registration Failed",
+        description: "Unable to register patient. Please try again.",
         variant: "destructive",
       });
     },
