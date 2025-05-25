@@ -37,6 +37,10 @@ export default function OutpatientQueue() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [amountPaid, setAmountPaid] = useState("");
+  const [transactionRef, setTransactionRef] = useState("");
+  const [changeAmount, setChangeAmount] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -76,20 +80,31 @@ export default function OutpatientQueue() {
   });
 
   const updatePaymentMutation = useMutation({
-    mutationFn: async ({ billId, paymentMethod }: { billId: number; paymentMethod: string }) => {
+    mutationFn: async ({ billId, paymentMethod, amountPaid, transactionRef }: { 
+      billId: number; 
+      paymentMethod: string; 
+      amountPaid?: string; 
+      transactionRef?: string; 
+    }) => {
       return await apiRequest("PUT", `/api/billing/${billId}`, {
         paymentStatus: "paid",
         paymentMethod,
-        paymentDate: new Date()
+        transactionReference: transactionRef || "",
+        notes: `Payment received: Kshs.${amountPaid || "50.00"} via ${paymentMethod}${transactionRef ? ` (Ref: ${transactionRef})` : ""}`,
+        paymentDate: new Date().toISOString()
       });
     },
     onSuccess: () => {
       toast({
-        title: "Payment Recorded",
+        title: "Payment Recorded Successfully",
         description: "Patient can now proceed to doctor consultation.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/billing"] });
       setShowPaymentModal(false);
+      setPaymentMethod("");
+      setAmountPaid("");
+      setTransactionRef("");
+      setChangeAmount(0);
     },
   });
 
@@ -308,23 +323,172 @@ export default function OutpatientQueue() {
                                 Record Payment
                               </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="max-w-lg">
                               <DialogHeader>
                                 <DialogTitle>Record Payment - {selectedPatient?.firstName} {selectedPatient?.lastName}</DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4">
-                                <p>Consultation Fee: {formatCurrency(50)}</p>
-                                <div className="flex space-x-2">
-                                  <Button onClick={() => handleMarkPaid(selectedPatient!, "cash")}>
-                                    Cash Payment
-                                  </Button>
-                                  <Button onClick={() => handleMarkPaid(selectedPatient!, "card")}>
-                                    Card Payment
-                                  </Button>
-                                  <Button onClick={() => handleMarkPaid(selectedPatient!, "mobile")}>
-                                    Mobile Payment
-                                  </Button>
+                                <div className="text-center bg-blue-50 p-4 rounded-lg">
+                                  <p className="text-lg font-semibold text-blue-600">
+                                    Consultation Fee: Kshs.50.00
+                                  </p>
                                 </div>
+                                
+                                {!paymentMethod ? (
+                                  <div className="grid grid-cols-1 gap-3">
+                                    <Button 
+                                      className="w-full bg-green-600 hover:bg-green-700 h-12 text-white" 
+                                      onClick={() => setPaymentMethod("cash")}
+                                    >
+                                      <DollarSign className="h-5 w-5 mr-2" />
+                                      Cash Payment
+                                    </Button>
+                                    <Button 
+                                      className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-white" 
+                                      onClick={() => setPaymentMethod("card")}
+                                    >
+                                      <CheckCircle className="h-5 w-5 mr-2" />
+                                      Card Payment
+                                    </Button>
+                                    <Button 
+                                      className="w-full bg-purple-600 hover:bg-purple-700 h-12 text-white" 
+                                      onClick={() => setPaymentMethod("mobile")}
+                                    >
+                                      <UserCheck className="h-5 w-5 mr-2" />
+                                      Mobile Payment (M-Pesa)
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                      <h3 className="font-semibold capitalize">{paymentMethod} Payment</h3>
+                                      <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={() => {
+                                          setPaymentMethod("");
+                                          setAmountPaid("");
+                                          setTransactionRef("");
+                                          setChangeAmount(0);
+                                        }}
+                                      >
+                                        Change Method
+                                      </Button>
+                                    </div>
+                                    
+                                    {paymentMethod === "cash" && (
+                                      <div className="space-y-3">
+                                        <div>
+                                          <label className="text-sm font-medium">Amount Received (Kshs.)</label>
+                                          <Input
+                                            type="number"
+                                            placeholder="Enter amount received"
+                                            value={amountPaid}
+                                            onChange={(e) => {
+                                              const paid = parseFloat(e.target.value) || 0;
+                                              setAmountPaid(e.target.value);
+                                              setChangeAmount(paid - 50);
+                                            }}
+                                            className="mt-1"
+                                          />
+                                        </div>
+                                        {amountPaid && (
+                                          <div className="bg-yellow-50 p-3 rounded-lg border">
+                                            <div className="flex justify-between text-sm">
+                                              <span>Bill Amount:</span>
+                                              <span>Kshs.50.00</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                              <span>Amount Paid:</span>
+                                              <span>Kshs.{amountPaid}</span>
+                                            </div>
+                                            <hr className="my-2" />
+                                            <div className="flex justify-between font-semibold">
+                                              <span>Change:</span>
+                                              <span className={changeAmount < 0 ? "text-red-600" : "text-green-600"}>
+                                                Kshs.{changeAmount.toFixed(2)}
+                                              </span>
+                                            </div>
+                                            {changeAmount < 0 && (
+                                              <p className="text-red-600 text-xs mt-1 font-medium">
+                                                ⚠️ Insufficient payment. Balance: Kshs.{Math.abs(changeAmount).toFixed(2)}
+                                              </p>
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                    
+                                    {(paymentMethod === "mobile" || paymentMethod === "card") && (
+                                      <div className="space-y-3">
+                                        <div>
+                                          <label className="text-sm font-medium">Amount Paid (Kshs.)</label>
+                                          <Input
+                                            type="number"
+                                            placeholder="Enter exact amount: 50.00"
+                                            value={amountPaid}
+                                            onChange={(e) => setAmountPaid(e.target.value)}
+                                            className="mt-1"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-sm font-medium">
+                                            {paymentMethod === "mobile" ? "M-Pesa Transaction Code" : "Card Transaction Reference"}
+                                          </label>
+                                          <Input
+                                            placeholder={paymentMethod === "mobile" ? "e.g. QA12B3CD45" : "e.g. AUTH123456"}
+                                            value={transactionRef}
+                                            onChange={(e) => setTransactionRef(e.target.value)}
+                                            className="mt-1"
+                                            required
+                                          />
+                                        </div>
+                                        {amountPaid && parseFloat(amountPaid) !== 50 && (
+                                          <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                                            <p className="text-red-600 text-sm font-medium">
+                                              ⚠️ Amount must be exactly Kshs.50.00 for consultation fee
+                                            </p>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                    
+                                    <div className="flex space-x-2 pt-4">
+                                      <Button 
+                                        onClick={() => {
+                                          setShowPaymentModal(false);
+                                          setPaymentMethod("");
+                                          setAmountPaid("");
+                                          setTransactionRef("");
+                                          setChangeAmount(0);
+                                        }}
+                                        variant="outline" 
+                                        className="flex-1"
+                                      >
+                                        Cancel
+                                      </Button>
+                                      <Button 
+                                        onClick={() => {
+                                          if (paymentMethod === "cash" && changeAmount >= 0) {
+                                            handleMarkPaid(selectedPatient!, paymentMethod, amountPaid, transactionRef);
+                                          } else if ((paymentMethod === "mobile" || paymentMethod === "card") && 
+                                                   parseFloat(amountPaid) === 50 && transactionRef) {
+                                            handleMarkPaid(selectedPatient!, paymentMethod, amountPaid, transactionRef);
+                                          }
+                                        }}
+                                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                                        disabled={
+                                          !amountPaid || 
+                                          (paymentMethod === "cash" && changeAmount < 0) ||
+                                          ((paymentMethod === "mobile" || paymentMethod === "card") && 
+                                           (!transactionRef || parseFloat(amountPaid) !== 50))
+                                        }
+                                      >
+                                        Complete Payment
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </DialogContent>
                           </Dialog>
