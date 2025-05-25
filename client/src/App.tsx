@@ -6,7 +6,7 @@ import { queryClient } from "./lib/queryClient";
 import Header from "@/components/layout/header";
 import Sidebar from "@/components/layout/sidebar";
 import Dashboard from "@/pages/dashboard";
-import PatientRegistration from "@/pages/patient-registration";
+import PatientRegistration from "@/pages/patient-registration-new";
 import OutpatientQueue from "@/pages/outpatient-queue";
 import DoctorPortal from "@/pages/doctor-portal";
 import Appointments from "@/pages/appointments";

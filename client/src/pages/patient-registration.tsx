@@ -1,23 +1,43 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { UserPlus, Search, Filter, Download } from "lucide-react";
-import PatientRegistrationModal from "@/components/modals/patient-registration-modal";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import logoPath from "@assets/image_1748113978202.png";
 import type { Patient } from "@shared/schema";
 
+const registrationSchema = z.object({
+  firstName: z.string().min(1, "Baptismal name is required"),
+  middleName: z.string().min(1, "Other name is required"),
+  lastName: z.string().min(1, "Surname is required"),
+  phone: z.string().min(1, "Phone number is required"),
+  nationalId: z.string().min(1, "ID number is required"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  gender: z.string().min(1, "Gender is required"),
+  emergencyContactName: z.string().min(1, "Next of kin name is required"),
+  emergencyContactPhone: z.string().min(1, "Next of kin phone is required"),
+  emergencyContactRelationship: z.string().min(1, "Relationship is required"),
+  occupation: z.string().min(1, "Occupation is required"),
+  address: z.string().min(1, "Residence is required"),
+  registerFor: z.string().min(1, "Registration type is required"),
+  patientCategory: z.string().min(1, "Patient category is required"),
+  paymentOption: z.string().min(1, "Payment option is required"),
+  referralSource: z.string().min(1, "Referral source is required"),
+});
+
+type RegistrationData = z.infer<typeof registrationSchema>;
+
 export default function PatientRegistration() {
-  const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: patients = [], isLoading } = useQuery({
     queryKey: ["/api/patients", searchQuery],
