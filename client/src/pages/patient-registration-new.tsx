@@ -363,7 +363,12 @@ export default function PatientRegistration() {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input {...field} className="mt-1" required />
+                            <Input 
+                              {...field} 
+                              className="mt-1" 
+                              required 
+                              onChange={(e) => field.onChange(capitalizeInput(e.target.value))}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -653,31 +658,32 @@ export default function PatientRegistration() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
+                {/* Essential Action Buttons */}
                 <div className="flex justify-center gap-4 pt-6 border-t">
                   <Button 
                     type="submit" 
                     disabled={createPatientMutation.isPending} 
-                    className="bg-gray-200 text-black hover:bg-gray-300 px-6"
+                    className="bg-green-600 text-white hover:bg-green-700 px-6"
                   >
-                    {createPatientMutation.isPending ? "Registering..." : "Register Patient"}
-                  </Button>
-                  <Button type="button" variant="outline" className="bg-gray-200 text-black hover:bg-gray-300 px-6">
-                    Update Record
+                    {editingPatient ? (updatePatientMutation.isPending ? "Updating..." : "Update Record") : (createPatientMutation.isPending ? "Registering..." : "Register Patient")}
                   </Button>
                   <Button 
                     type="button" 
                     variant="outline" 
-                    className="bg-gray-200 text-black hover:bg-gray-300 px-6" 
-                    onClick={() => form.reset()}
+                    className="bg-blue-600 text-white hover:bg-blue-700 px-6" 
+                    onClick={resetForm}
                   >
+                    <RotateCcw className="w-4 h-4 mr-1" />
                     Reset Form
                   </Button>
-                  <Button type="button" variant="outline" className="bg-gray-200 text-black hover:bg-gray-300 px-6">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="bg-purple-600 text-white hover:bg-purple-700 px-6"
+                    onClick={refreshData}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-1" />
                     Refresh
-                  </Button>
-                  <Button type="button" variant="outline" className="bg-gray-200 text-black hover:bg-gray-300 px-6">
-                    Close Form
                   </Button>
                 </div>
               </form>
