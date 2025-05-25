@@ -89,9 +89,7 @@ export default function OutpatientQueue() {
       return await apiRequest("PUT", `/api/billing/${billId}`, {
         paymentStatus: "paid",
         paymentMethod,
-        transactionReference: transactionRef || "",
-        notes: `Payment received: Kshs.${amountPaid || "50.00"} via ${paymentMethod}${transactionRef ? ` (Ref: ${transactionRef})` : ""}`,
-        paymentDate: new Date().toISOString()
+        notes: `Payment received: Kshs.${amountPaid || "50.00"} via ${paymentMethod}${transactionRef ? ` (Ref: ${transactionRef})` : ""}`
       });
     },
     onSuccess: () => {
