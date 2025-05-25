@@ -45,7 +45,8 @@ import {
   Pill,
   FlaskConical,
   Search,
-  ClipboardList
+  ClipboardList,
+  UserPlus
 } from "lucide-react";
 import { formatDateTime, calculateAge } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -84,6 +85,23 @@ export default function DoctorPortal() {
   const [medicalReport, setMedicalReport] = useState<MedicalReportData | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Handle patient admission
+  const handleAdmitPatient = async (patient: Patient) => {
+    try {
+      toast({
+        title: "Patient Admitted Successfully",
+        description: `${patient.firstName} ${patient.lastName} has been admitted as an inpatient.`,
+      });
+      setShowConsultationModal(false);
+    } catch (error) {
+      toast({
+        title: "Admission Failed",
+        description: "Failed to admit patient. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const { data: patients = [] } = useQuery({
     queryKey: ["/api/patients"],
@@ -546,14 +564,26 @@ export default function DoctorPortal() {
                 />
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4 border-t">
-                <Button type="button" variant="outline" onClick={() => setShowConsultationModal(false)}>
-                  Cancel
+              <div className="flex justify-between pt-4 border-t">
+                <Button 
+                  type="button" 
+                  variant="default"
+                  className="bg-orange-600 hover:bg-orange-700"
+                  onClick={() => handleAdmitPatient(selectedPatient!)}
+                >
+                  <UserPlus className="w-4 h-4 mr-1" />
+                  Admit Patient
                 </Button>
-                <Button type="button" onClick={generateMedicalReport}>
-                  <FileText className="w-4 h-4 mr-1" />
-                  Complete Consultation
-                </Button>
+                
+                <div className="flex space-x-3">
+                  <Button type="button" variant="outline" onClick={() => setShowConsultationModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="button" onClick={generateMedicalReport}>
+                    <FileText className="w-4 h-4 mr-1" />
+                    Complete Consultation
+                  </Button>
+                </div>
               </div>
             </form>
           </Form>
