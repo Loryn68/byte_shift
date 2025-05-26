@@ -26,7 +26,7 @@ const registrationSchema = z.object({
   emergencyContactName: z.string().min(1, "Next of kin name is required"),
   emergencyContactPhone: z.string().min(1, "Next of kin phone is required"),
   emergencyContactRelationship: z.string().min(1, "Relationship is required"),
-  occupation: z.string().min(1, "Occupation is required"),
+  occupation: z.string().optional(),
   address: z.string().min(1, "Residence is required"),
   registerFor: z.string().min(1, "Registration type is required"),
   patientCategory: z.string().min(1, "Patient category is required"),
@@ -499,14 +499,14 @@ export default function PatientRegistration() {
                       />
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Occupation: *</Label>
+                      <Label className="text-sm font-medium">Occupation:</Label>
                       <FormField
                         control={form.control}
                         name="occupation"
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input {...field} className="mt-1" required />
+                              <Input {...field} className="mt-1" placeholder="Enter occupation (optional)" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
