@@ -143,9 +143,8 @@ export default function PatientRegistration() {
           patientId: patient.id,
           serviceType: serviceDetails.name,
           serviceDescription: serviceDetails.name,
-          amount: serviceDetails.amount,
-          totalAmount: serviceDetails.amount,
-          paymentStatus: "pending"
+          amount: serviceDetails.amount.toFixed(2),
+          totalAmount: serviceDetails.amount.toFixed(2)
         };
         
         await apiRequest("POST", "/api/billing", billingData);
