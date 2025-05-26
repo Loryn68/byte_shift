@@ -29,12 +29,14 @@ function Router() {
             <Route path="/" component={Dashboard} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/patient-registration" component={PatientRegistration} />
+            <Route path="/cashier" component={ProfessionalBilling} />
+            <Route path="/triage" component={OutpatientQueue} />
+            <Route path="/outpatient" component={Appointments} />
+            <Route path="/inpatient" component={Appointments} />
             <Route path="/patient-flow" component={PatientFlowDashboard} />
             <Route path="/outpatient-queue" component={OutpatientQueue} />
             <Route path="/doctor-portal" component={DoctorPortal} />
             <Route path="/appointments" component={Appointments} />
-            <Route path="/outpatient" component={Appointments} />
-            <Route path="/inpatient" component={Appointments} />
             <Route path="/laboratory" component={Laboratory} />
             <Route path="/pharmacy" component={Pharmacy} />
             <Route path="/radiology" component={Laboratory} />

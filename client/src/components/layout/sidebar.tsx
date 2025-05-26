@@ -14,7 +14,8 @@ import {
   BarChart3,
   Activity,
   Users,
-  UserCheck
+  UserCheck,
+  CreditCard
 } from "lucide-react";
 
 const navigationItems = [
@@ -34,6 +35,26 @@ const navigationItems = [
         icon: UserPlus
       },
       {
+        title: "Cashier",
+        href: "/cashier",
+        icon: CreditCard
+      },
+      {
+        title: "Triage",
+        href: "/triage",
+        icon: Stethoscope
+      },
+      {
+        title: "Outpatient",
+        href: "/outpatient",
+        icon: UserCheck
+      },
+      {
+        title: "Inpatient",
+        href: "/inpatient",
+        icon: Bed
+      },
+      {
         title: "Outpatient Queue",
         href: "/outpatient-queue",
         icon: Users
@@ -47,16 +68,6 @@ const navigationItems = [
         title: "Appointments",
         href: "/appointments",
         icon: Calendar
-      },
-      {
-        title: "Outpatient Management",
-        href: "/outpatient",
-        icon: Stethoscope
-      },
-      {
-        title: "Inpatient Management",
-        href: "/inpatient",
-        icon: Bed
       }
     ]
   },
