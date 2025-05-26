@@ -194,19 +194,7 @@ export default function PatientRegistration() {
           <div className="flex items-center gap-4">
             <img src={logoPath} alt="Child Mental Haven Logo" className="h-12 w-12" />
             <div>
-              <h1 className="text-xl font-bold text-blue-800">CHILD MENTAL HAVEN (HEALTH CENTRE INFORMATION MANAGEMENT SYSTEM) - [PATIENTS REGISTRY]</h1>
-              <div className="flex items-center gap-6 mt-2 text-sm">
-                <span className="bg-blue-100 px-3 py-1 rounded font-medium">Registry</span>
-                <span className="bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 cursor-pointer">Triage</span>
-                <span className="bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 cursor-pointer">Cashier-OPD</span>
-                <span className="bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 cursor-pointer">IPD-Billing</span>
-                <span className="bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 cursor-pointer">Out-Patient</span>
-                <span className="bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 cursor-pointer">In-Patient</span>
-                <span className="bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 cursor-pointer">Laboratory</span>
-                <span className="bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 cursor-pointer">RX-OPD</span>
-                <span className="bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 cursor-pointer">Store</span>
-                <span className="bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 cursor-pointer">Patient History</span>
-              </div>
+              <h1 className="text-xl font-bold text-blue-800">CHILD MENTAL HAVEN - [PATIENTS REGISTRY]</h1>
             </div>
           </div>
         </div>
@@ -215,15 +203,11 @@ export default function PatientRegistration() {
       <div className="grid grid-cols-4 gap-4">
         {/* Left Sidebar */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
-          <div className="space-y-2">
-            <h3 className="font-semibold text-center bg-orange-200 p-2 rounded">Registry</h3>
-          </div>
-          
           {/* Patient List */}
-          <div className="mt-6">
+          <div className="mt-2">
             <Button 
               onClick={() => setShowPatientList(!showPatientList)}
-              className="w-full mb-3 bg-yellow-500 hover:bg-yellow-600 text-black font-medium"
+              className="w-full mb-3 bg-yellow-500 hover:bg-yellow-600 text-black font-medium text-sm px-2 py-2 h-auto"
             >
               Load List of Registered Patients
             </Button>
