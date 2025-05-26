@@ -19,9 +19,11 @@ export const users = pgTable("users", {
 // Patients table - central patient information
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
-  patientId: text("patient_id").notNull().unique(), // CH-YYYY-#### format
+  patientId: text("patient_id").notNull().unique(), // CMH-YYYYMMLLL### format
   firstName: text("first_name").notNull(),
+  middleName: text("middle_name"),
   lastName: text("last_name").notNull(),
+  nationalId: text("national_id"),
   dateOfBirth: date("date_of_birth").notNull(),
   gender: text("gender").notNull(), // male, female, other
   bloodType: text("blood_type"),
@@ -30,6 +32,8 @@ export const patients = pgTable("patients", {
   address: text("address").notNull(),
   emergencyContactName: text("emergency_contact_name").notNull(),
   emergencyContactPhone: text("emergency_contact_phone").notNull(),
+  emergencyContactRelationship: text("emergency_contact_relationship"),
+  occupation: text("occupation"),
   insuranceProvider: text("insurance_provider"),
   policyNumber: text("policy_number"),
   medicalHistory: text("medical_history"),

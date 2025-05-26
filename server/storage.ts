@@ -104,10 +104,27 @@ export class MemStorage implements IStorage {
     this.users.set(adminUser.id, adminUser);
   }
 
-  private generatePatientId(): string {
-    const year = new Date().getFullYear();
-    const id = String(this.currentPatientId).padStart(4, '0');
-    return `CH-${year}-${id}`;
+  private generatePatientId(firstName: string, middleName: string, lastName: string): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    
+    // Get first letters of names
+    const firstInitial = firstName.charAt(0).toUpperCase();
+    const middleInitial = middleName ? middleName.charAt(0).toUpperCase() : '';
+    const lastInitial = lastName.charAt(0).toUpperCase();
+    
+    // Count patients registered this month to get sequential number
+    const currentMonth = `${year}${month}`;
+    const patientsThisMonth = Array.from(this.patients.values()).filter(patient => {
+      const patientDate = new Date(patient.registrationDate);
+      const patientMonth = `${patientDate.getFullYear()}${String(patientDate.getMonth() + 1).padStart(2, '0')}`;
+      return patientMonth === currentMonth;
+    });
+    
+    const monthlySequence = String(patientsThisMonth.length + 1).padStart(3, '0');
+    
+    return `CMH-${year}${month}${firstInitial}${middleInitial}${lastInitial}${monthlySequence}`;
   }
 
   private generateAppointmentId(): string {
@@ -172,7 +189,7 @@ export class MemStorage implements IStorage {
     const patient: Patient = {
       ...insertPatient,
       id: this.currentPatientId,
-      patientId: this.generatePatientId(),
+      patientId: this.generatePatientId(insertPatient.firstName, insertPatient.middleName || '', insertPatient.lastName),
       registrationDate: new Date(),
       updatedAt: new Date(),
     };
