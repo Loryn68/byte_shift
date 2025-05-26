@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Search, RotateCcw, RefreshCw, Edit } from "lucide-react";
+import { Search, RotateCcw, RefreshCw, Edit, CreditCard, Stethoscope, UserCheck, Bed } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { workflowManager } from "@/lib/workflow-system";
@@ -47,6 +47,8 @@ export default function PatientRegistration() {
   const [requestedLabs, setRequestedLabs] = useState<string[]>([]);
   const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
   const [prescribedMedications, setPrescribedMedications] = useState<string[]>([]);
+  const [showWorkflow, setShowWorkflow] = useState(false);
+  const [currentWorkflowStep, setCurrentWorkflowStep] = useState<'cashier' | 'triage' | 'outpatient' | 'inpatient' | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -122,6 +124,8 @@ export default function PatientRegistration() {
         description: "Patient registered successfully. Ready for consultation billing.",
       });
       form.reset();
+      setShowWorkflow(true);
+      setCurrentWorkflowStep('cashier');
       queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
     },
     onError: () => {
@@ -954,6 +958,141 @@ export default function PatientRegistration() {
           </div>
         </div>
       </div>
+
+      {/* Workflow Sequence - appears after successful registration */}
+      {showWorkflow && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl mx-4">
+            <h3 className="text-xl font-bold text-center mb-6">Patient Workflow Management</h3>
+            
+            {/* Workflow Steps */}
+            <div className="flex justify-between items-center mb-8">
+              {[
+                { step: 'cashier', label: 'Cashier', icon: CreditCard, description: 'Payment Processing' },
+                { step: 'triage', label: 'Triage', icon: Stethoscope, description: 'Initial Assessment' },
+                { step: 'outpatient', label: 'Outpatient', icon: UserCheck, description: 'Outpatient Care' },
+                { step: 'inpatient', label: 'Inpatient', icon: Bed, description: 'Inpatient Care' }
+              ].map((item, index) => {
+                const Icon = item.icon;
+                const isActive = currentWorkflowStep === item.step;
+                const isCompleted = ['cashier', 'triage', 'outpatient', 'inpatient'].indexOf(currentWorkflowStep || '') > index;
+                
+                return (
+                  <div key={item.step} className="flex flex-col items-center">
+                    <div className={`w-16 h-16 rounded-full border-2 flex items-center justify-center mb-2 ${
+                      isActive ? 'bg-blue-500 border-blue-500 text-white' :
+                      isCompleted ? 'bg-green-500 border-green-500 text-white' :
+                      'bg-gray-100 border-gray-300 text-gray-400'
+                    }`}>
+                      <Icon className="w-8 h-8" />
+                    </div>
+                    <div className={`text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-600'}`}>
+                      {item.label}
+                    </div>
+                    <div className="text-xs text-gray-500 text-center">{item.description}</div>
+                    {index < 3 && (
+                      <div className={`w-12 h-0.5 mt-2 ${
+                        isCompleted ? 'bg-green-500' : 'bg-gray-300'
+                      }`} style={{ marginLeft: '50px', position: 'absolute' }} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Current Step Actions */}
+            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+              {currentWorkflowStep === 'cashier' && (
+                <div className="text-center">
+                  <h4 className="font-semibold mb-2">Cashier - Payment Processing</h4>
+                  <p className="text-sm text-gray-600 mb-4">Process consultation fees and generate receipt</p>
+                  <Button 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                    onClick={() => setCurrentWorkflowStep('triage')}
+                  >
+                    Complete Payment & Continue to Triage
+                  </Button>
+                </div>
+              )}
+              
+              {currentWorkflowStep === 'triage' && (
+                <div className="text-center">
+                  <h4 className="font-semibold mb-2">Triage - Initial Assessment</h4>
+                  <p className="text-sm text-gray-600 mb-4">Conduct initial patient assessment and vital signs</p>
+                  <Button 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+                    onClick={() => setCurrentWorkflowStep('outpatient')}
+                  >
+                    Complete Triage & Continue to Outpatient
+                  </Button>
+                </div>
+              )}
+              
+              {currentWorkflowStep === 'outpatient' && (
+                <div className="text-center">
+                  <h4 className="font-semibold mb-2">Outpatient Management</h4>
+                  <p className="text-sm text-gray-600 mb-4">Manage outpatient consultations and treatments</p>
+                  <div className="flex gap-3 justify-center">
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700 text-white px-6"
+                      onClick={() => {
+                        setShowWorkflow(false);
+                        setCurrentWorkflowStep(null);
+                        toast({
+                          title: "Workflow Complete",
+                          description: "Patient processed through outpatient care successfully.",
+                        });
+                      }}
+                    >
+                      Complete Outpatient Care
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="border-red-500 text-red-600 hover:bg-red-50 px-6"
+                      onClick={() => setCurrentWorkflowStep('inpatient')}
+                    >
+                      Transfer to Inpatient
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {currentWorkflowStep === 'inpatient' && (
+                <div className="text-center">
+                  <h4 className="font-semibold mb-2">Inpatient Management</h4>
+                  <p className="text-sm text-gray-600 mb-4">Manage inpatient admission and care</p>
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white px-6"
+                    onClick={() => {
+                      setShowWorkflow(false);
+                      setCurrentWorkflowStep(null);
+                      toast({
+                        title: "Workflow Complete",
+                        description: "Patient admitted to inpatient care successfully.",
+                      });
+                    }}
+                  >
+                    Complete Inpatient Admission
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Close Button */}
+            <div className="text-center">
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setShowWorkflow(false);
+                  setCurrentWorkflowStep(null);
+                }}
+              >
+                Close Workflow
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
