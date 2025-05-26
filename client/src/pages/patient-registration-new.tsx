@@ -141,18 +141,11 @@ export default function PatientRegistration() {
         const serviceDetails = getServiceDetails(data.registerFor);
         const billingData = {
           patientId: patient.id,
-          appointmentId: null,
           serviceType: serviceDetails.name,
           serviceDescription: serviceDetails.name,
-          amount: serviceDetails.amount.toString(),
-          discount: "0",
-          totalAmount: serviceDetails.amount.toString(),
-          paymentStatus: "pending",
-          paymentMethod: null,
-          paymentDate: null,
-          insuranceClaimed: false,
-          insuranceAmount: "0",
-          notes: `Registration service: ${serviceDetails.name}`
+          amount: serviceDetails.amount,
+          totalAmount: serviceDetails.amount,
+          paymentStatus: "pending"
         };
         
         await apiRequest("POST", "/api/billing", billingData);
