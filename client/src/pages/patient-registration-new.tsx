@@ -12,7 +12,7 @@ import { Search, RotateCcw, RefreshCw, Edit } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { workflowManager } from "@/lib/workflow-system";
-import logoPath from "@assets/image_1748113978202.png";
+import logoPath from "@assets/image_1748235276293.png";
 import type { Patient } from "@shared/schema";
 
 const registrationSchema = z.object({
