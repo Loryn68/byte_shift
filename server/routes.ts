@@ -298,13 +298,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/billing", async (req, res) => {
     try {
+      console.log("Received billing data:", req.body);
       const validatedData = insertBillingSchema.parse(req.body);
       const billing = await storage.createBilling(validatedData);
       res.status(201).json(billing);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation error details:", error.errors);
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
+      console.error("Server error:", error);
       res.status(500).json({ message: "Failed to create billing record" });
     }
   });

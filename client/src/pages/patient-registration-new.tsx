@@ -147,7 +147,14 @@ export default function PatientRegistration() {
           totalAmount: serviceDetails.amount.toFixed(2)
         };
         
-        await apiRequest("POST", "/api/billing", billingData);
+        console.log("Billing data being sent:", billingData);
+        
+        try {
+          await apiRequest("POST", "/api/billing", billingData);
+        } catch (error) {
+          console.error("Billing creation error:", error);
+          throw error;
+        }
       }
       
       return patient;
