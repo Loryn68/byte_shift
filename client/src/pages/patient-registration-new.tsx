@@ -45,6 +45,8 @@ export default function PatientRegistration() {
   const [communityUnit, setCommunityUnit] = useState("");
   const [labRequestFile, setLabRequestFile] = useState<File | null>(null);
   const [requestedLabs, setRequestedLabs] = useState<string[]>([]);
+  const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
+  const [prescribedMedications, setPrescribedMedications] = useState<string[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -557,6 +559,7 @@ export default function PatientRegistration() {
                                 <SelectItem value="psychiatric-consultation-5000">Psychiatric Consultation - KSh 5,000</SelectItem>
                                 <SelectItem value="psychiatric-consultation-3000">Psychiatric Consultation - KSh 3,000</SelectItem>
                                 <SelectItem value="laboratory-only">Laboratory Only</SelectItem>
+                                <SelectItem value="pharmacy-only">Pharmacy Only</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -641,6 +644,91 @@ export default function PatientRegistration() {
                           <div className="mt-2 pt-2 border-t text-sm font-medium">
                             Total Estimated Cost: KSh {requestedLabs.reduce((total, lab) => {
                               const price = parseInt(lab.match(/(\d+,?\d*)/)?.[1]?.replace(',', '') || '0');
+                              return total + price;
+                            }, 0).toLocaleString()}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Pharmacy Upload Section - appears when Pharmacy Only is selected */}
+                  {form.watch("registerFor") === "pharmacy-only" && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-4">
+                      <h4 className="font-medium text-gray-800">Prescription Upload</h4>
+                      
+                      {/* File Upload */}
+                      <div>
+                        <Label className="text-sm font-medium">Upload Prescription Form: *</Label>
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setPrescriptionFile(file);
+                              toast({
+                                title: "Prescription Uploaded",
+                                description: `${file.name} has been uploaded successfully.`,
+                              });
+                            }
+                          }}
+                          className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                        />
+                        <p className="text-xs text-gray-600 mt-1">Accepted formats: PDF, JPG, PNG, DOC, DOCX</p>
+                      </div>
+
+                      {/* Medication Selection */}
+                      <div>
+                        <Label className="text-sm font-medium">Select Prescribed Medications:</Label>
+                        <div className="grid grid-cols-2 gap-2 mt-2 max-h-40 overflow-y-auto">
+                          {[
+                            "Paracetamol 500mg - KSh 50",
+                            "Amoxicillin 250mg - KSh 120",
+                            "Ibuprofen 400mg - KSh 80",
+                            "Omeprazole 20mg - KSh 150",
+                            "Metformin 500mg - KSh 200",
+                            "Amlodipine 5mg - KSh 180",
+                            "Atorvastatin 20mg - KSh 300",
+                            "Losartan 50mg - KSh 250",
+                            "Cetirizine 10mg - KSh 60",
+                            "Fluoxetine 20mg - KSh 400",
+                            "Risperidone 2mg - KSh 500",
+                            "Lorazepam 1mg - KSh 350",
+                            "Haloperidol 5mg - KSh 280",
+                            "Carbamazepine 200mg - KSh 320"
+                          ].map((medication) => (
+                            <label key={medication} className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={prescribedMedications.includes(medication)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setPrescribedMedications([...prescribedMedications, medication]);
+                                  } else {
+                                    setPrescribedMedications(prescribedMedications.filter(m => m !== medication));
+                                  }
+                                }}
+                                className="rounded"
+                              />
+                              <span>{medication}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Summary */}
+                      {prescribedMedications.length > 0 && (
+                        <div className="bg-white border rounded p-3">
+                          <h5 className="font-medium text-sm mb-2">Selected Medications ({prescribedMedications.length}):</h5>
+                          <div className="text-xs space-y-1">
+                            {prescribedMedications.map((medication, index) => (
+                              <div key={index} className="text-gray-700">• {medication}</div>
+                            ))}
+                          </div>
+                          <div className="mt-2 pt-2 border-t text-sm font-medium">
+                            Total Estimated Cost: KSh {prescribedMedications.reduce((total, medication) => {
+                              const price = parseInt(medication.match(/(\d+,?\d*)/)?.[1]?.replace(',', '') || '0');
                               return total + price;
                             }, 0).toLocaleString()}
                           </div>
