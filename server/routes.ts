@@ -326,8 +326,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(billing);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Billing update validation error:", error.errors);
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
+      console.error("Billing update server error:", error);
       res.status(500).json({ message: "Failed to update billing record" });
     }
   });

@@ -156,6 +156,13 @@ export default function PatientRegistration() {
         const billingRecord = await billingResponse.json();
         console.log("Created billing record:", billingRecord);
       }
+
+      // Set patient department based on registration type
+      const department = data.registerFor === "laboratory-only" ? "laboratory" :
+                        data.registerFor === "pharmacy-only" ? "pharmacy" : "outpatient";
+      
+      // Update patient with department assignment
+      await apiRequest("PUT", `/api/patients/${createdPatient.id}`, { department });
       
       return createdPatient;
     },
