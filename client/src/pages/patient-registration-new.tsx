@@ -551,9 +551,9 @@ export default function PatientRegistration() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="outpatient">Outpatient</SelectItem>
-                                <SelectItem value="inpatient">Inpatient</SelectItem>
-                                <SelectItem value="emergency">Emergency</SelectItem>
+                                <SelectItem value="child-consultation">Child Consultation - KSh 200</SelectItem>
+                                <SelectItem value="psychiatric-consultation-5000">Psychiatric Consultation - KSh 5,000</SelectItem>
+                                <SelectItem value="psychiatric-consultation-3000">Psychiatric Consultation - KSh 3,000</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
