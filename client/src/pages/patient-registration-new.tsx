@@ -140,14 +140,19 @@ export default function PatientRegistration() {
       if (data.registerFor && data.registerFor !== "laboratory-only" && data.registerFor !== "pharmacy-only") {
         const serviceDetails = getServiceDetails(data.registerFor);
         const billingData = {
+          billId: `BILL-${Date.now()}`,
           patientId: patient.id,
           serviceType: serviceDetails.name,
           serviceDescription: serviceDetails.name,
-          amount: serviceDetails.amount,
-          status: "pending",
-          date: new Date().toISOString().split('T')[0],
+          amount: serviceDetails.amount.toString(),
+          discount: "0",
+          totalAmount: serviceDetails.amount.toString(),
+          paymentStatus: "pending",
           paymentMethod: null,
-          transactionReference: null
+          paymentDate: null,
+          insuranceClaimed: false,
+          insuranceAmount: "0",
+          notes: `Registration service: ${serviceDetails.name}`
         };
         
         await apiRequest("POST", "/api/billing", billingData);
