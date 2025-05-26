@@ -44,30 +44,27 @@ export default function PatientRegistration() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Function to get patient visit history
+  // Query to get appointments for the patient
+  const { data: patientAppointments = [] } = useQuery({
+    queryKey: ["/api/appointments", selectedPatient?.id],
+    enabled: !!selectedPatient?.id,
+  });
+
+  // Function to get patient visit history from real appointment data
   const getPatientVisitHistory = (patientId: number) => {
-    // This would normally fetch from appointments/episodes data
-    // For now, return sample data structure for demonstration
-    const visitHistory = [
-      {
-        date: "2024-12-15",
-        type: "Consultation", 
-        doctor: "Sarah Johnson"
-      },
-      {
-        date: "2024-11-20",
-        type: "Follow-up",
-        doctor: "Michael Chen"
-      },
-      {
-        date: "2024-10-05", 
-        type: "Initial Assessment",
-        doctor: "Sarah Johnson"
-      }
-    ];
+    if (!selectedPatient || selectedPatient.id !== patientId) return [];
     
-    // Return actual visits if patient has any, otherwise empty array
-    return selectedPatient && selectedPatient.id === patientId ? visitHistory : [];
+    // Transform appointments data into visit history format
+    return patientAppointments
+      .filter((apt: any) => apt.patientId === patientId)
+      .map((apt: any) => ({
+        date: new Date(apt.appointmentDate).toLocaleDateString(),
+        type: apt.type || "Consultation",
+        doctor: `Dr. ${apt.doctorName || "Unknown"}`,
+        status: apt.status,
+        department: apt.department
+      }))
+      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
   };
 
   const form = useForm<RegistrationData>({
@@ -709,22 +706,37 @@ export default function PatientRegistration() {
           <div className="max-h-96 overflow-y-auto">
             {selectedPatient ? (
               <div className="space-y-2">
-                {getPatientVisitHistory(selectedPatient.id).map((visit, index) => (
-                  <div key={index} className="p-2 border rounded text-sm">
-                    <div className="font-medium text-blue-600">{visit.date}</div>
-                    <div className="text-gray-600 text-xs">{visit.type}</div>
-                    {visit.doctor && <div className="text-gray-500 text-xs">Dr. {visit.doctor}</div>}
+                {getPatientVisitHistory(selectedPatient.id).map((visit: any, index: number) => (
+                  <div key={index} className="p-3 border rounded-lg bg-gray-50 text-sm">
+                    <div className="font-semibold text-blue-700 mb-1">{visit.date}</div>
+                    <div className="text-gray-700 font-medium">{visit.type}</div>
+                    {visit.doctor && <div className="text-gray-600 text-xs mt-1">{visit.doctor}</div>}
+                    {visit.department && <div className="text-gray-500 text-xs">{visit.department}</div>}
+                    {visit.status && (
+                      <div className={`text-xs mt-1 px-2 py-1 rounded ${
+                        visit.status === 'completed' ? 'bg-green-100 text-green-700' :
+                        visit.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
+                        visit.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {visit.status.charAt(0).toUpperCase() + visit.status.slice(1)}
+                      </div>
+                    )}
                   </div>
                 ))}
                 {getPatientVisitHistory(selectedPatient.id).length === 0 && (
-                  <div className="text-center text-gray-500 text-sm">
-                    No previous visits recorded
+                  <div className="text-center text-gray-500 text-sm p-4">
+                    <div className="text-gray-400 mb-2">📋</div>
+                    <div>No previous visits recorded</div>
+                    <div className="text-xs mt-1">This patient is new to the system</div>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-center text-gray-500 text-sm">
-                Select a patient to view visit history
+              <div className="text-center text-gray-500 text-sm p-4">
+                <div className="text-gray-400 mb-2">👤</div>
+                <div>Select a patient to view visit history</div>
+                <div className="text-xs mt-1">Click on a patient from the list</div>
               </div>
             )}
           </div>
