@@ -141,6 +141,7 @@ export default function PatientRegistration() {
         const serviceDetails = getServiceDetails(data.registerFor);
         const billingData = {
           patientId: patient.id,
+          appointmentId: null,
           serviceType: serviceDetails.name,
           serviceDescription: serviceDetails.name,
           amount: serviceDetails.amount.toString(),
