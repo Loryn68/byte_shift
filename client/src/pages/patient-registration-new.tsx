@@ -140,7 +140,6 @@ export default function PatientRegistration() {
       if (data.registerFor && data.registerFor !== "laboratory-only" && data.registerFor !== "pharmacy-only") {
         const serviceDetails = getServiceDetails(data.registerFor);
         const billingData = {
-          billId: `BILL-${Date.now()}`,
           patientId: patient.id,
           serviceType: serviceDetails.name,
           serviceDescription: serviceDetails.name,
