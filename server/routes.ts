@@ -315,6 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/billing/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      console.log("Updating billing record:", id, "with data:", req.body);
       const validatedData = insertBillingSchema.partial().parse(req.body);
       const billing = await storage.updateBilling(id, validatedData);
       
