@@ -114,15 +114,55 @@ export default function PatientRegistration() {
         isActive: true,
       };
       
-      return apiRequest("POST", "/api/patients", patientData);
+      // Create patient first
+      const patient: any = await apiRequest("POST", "/api/patients", patientData);
+      
+      // Get service details and pricing
+      const getServiceDetails = (registerFor: string) => {
+        const serviceMap: Record<string, { name: string; amount: number }> = {
+          "child-consultation": { name: "Child Consultation", amount: 200 },
+          "psychiatric-consultation-5000": { name: "Psychiatric Consultation", amount: 5000 },
+          "psychiatric-consultation-3000": { name: "Psychiatric Consultation", amount: 3000 },
+          "psychiatric-review-5000": { name: "Psychiatric Review", amount: 5000 },
+          "psychiatric-review-3000": { name: "Psychiatric Review", amount: 3000 },
+          "medical-consultation-300": { name: "Medical Consultation", amount: 300 },
+          "medical-review-300": { name: "Medical Review", amount: 300 },
+          "counseling-3000": { name: "Counseling", amount: 3000 },
+          "family-counseling-3000": { name: "Family Counseling", amount: 3000 },
+          "injection-service-200": { name: "Injection Service", amount: 200 },
+          "laboratory-only": { name: "Laboratory Services", amount: 0 },
+          "pharmacy-only": { name: "Pharmacy Services", amount: 0 }
+        };
+        return serviceMap[registerFor] || { name: "General Consultation", amount: 0 };
+      };
+
+      // Create billing record for the selected service
+      if (data.registerFor && data.registerFor !== "laboratory-only" && data.registerFor !== "pharmacy-only") {
+        const serviceDetails = getServiceDetails(data.registerFor);
+        const billingData = {
+          patientId: patient.id,
+          serviceType: serviceDetails.name,
+          serviceDescription: serviceDetails.name,
+          amount: serviceDetails.amount,
+          status: "pending",
+          date: new Date().toISOString().split('T')[0],
+          paymentMethod: null,
+          transactionReference: null
+        };
+        
+        await apiRequest("POST", "/api/billing", billingData);
+      }
+      
+      return patient;
     },
     onSuccess: () => {
       toast({
         title: "Registration Successful",
-        description: "Patient registered successfully. Ready for consultation billing.",
+        description: "Patient registered successfully. Service automatically added to billing.",
       });
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/billing"] });
     },
     onError: () => {
       toast({
