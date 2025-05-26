@@ -43,6 +43,8 @@ export default function PatientRegistration() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [referralFacility, setReferralFacility] = useState("");
   const [communityUnit, setCommunityUnit] = useState("");
+  const [labRequestFile, setLabRequestFile] = useState<File | null>(null);
+  const [requestedLabs, setRequestedLabs] = useState<string[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -554,6 +556,7 @@ export default function PatientRegistration() {
                                 <SelectItem value="child-consultation">Child Consultation - KSh 200</SelectItem>
                                 <SelectItem value="psychiatric-consultation-5000">Psychiatric Consultation - KSh 5,000</SelectItem>
                                 <SelectItem value="psychiatric-consultation-3000">Psychiatric Consultation - KSh 3,000</SelectItem>
+                                <SelectItem value="laboratory-only">Laboratory Only</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -561,6 +564,92 @@ export default function PatientRegistration() {
                         )}
                       />
                     </div>
+                  </div>
+                  
+                  {/* Laboratory Upload Section - appears when Laboratory Only is selected */}
+                  {form.watch("registerFor") === "laboratory-only" && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-4">
+                      <h4 className="font-medium text-gray-800">Laboratory Request Upload</h4>
+                      
+                      {/* File Upload */}
+                      <div>
+                        <Label className="text-sm font-medium">Upload Lab Request Form: *</Label>
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setLabRequestFile(file);
+                              toast({
+                                title: "File Uploaded",
+                                description: `${file.name} has been uploaded successfully.`,
+                              });
+                            }
+                          }}
+                          className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                        <p className="text-xs text-gray-600 mt-1">Accepted formats: PDF, JPG, PNG, DOC, DOCX</p>
+                      </div>
+
+                      {/* Lab Selection */}
+                      <div>
+                        <Label className="text-sm font-medium">Select Requested Lab Tests:</Label>
+                        <div className="grid grid-cols-2 gap-2 mt-2 max-h-40 overflow-y-auto">
+                          {[
+                            "Full Blood Count - KSh 800",
+                            "Liver Function Tests - KSh 1,200", 
+                            "Kidney Function Tests - KSh 1,000",
+                            "Thyroid Function Tests - KSh 1,500",
+                            "Blood Sugar - KSh 300",
+                            "Lipid Profile - KSh 1,000",
+                            "Urine Analysis - KSh 400",
+                            "Hepatitis B Surface Antigen - KSh 600",
+                            "HIV Test - KSh 500",
+                            "Pregnancy Test - KSh 200",
+                            "Malaria Test - KSh 300",
+                            "Syphilis Test - KSh 400"
+                          ].map((lab) => (
+                            <label key={lab} className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={requestedLabs.includes(lab)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setRequestedLabs([...requestedLabs, lab]);
+                                  } else {
+                                    setRequestedLabs(requestedLabs.filter(l => l !== lab));
+                                  }
+                                }}
+                                className="rounded"
+                              />
+                              <span>{lab}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Summary */}
+                      {requestedLabs.length > 0 && (
+                        <div className="bg-white border rounded p-3">
+                          <h5 className="font-medium text-sm mb-2">Selected Tests ({requestedLabs.length}):</h5>
+                          <div className="text-xs space-y-1">
+                            {requestedLabs.map((lab, index) => (
+                              <div key={index} className="text-gray-700">• {lab}</div>
+                            ))}
+                          </div>
+                          <div className="mt-2 pt-2 border-t text-sm font-medium">
+                            Total Estimated Cost: KSh {requestedLabs.reduce((total, lab) => {
+                              const price = parseInt(lab.match(/(\d+,?\d*)/)?.[1]?.replace(',', '') || '0');
+                              return total + price;
+                            }, 0).toLocaleString()}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-medium">Patient Categorization: *</Label>
                       <FormField
