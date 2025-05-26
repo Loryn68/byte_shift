@@ -40,8 +40,35 @@ export default function PatientRegistration() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showPatientList, setShowPatientList] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Function to get patient visit history
+  const getPatientVisitHistory = (patientId: number) => {
+    // This would normally fetch from appointments/episodes data
+    // For now, return sample data structure for demonstration
+    const visitHistory = [
+      {
+        date: "2024-12-15",
+        type: "Consultation", 
+        doctor: "Sarah Johnson"
+      },
+      {
+        date: "2024-11-20",
+        type: "Follow-up",
+        doctor: "Michael Chen"
+      },
+      {
+        date: "2024-10-05", 
+        type: "Initial Assessment",
+        doctor: "Sarah Johnson"
+      }
+    ];
+    
+    // Return actual visits if patient has any, otherwise empty array
+    return selectedPatient && selectedPatient.id === patientId ? visitHistory : [];
+  };
 
   const form = useForm<RegistrationData>({
     resolver: zodResolver(registrationSchema),
@@ -150,6 +177,7 @@ export default function PatientRegistration() {
   // Load patient for editing
   const loadPatientForEdit = (patient: Patient) => {
     setEditingPatient(patient);
+    setSelectedPatient(patient);
     form.reset({
       firstName: patient.firstName,
       middleName: patient.middleName || "",
@@ -207,9 +235,9 @@ export default function PatientRegistration() {
           <div className="mt-2">
             <Button 
               onClick={() => setShowPatientList(!showPatientList)}
-              className="w-full mb-3 bg-yellow-500 hover:bg-yellow-600 text-black font-medium text-sm px-2 py-2 h-auto"
+              className="w-full mb-3 bg-yellow-500 hover:bg-yellow-600 text-black font-medium text-xs sm:text-sm px-1 sm:px-2 py-2 h-auto leading-tight"
             >
-              Load List of Registered Patients
+              <span className="break-words text-center">Load List of Registered Patients</span>
             </Button>
             
             {showPatientList && (
@@ -678,14 +706,27 @@ export default function PatientRegistration() {
         {/* Right Sidebar - Earlier Visit Dates */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <h4 className="font-medium text-center bg-blue-100 p-2 rounded mb-4">Earlier Visit Dates</h4>
-          <div className="text-center text-gray-500 text-sm">
-            No previous visits
-          </div>
-          
-          {/* Cost Display */}
-          <div className="mt-8 text-center">
-            <div className="text-3xl font-bold text-orange-600">Kshs: 20</div>
-            <div className="text-sm text-gray-600 mt-2">Registration Fee</div>
+          <div className="max-h-96 overflow-y-auto">
+            {selectedPatient ? (
+              <div className="space-y-2">
+                {getPatientVisitHistory(selectedPatient.id).map((visit, index) => (
+                  <div key={index} className="p-2 border rounded text-sm">
+                    <div className="font-medium text-blue-600">{visit.date}</div>
+                    <div className="text-gray-600 text-xs">{visit.type}</div>
+                    {visit.doctor && <div className="text-gray-500 text-xs">Dr. {visit.doctor}</div>}
+                  </div>
+                ))}
+                {getPatientVisitHistory(selectedPatient.id).length === 0 && (
+                  <div className="text-center text-gray-500 text-sm">
+                    No previous visits recorded
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 text-sm">
+                Select a patient to view visit history
+              </div>
+            )}
           </div>
         </div>
       </div>
