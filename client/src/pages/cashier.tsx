@@ -39,6 +39,19 @@ import logoPath from "@assets/image_1748235729903.png";
 export default function Cashier() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedView, setSelectedView] = useState<'payments' | 'queue' | 'receipts' | 'insurance' | 'credit' | 'cancelled' | 'income' | 'refunds'>('payments');
+  const [paymentDialog, setPaymentDialog] = useState<{
+    isOpen: boolean;
+    bill: Billing | null;
+    method: 'cash' | 'card' | 'mobile' | 'bank' | null;
+  }>({
+    isOpen: false,
+    bill: null,
+    method: null
+  });
+  const [paymentData, setPaymentData] = useState({
+    amountReceived: '',
+    transactionNumber: ''
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -51,12 +64,22 @@ export default function Cashier() {
   });
 
   const updatePaymentMutation = useMutation({
-    mutationFn: async ({ id, paymentMethod }: { id: number; paymentMethod: string }) => {
-      return await apiRequest("PUT", `/api/billing/${id}`, {
+    mutationFn: async ({ id, paymentMethod, transactionNumber }: { 
+      id: number; 
+      paymentMethod: string; 
+      transactionNumber?: string;
+    }) => {
+      const updateData: any = {
         paymentStatus: "paid",
         paymentMethod,
         paymentDate: new Date().toISOString(),
-      });
+      };
+      
+      if (transactionNumber) {
+        updateData.transactionNumber = transactionNumber;
+      }
+      
+      return await apiRequest("PUT", `/api/billing/${id}`, updateData);
     },
     onSuccess: () => {
       toast({
@@ -64,8 +87,28 @@ export default function Cashier() {
         description: "Payment has been processed successfully.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/billing"] });
+      setPaymentDialog({ isOpen: false, bill: null, method: null });
+      setPaymentData({ amountReceived: '', transactionNumber: '' });
     },
   });
+
+  const openPaymentDialog = (bill: Billing, method: 'cash' | 'card' | 'mobile' | 'bank') => {
+    setPaymentDialog({ isOpen: true, bill, method });
+    setPaymentData({ amountReceived: bill.totalAmount || '', transactionNumber: '' });
+  };
+
+  const processPayment = () => {
+    if (!paymentDialog.bill) return;
+    
+    const { bill, method } = paymentDialog;
+    const { transactionNumber } = paymentData;
+    
+    updatePaymentMutation.mutate({
+      id: bill.id!,
+      paymentMethod: method!,
+      transactionNumber: method === 'cash' ? undefined : transactionNumber
+    });
+  };
 
   const processRefundMutation = useMutation({
     mutationFn: async ({ id, reason }: { id: number; reason: string }) => {
@@ -156,24 +199,31 @@ export default function Cashier() {
                     <TableCell className="space-x-2">
                       <Button
                         size="sm"
-                        onClick={() => updatePaymentMutation.mutate({ id: bill.id!, paymentMethod: "cash" })}
+                        onClick={() => openPaymentDialog(bill, "cash")}
                         className="bg-green-600 hover:bg-green-700"
                       >
                         Cash
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => updatePaymentMutation.mutate({ id: bill.id!, paymentMethod: "card" })}
+                        onClick={() => openPaymentDialog(bill, "card")}
                         className="bg-blue-600 hover:bg-blue-700"
                       >
                         Card
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => updatePaymentMutation.mutate({ id: bill.id!, paymentMethod: "mobile" })}
+                        onClick={() => openPaymentDialog(bill, "mobile")}
                         className="bg-purple-600 hover:bg-purple-700"
                       >
-                        Mobile
+                        M-Pesa
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => openPaymentDialog(bill, "bank")}
+                        className="bg-orange-600 hover:bg-orange-700"
+                      >
+                        Bank
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -515,6 +565,84 @@ export default function Cashier() {
           {renderContent()}
         </div>
       </div>
+
+      {/* Payment Dialog */}
+      <Dialog open={paymentDialog.isOpen} onOpenChange={(open) => 
+        setPaymentDialog({ isOpen: open, bill: null, method: null })
+      }>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              Process {paymentDialog.method === 'cash' ? 'Cash' : 
+                     paymentDialog.method === 'card' ? 'Card' :
+                     paymentDialog.method === 'mobile' ? 'M-Pesa' : 'Bank'} Payment
+            </DialogTitle>
+          </DialogHeader>
+          
+          {paymentDialog.bill && (
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p><strong>Patient:</strong> {getPatientName(paymentDialog.bill.patientId)}</p>
+                <p><strong>Service:</strong> {paymentDialog.bill.serviceType}</p>
+                <p><strong>Amount Due:</strong> {formatCurrency(parseFloat(paymentDialog.bill.totalAmount || "0"))}</p>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Amount Received</label>
+                  <Input
+                    value={paymentData.amountReceived}
+                    onChange={(e) => setPaymentData({...paymentData, amountReceived: e.target.value})}
+                    placeholder="Enter amount received"
+                    type="number"
+                  />
+                </div>
+
+                {paymentDialog.method !== 'cash' && (
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {paymentDialog.method === 'mobile' ? 'M-Pesa Transaction Code' : 'Transaction Number'}
+                    </label>
+                    <Input
+                      value={paymentData.transactionNumber}
+                      onChange={(e) => setPaymentData({...paymentData, transactionNumber: e.target.value})}
+                      placeholder={paymentDialog.method === 'mobile' ? 'Enter M-Pesa code' : 'Enter transaction number'}
+                    />
+                  </div>
+                )}
+
+                {paymentDialog.method === 'cash' && (
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <p className="text-sm">
+                      <strong>Change Due:</strong> {formatCurrency(
+                        Math.max(0, parseFloat(paymentData.amountReceived || "0") - parseFloat(paymentDialog.bill.totalAmount || "0"))
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={processPayment}
+                  disabled={updatePaymentMutation.isPending || 
+                    !paymentData.amountReceived || 
+                    (paymentDialog.method !== 'cash' && !paymentData.transactionNumber)}
+                  className="flex-1"
+                >
+                  {updatePaymentMutation.isPending ? 'Processing...' : 'Process Payment'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setPaymentDialog({ isOpen: false, bill: null, method: null })}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
