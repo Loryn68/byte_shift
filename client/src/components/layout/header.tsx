@@ -20,7 +20,7 @@ export default function Header() {
   const currentUser = {
     name: "Dr. Sarah Johnson",
     role: "Administrator",
-    email: "sarah.johnson@childhaven.com"
+    email: "sarah.johnson@childmentalhaven.com"
   };
 
   const handleLogout = () => {
@@ -40,7 +40,7 @@ export default function Header() {
                 <Hospital className="text-white text-lg" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">ChildHaven HIMS</h1>
+                <h1 className="text-xl font-semibold text-gray-900">Child Mental Haven</h1>
                 <p className="text-xs text-gray-500">Hospital Information Management</p>
               </div>
             </div>
