@@ -92,27 +92,7 @@ const navigationItems = [
       }
     ]
   },
-  {
-    title: "Financial",
-    section: "financial",
-    items: [
-      {
-        title: "Patient Billing",
-        href: "/billing",
-        icon: FileText
-      },
-      {
-        title: "Professional Billing",
-        href: "/professional-billing",
-        icon: FileText
-      },
-      {
-        title: "Insurance Management",
-        href: "/insurance",
-        icon: Shield
-      }
-    ]
-  },
+
   {
     title: "Reports & Analytics",
     section: "reports",
