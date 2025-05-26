@@ -41,6 +41,7 @@ export default function PatientRegistration() {
   const [showPatientList, setShowPatientList] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [referralFacility, setReferralFacility] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -634,11 +635,24 @@ export default function PatientRegistration() {
                                 type="radio" 
                                 value="other-facility" 
                                 checked={field.value === "other-facility"}
-                                onChange={() => field.onChange("other-facility")}
+                                onChange={() => {
+                                  field.onChange("other-facility");
+                                  setReferralFacility("");
+                                }}
                                 required 
                               />
                               <span className="text-sm">Referral from other Health Facility</span>
                             </label>
+                            {field.value === "other-facility" && (
+                              <div className="ml-6 mt-2">
+                                <Input
+                                  placeholder="Enter name of referring health facility"
+                                  value={referralFacility}
+                                  onChange={(e) => setReferralFacility(e.target.value)}
+                                  className="text-sm"
+                                />
+                              </div>
+                            )}
                             <label className="flex items-center gap-2">
                               <input 
                                 type="radio" 
