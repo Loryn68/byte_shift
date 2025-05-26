@@ -54,11 +54,7 @@ const navigationItems = [
         href: "/inpatient",
         icon: Bed
       },
-      {
-        title: "Outpatient Queue",
-        href: "/outpatient-queue",
-        icon: Users
-      },
+
       {
         title: "Doctor Portal",
         href: "/doctor-portal",

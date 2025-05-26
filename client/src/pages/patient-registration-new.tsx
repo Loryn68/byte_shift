@@ -148,6 +148,7 @@ export default function PatientRegistration() {
         };
         
         console.log("Billing data being sent:", billingData);
+        console.log("Patient object:", patient);
         
         try {
           await apiRequest("POST", "/api/billing", billingData);
