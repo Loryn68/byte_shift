@@ -115,7 +115,8 @@ export default function PatientRegistration() {
       };
       
       // Create patient first
-      const patient: any = await apiRequest("POST", "/api/patients", patientData);
+      const createdPatient: any = await apiRequest("POST", "/api/patients", patientData);
+      console.log("Created patient response:", createdPatient);
       
       // Get service details and pricing
       const getServiceDetails = (registerFor: string) => {
@@ -140,7 +141,7 @@ export default function PatientRegistration() {
       if (data.registerFor && data.registerFor !== "laboratory-only" && data.registerFor !== "pharmacy-only") {
         const serviceDetails = getServiceDetails(data.registerFor);
         const billingData = {
-          patientId: patient.id,
+          patientId: createdPatient.id,
           serviceType: serviceDetails.name,
           serviceDescription: serviceDetails.name,
           amount: serviceDetails.amount.toFixed(2),
@@ -148,17 +149,12 @@ export default function PatientRegistration() {
         };
         
         console.log("Billing data being sent:", billingData);
-        console.log("Patient object:", patient);
         
-        try {
-          await apiRequest("POST", "/api/billing", billingData);
-        } catch (error) {
-          console.error("Billing creation error:", error);
-          throw error;
-        }
+        const billingRecord = await apiRequest("POST", "/api/billing", billingData);
+        console.log("Created billing record:", billingRecord);
       }
       
-      return patient;
+      return createdPatient;
     },
     onSuccess: () => {
       toast({
