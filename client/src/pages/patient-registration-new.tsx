@@ -146,7 +146,8 @@ export default function PatientRegistration() {
           serviceType: serviceDetails.name,
           serviceDescription: serviceDetails.name,
           amount: serviceDetails.amount.toFixed(2),
-          totalAmount: serviceDetails.amount.toFixed(2)
+          totalAmount: serviceDetails.amount.toFixed(2),
+          paymentStatus: "pending"
         };
         
         console.log("Billing data being sent:", billingData);
