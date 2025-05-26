@@ -15,6 +15,7 @@ import Laboratory from "@/pages/laboratory";
 import Pharmacy from "@/pages/pharmacy";
 import Billing from "@/pages/billing";
 import ProfessionalBilling from "@/pages/professional-billing";
+import Cashier from "@/pages/cashier";
 import Reports from "@/pages/reports";
 import NotFound from "@/pages/not-found";
 
@@ -29,7 +30,7 @@ function Router() {
             <Route path="/" component={Dashboard} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/patient-registration" component={PatientRegistration} />
-            <Route path="/cashier" component={ProfessionalBilling} />
+            <Route path="/cashier" component={Cashier} />
             <Route path="/triage" component={OutpatientQueue} />
             <Route path="/outpatient" component={Appointments} />
             <Route path="/inpatient" component={Appointments} />
