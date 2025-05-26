@@ -94,13 +94,17 @@ export default function Cashier() {
   };
 
   const filterBillingByStatus = (status: string[]) => {
-    return billingRecords.filter((bill: Billing) => 
+    console.log("All billing records:", billingRecords);
+    console.log("Filtering for status:", status);
+    const filtered = billingRecords.filter((bill: Billing) => 
       status.includes(bill.paymentStatus) &&
       (searchQuery === "" || 
        getPatientName(bill.patientId).toLowerCase().includes(searchQuery.toLowerCase()) ||
        getPatientId(bill.patientId).toLowerCase().includes(searchQuery.toLowerCase()) ||
        bill.serviceType.toLowerCase().includes(searchQuery.toLowerCase()))
     );
+    console.log("Filtered billing records:", filtered);
+    return filtered;
   };
 
   const calculateIncomeByDepartment = () => {
