@@ -151,7 +151,8 @@ export default function PatientRegistration() {
         
         console.log("Billing data being sent:", billingData);
         
-        const billingRecord = await apiRequest("POST", "/api/billing", billingData);
+        const billingResponse = await apiRequest("POST", "/api/billing", billingData);
+        const billingRecord = await billingResponse.json();
         console.log("Created billing record:", billingRecord);
       }
       
