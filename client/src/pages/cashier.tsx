@@ -229,34 +229,88 @@ export default function Cashier() {
         );
 
       case 'queue':
+        const pendingPayments = filterBillingByStatus(["pending"]);
+        const todayPayments = filterBillingByStatus(["paid"]).filter((bill: Billing) => 
+          bill.paymentDate && new Date(bill.paymentDate).toDateString() === new Date().toDateString()
+        );
+
+        const paymentsByMethod = todayPayments.reduce((acc: any, bill: Billing) => {
+          const method = bill.paymentMethod || 'unknown';
+          acc[method] = (acc[method] || 0) + parseFloat(bill.totalAmount || "0");
+          return acc;
+        }, {});
+
+        const totalRevenue = todayPayments.reduce((sum, bill) => sum + parseFloat(bill.totalAmount || "0"), 0);
+
         return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Payment Queue</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                <h4 className="font-medium text-orange-800">Pending Payments</h4>
-                <p className="text-2xl font-bold text-orange-600">
-                  {filterBillingByStatus(["pending"]).length}
-                </p>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold">Queue Management</h3>
+            
+            {/* Patients with Pending Payments */}
+            <div>
+              <h4 className="text-md font-medium mb-3 text-orange-600">Patients with Pending Payments</h4>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Patient ID</TableHead>
+                    <TableHead>Patient Name</TableHead>
+                    <TableHead>Service</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Time</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingPayments.map((bill: Billing) => (
+                    <TableRow key={bill.id}>
+                      <TableCell>{getPatientId(bill.patientId)}</TableCell>
+                      <TableCell>{getPatientName(bill.patientId)}</TableCell>
+                      <TableCell>{bill.serviceType}</TableCell>
+                      <TableCell>{formatCurrency(parseFloat(bill.totalAmount || "0"))}</TableCell>
+                      <TableCell>{formatDate(bill.createdAt)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Today's Payments by Method */}
+            <div>
+              <h4 className="text-md font-medium mb-3 text-green-600">Payments Made Today by Method</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h5 className="font-medium text-green-800">Cash</h5>
+                  <p className="text-xl font-bold text-green-600">
+                    {formatCurrency(paymentsByMethod.cash || 0)}
+                  </p>
+                </div>
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  <h5 className="font-medium text-purple-800">M-Pesa</h5>
+                  <p className="text-xl font-bold text-purple-600">
+                    {formatCurrency(paymentsByMethod.mobile || 0)}
+                  </p>
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h5 className="font-medium text-blue-800">Card</h5>
+                  <p className="text-xl font-bold text-blue-600">
+                    {formatCurrency(paymentsByMethod.card || 0)}
+                  </p>
+                </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <h5 className="font-medium text-orange-800">Bank</h5>
+                  <p className="text-xl font-bold text-orange-600">
+                    {formatCurrency(paymentsByMethod.bank || 0)}
+                  </p>
+                </div>
               </div>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h4 className="font-medium text-green-800">Paid Today</h4>
-                <p className="text-2xl font-bold text-green-600">
-                  {filterBillingByStatus(["paid"]).filter((bill: Billing) => 
-                    bill.paymentDate && new Date(bill.paymentDate).toDateString() === new Date().toDateString()
-                  ).length}
+              
+              {/* Combined Total Revenue */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h5 className="font-medium text-gray-800">Total Revenue Today</h5>
+                <p className="text-2xl font-bold text-gray-700">
+                  {formatCurrency(totalRevenue)}
                 </p>
-              </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-medium text-blue-800">Total Revenue Today</h4>
-                <p className="text-2xl font-bold text-blue-600">
-                  {formatCurrency(
-                    filterBillingByStatus(["paid"])
-                      .filter((bill: Billing) => 
-                        bill.paymentDate && new Date(bill.paymentDate).toDateString() === new Date().toDateString()
-                      )
-                      .reduce((sum, bill) => sum + parseFloat(bill.totalAmount || "0"), 0)
-                  )}
+                <p className="text-sm text-gray-600">
+                  Combined total: Cash + M-Pesa + Card + Bank
                 </p>
               </div>
             </div>
