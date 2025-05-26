@@ -559,6 +559,7 @@ export default function PatientRegistration() {
                                 <SelectItem value="psychiatric-consultation-5000">Psychiatric Consultation - KSh 5,000</SelectItem>
                                 <SelectItem value="psychiatric-consultation-3000">Psychiatric Consultation - KSh 3,000</SelectItem>
                                 <SelectItem value="psychiatry-review-3000">Psychiatry Review - KSh 3,000</SelectItem>
+                                <SelectItem value="psychiatric-review-3000">Psychiatric Review - KSh 3,000</SelectItem>
                                 <SelectItem value="laboratory-only">Laboratory Only</SelectItem>
                                 <SelectItem value="pharmacy-only">Pharmacy Only</SelectItem>
                               </SelectContent>
