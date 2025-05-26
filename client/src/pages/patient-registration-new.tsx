@@ -192,7 +192,7 @@ export default function PatientRegistration() {
       <div className="bg-white rounded-lg shadow-sm border mb-4 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <img src={logoPath} alt="Child Mental Haven Logo" className="h-12 w-12" />
+            <img src={logoPath} alt="Child Mental Haven Logo" className="h-16 w-16 object-contain" />
             <div>
               <h1 className="text-xl font-bold text-blue-800">CHILD MENTAL HAVEN - [PATIENTS REGISTRY]</h1>
             </div>
