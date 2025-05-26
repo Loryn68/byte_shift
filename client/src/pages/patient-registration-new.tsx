@@ -115,7 +115,8 @@ export default function PatientRegistration() {
       };
       
       // Create patient first
-      const createdPatient: any = await apiRequest("POST", "/api/patients", patientData);
+      const patientResponse = await apiRequest("POST", "/api/patients", patientData);
+      const createdPatient = await patientResponse.json();
       console.log("Created patient response:", createdPatient);
       
       // Get service details and pricing
