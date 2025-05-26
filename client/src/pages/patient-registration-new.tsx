@@ -42,6 +42,7 @@ export default function PatientRegistration() {
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [referralFacility, setReferralFacility] = useState("");
+  const [communityUnit, setCommunityUnit] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -658,11 +659,24 @@ export default function PatientRegistration() {
                                 type="radio" 
                                 value="community" 
                                 checked={field.value === "community"}
-                                onChange={() => field.onChange("community")}
+                                onChange={() => {
+                                  field.onChange("community");
+                                  setCommunityUnit("");
+                                }}
                                 required 
                               />
                               <span className="text-sm">Referral from Community Unit</span>
                             </label>
+                            {field.value === "community" && (
+                              <div className="ml-6 mt-2">
+                                <Input
+                                  placeholder="Enter name of community unit"
+                                  value={communityUnit}
+                                  onChange={(e) => setCommunityUnit(e.target.value)}
+                                  className="text-sm"
+                                />
+                              </div>
+                            )}
                             <label className="flex items-center gap-2">
                               <input 
                                 type="radio" 
