@@ -905,6 +905,17 @@ function PatientAdmissionForm() {
     patientPhoto: null
   });
 
+  // Auto-populate form with current patient data
+  useEffect(() => {
+    if (patient) {
+      setFormData(prev => ({
+        ...prev,
+        patientName: `${patient.firstName} ${patient.lastName}`.trim(),
+        patientId: patient.patientId || ""
+      }));
+    }
+  }, [patient]);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -1077,14 +1088,13 @@ Generated on: ${new Date().toLocaleDateString()}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="patientName">Patient Name</Label>
-            <Input
-              id="patientName"
-              value={formData.patientName}
-              onChange={(e) => setFormData(prev => ({ ...prev, patientName: e.target.value }))}
-              placeholder="Enter patient name"
-            />
+          {/* Patient Information - Read Only */}
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h4 className="font-semibold text-blue-800 mb-2">Patient Information</h4>
+            <div className="space-y-1 text-sm">
+              <div><strong>Name:</strong> {formData.patientName}</div>
+              <div><strong>ID:</strong> {formData.patientId}</div>
+            </div>
           </div>
 
           <div>
