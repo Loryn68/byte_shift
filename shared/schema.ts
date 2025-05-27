@@ -38,6 +38,10 @@ export const patients = pgTable("patients", {
   policyNumber: text("policy_number"),
   medicalHistory: text("medical_history"),
   allergies: text("allergies"),
+  patientType: text("patient_type").notNull().default("outpatient"), // outpatient, inpatient
+  wardAssignment: text("ward_assignment"),
+  bedNumber: text("bed_number"),
+  admissionDate: timestamp("admission_date"),
   isActive: boolean("is_active").notNull().default(true),
   registrationDate: timestamp("registration_date").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

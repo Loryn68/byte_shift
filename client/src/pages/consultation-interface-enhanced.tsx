@@ -876,6 +876,52 @@ function PatientAdmissionForm() {
     patientPhoto: null
   });
 
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const admitPatientMutation = useMutation({
+    mutationFn: async (admissionData: any) => {
+      const response = await apiRequest(`/api/patients/${patient?.id}/admit`, {
+        method: "POST",
+        body: JSON.stringify({
+          ward: admissionData.ward,
+          bed: admissionData.bed,
+          department: admissionData.department
+        }),
+      });
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Patient Admitted Successfully",
+        description: "Patient has been moved to inpatient section",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/patients/outpatients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/patients/inpatients"] });
+    },
+    onError: () => {
+      toast({
+        title: "Admission Failed",
+        description: "Could not admit patient. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSaveAdmission = async () => {
+    if (!formData.ward || !formData.bed || !formData.department) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in ward, bed, and department information",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    admitPatientMutation.mutate(formData);
+  };
+
   const handlePrint = () => {
     const printContent = `
       <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">

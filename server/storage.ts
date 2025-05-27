@@ -18,6 +18,9 @@ export interface IStorage {
   createPatient(patient: InsertPatient): Promise<Patient>;
   updatePatient(id: number, patient: Partial<InsertPatient>): Promise<Patient | undefined>;
   getAllPatients(): Promise<Patient[]>;
+  getOutpatients(): Promise<Patient[]>;
+  getInpatients(): Promise<Patient[]>;
+  admitPatient(patientId: number, admissionData: { ward: string; bed: string; department: string }): Promise<Patient | undefined>;
   searchPatients(query: string): Promise<Patient[]>;
   
   // Appointment management
@@ -212,6 +215,32 @@ export class MemStorage implements IStorage {
 
   async getAllPatients(): Promise<Patient[]> {
     return Array.from(this.patients.values()).filter(patient => patient.isActive);
+  }
+
+  async getOutpatients(): Promise<Patient[]> {
+    const patients = Array.from(this.patients.values());
+    return patients.filter(patient => patient.isActive && patient.patientType === 'outpatient');
+  }
+
+  async getInpatients(): Promise<Patient[]> {
+    const patients = Array.from(this.patients.values());
+    return patients.filter(patient => patient.isActive && patient.patientType === 'inpatient');
+  }
+
+  async admitPatient(patientId: number, admissionData: { ward: string; bed: string; department: string }): Promise<Patient | undefined> {
+    const patient = this.patients.get(patientId);
+    if (!patient) return undefined;
+    
+    const updatedPatient: Patient = {
+      ...patient,
+      patientType: 'inpatient',
+      wardAssignment: admissionData.ward,
+      bedNumber: admissionData.bed,
+      admissionDate: new Date(),
+      updatedAt: new Date(),
+    };
+    this.patients.set(patientId, updatedPatient);
+    return updatedPatient;
   }
 
   async searchPatients(query: string): Promise<Patient[]> {

@@ -82,6 +82,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/patients/outpatients", async (req, res) => {
+    try {
+      const patients = await storage.getOutpatients();
+      res.json(patients);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch outpatients" });
+    }
+  });
+
+  app.get("/api/patients/inpatients", async (req, res) => {
+    try {
+      const patients = await storage.getInpatients();
+      res.json(patients);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch inpatients" });
+    }
+  });
+
+  app.post("/api/patients/:id/admit", async (req, res) => {
+    try {
+      const patientId = parseInt(req.params.id);
+      const admissionData = req.body;
+      
+      const patient = await storage.admitPatient(patientId, admissionData);
+      if (!patient) {
+        return res.status(404).json({ message: "Patient not found" });
+      }
+      
+      res.json(patient);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to admit patient" });
+    }
+  });
+
   app.post("/api/patients", async (req, res) => {
     try {
       const validatedData = insertPatientSchema.parse(req.body);
