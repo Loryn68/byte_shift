@@ -148,33 +148,27 @@ export default function TriageVitals() {
     setShowVitalsModal(true);
   };
 
+  // Store saved vital signs for printing
+  const [savedVitals, setSavedVitals] = useState<VitalSigns | null>(null);
+
   const saveVitalsMutation = useMutation({
     mutationFn: async (vitalsData: VitalSigns) => {
       // In a real system, this would save to a vitals table
-      // For now, we'll store it in the patient notes or a separate system
+      // For now, we'll store it in local state for printing
       console.log("Saving vital signs:", vitalsData);
       return vitalsData;
     },
-    onSuccess: () => {
+    onSuccess: (savedData) => {
+      // Store the saved data for printing
+      setSavedVitals(savedData);
+      
       toast({
         title: "Vital Signs Recorded",
         description: "Patient vital signs have been successfully recorded.",
       });
-      setShowVitalsModal(false);
-      setVitals(prev => ({
-        ...prev,
-        height: "",
-        weight: "",
-        bmi: "",
-        temperature: "",
-        bloodPressureSystolic: "",
-        bloodPressureDiastolic: "",
-        respirationRate: "",
-        pulseRate: "",
-        oxygenSaturation: "",
-        bloodSugar: "",
-        notes: ""
-      }));
+      
+      // Don't close the modal immediately, let user print if needed
+      // setShowVitalsModal(false);
     },
   });
 
@@ -357,6 +351,19 @@ export default function TriageVitals() {
   const printTriageReport = () => {
     if (!selectedPatient) return;
     
+    // Use saved vitals data if available, otherwise current form data
+    const vitalsToUse = savedVitals || vitals;
+    
+    // Check if vitals have been recorded
+    if (!vitalsToUse.height || !vitalsToUse.weight) {
+      toast({
+        title: "No Vital Signs Recorded",
+        description: "Please record vital signs before printing the report.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(`
@@ -371,7 +378,7 @@ export default function TriageVitals() {
             </style>
           </head>
           <body>
-            ${generateTriageReportContent(selectedPatient, vitals)}
+            ${generateTriageReportContent(selectedPatient, vitalsToUse)}
           </body>
         </html>
       `);
@@ -382,6 +389,19 @@ export default function TriageVitals() {
 
   const downloadTriagePDF = () => {
     if (!selectedPatient) return;
+    
+    // Use saved vitals data if available, otherwise current form data
+    const vitalsToUse = savedVitals || vitals;
+    
+    // Check if vitals have been recorded
+    if (!vitalsToUse.height || !vitalsToUse.weight) {
+      toast({
+        title: "No Vital Signs Recorded",
+        description: "Please record vital signs before downloading the PDF.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     const pdfWindow = window.open('', '_blank');
     if (pdfWindow) {
@@ -394,7 +414,7 @@ export default function TriageVitals() {
             </style>
           </head>
           <body>
-            ${generateTriageReportContent(selectedPatient, vitals)}
+            ${generateTriageReportContent(selectedPatient, vitalsToUse)}
             <script>
               window.onload = function() {
                 window.print();
@@ -733,33 +753,58 @@ export default function TriageVitals() {
               Patient: {selectedPatient?.patientId} • Age: {selectedPatient ? new Date().getFullYear() - new Date(selectedPatient.dateOfBirth).getFullYear() : 0} years
             </div>
             <div className="flex space-x-2">
-              <Button variant="outline" onClick={() => setShowVitalsModal(false)}>
-                Cancel
+              <Button variant="outline" onClick={() => {
+                setShowVitalsModal(false);
+                setSavedVitals(null); // Reset saved vitals when closing
+                setVitals(prev => ({
+                  ...prev,
+                  height: "",
+                  weight: "",
+                  bmi: "",
+                  temperature: "",
+                  bloodPressureSystolic: "",
+                  bloodPressureDiastolic: "",
+                  respirationRate: "",
+                  pulseRate: "",
+                  oxygenSaturation: "",
+                  bloodSugar: "",
+                  notes: ""
+                }));
+              }}>
+                {savedVitals ? 'Close' : 'Cancel'}
               </Button>
-              <Button 
-                variant="outline"
-                onClick={printTriageReport}
-                className="text-blue-600 border-blue-600 hover:bg-blue-50"
-              >
-                <Activity className="w-4 h-4 mr-1" />
-                Print Report
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={downloadTriagePDF}
-                className="text-purple-600 border-purple-600 hover:bg-purple-50"
-              >
-                <Save className="w-4 h-4 mr-1" />
-                Download PDF
-              </Button>
-              <Button 
-                onClick={handleSaveVitals}
-                disabled={saveVitalsMutation.isPending}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Save className="w-4 h-4 mr-1" />
-                Save Vital Signs
-              </Button>
+              
+              {savedVitals && (
+                <>
+                  <Button 
+                    variant="outline"
+                    onClick={printTriageReport}
+                    className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                  >
+                    <Activity className="w-4 h-4 mr-1" />
+                    Print Report
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={downloadTriagePDF}
+                    className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                  >
+                    <Save className="w-4 h-4 mr-1" />
+                    Download PDF
+                  </Button>
+                </>
+              )}
+              
+              {!savedVitals && (
+                <Button 
+                  onClick={handleSaveVitals}
+                  disabled={saveVitalsMutation.isPending}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Save className="w-4 h-4 mr-1" />
+                  {saveVitalsMutation.isPending ? 'Saving...' : 'Save Vital Signs'}
+                </Button>
+              )}
             </div>
           </div>
         </DialogContent>
