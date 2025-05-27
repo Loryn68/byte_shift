@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -66,23 +67,7 @@ interface ConsultationNotes {
 
 export default function OutpatientConsultation() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [consultation, setConsultation] = useState<ConsultationNotes>({
-    patientId: 0,
-    consultationDate: new Date().toISOString().split('T')[0],
-    consultationTime: new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5),
-    chiefComplaint: "",
-    historyOfPresentIllness: "",
-    pastMedicalHistory: "",
-    physicalExamination: "",
-    assessment: "",
-    treatment: "",
-    prescription: "",
-    followUp: "",
-    doctor: "Dr. Smith",
-    recordedAt: new Date().toISOString()
-  });
-  const [showConsultationModal, setShowConsultationModal] = useState(false);
+  const [, setLocation] = useLocation();
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -275,7 +260,7 @@ export default function OutpatientConsultation() {
                           <TableCell>
                             <div className="flex space-x-2">
                               <Button
-                                onClick={() => openConsultationModal(patient)}
+                                onClick={() => setLocation(`/consultation/${patient.id}`)}
                                 size="sm"
                                 className="bg-blue-600 hover:bg-blue-700"
                               >
