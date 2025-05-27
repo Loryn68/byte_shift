@@ -1226,8 +1226,12 @@ Generated on: ${new Date().toLocaleDateString()}
           </div>
 
           <div>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700">
-              Save Admission Details
+            <Button 
+              onClick={handleSaveAdmission}
+              disabled={admitPatientMutation.isPending}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              {admitPatientMutation.isPending ? "Admitting Patient..." : "Save Admission Details"}
             </Button>
           </div>
         </div>
