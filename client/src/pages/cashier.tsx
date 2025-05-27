@@ -337,65 +337,76 @@ export default function Cashier() {
           };
           
           return `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px;">
-                <h1 style="color: #2563eb; margin: 0;">Child Mental Haven</h1>
-                <p style="margin: 5px 0; color: #666;">Hospital Information Management</p>
-                <h2 style="margin: 10px 0; color: #333;">PAYMENT RECEIPT</h2>
+            <div style="font-family: 'Courier New', monospace; max-width: 400px; margin: 0 auto; padding: 20px; background: white;">
+              <div style="text-align: center; border-bottom: 2px dashed #333; padding-bottom: 15px; margin-bottom: 15px;">
+                <div style="margin-bottom: 10px;">
+                  <svg width="80" height="80" viewBox="0 0 100 100" style="margin: 0 auto; display: block;">
+                    <circle cx="50" cy="50" r="45" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+                    <text x="50" y="35" text-anchor="middle" fill="white" font-size="14" font-weight="bold">CMH</text>
+                    <text x="50" y="55" text-anchor="middle" fill="white" font-size="8">MENTAL</text>
+                    <text x="50" y="68" text-anchor="middle" fill="white" font-size="8">HEALTH</text>
+                  </svg>
+                </div>
+                <h1 style="font-size: 18px; font-weight: bold; margin: 5px 0; letter-spacing: 1px;">CHILD MENTAL HAVEN</h1>
+                <p style="font-size: 12px; margin: 5px 0;">Specialized Pediatric Mental Health</p>
+                <h2 style="font-size: 14px; margin: 10px 0; letter-spacing: 2px;">PAYMENT RECEIPT</h2>
               </div>
               
-              <div style="margin-bottom: 20px;">
-                <h3 style="color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Receipt Information</h3>
-                <p><strong>Receipt #:</strong> ${bill.billId}</p>
-                <p><strong>Date:</strong> ${bill.paymentDate ? formatDateTime(bill.paymentDate) : formatDateTime(new Date())}</p>
-                <p><strong>Payment Method:</strong> Cash</p>
+              <div style="margin-bottom: 15px; font-size: 12px;">
+                <div style="border-bottom: 1px dashed #333; padding-bottom: 8px; margin-bottom: 8px;">
+                  <strong>RECEIPT DETAILS</strong>
+                </div>
+                <div>Receipt #: ${bill.billId}</div>
+                <div>Date: ${bill.paymentDate ? formatDateTime(bill.paymentDate) : formatDateTime(new Date())}</div>
+                <div>Payment: CASH</div>
               </div>
               
-              <div style="margin-bottom: 20px;">
-                <h3 style="color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Patient Information</h3>
-                <p><strong>Patient ID:</strong> ${patient.patientId}</p>
-                <p><strong>Name:</strong> ${patient.firstName} ${patient.middleName ? patient.middleName + ' ' : ''}${patient.lastName}</p>
-                <p><strong>Date of Birth:</strong> ${formatDate(patient.dateOfBirth)}</p>
-                <p><strong>Age:</strong> ${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} years</p>
-                <p><strong>Gender:</strong> ${patient.gender}</p>
-                <p><strong>Address:</strong> ${patient.address}</p>
-                <p><strong>County:</strong> ${patient.county || 'Not specified'}</p>
-                ${patient.occupation ? `<p><strong>Occupation:</strong> ${patient.occupation}</p>` : ''}
-                ${patient.bloodType ? `<p><strong>Blood Type:</strong> ${patient.bloodType}</p>` : ''}
-                ${patient.insuranceProvider ? `<p><strong>Insurance Provider:</strong> ${patient.insuranceProvider}</p>` : ''}
-                ${patient.insuranceNumber ? `<p><strong>Insurance Number:</strong> ${patient.insuranceNumber}</p>` : ''}
-                ${patient.allergies ? `<p><strong>Allergies:</strong> ${patient.allergies}</p>` : ''}
-                ${patient.medicalHistory ? `<p><strong>Medical History:</strong> ${patient.medicalHistory}</p>` : ''}
+              <div style="margin-bottom: 15px; font-size: 12px;">
+                <div style="border-bottom: 1px dashed #333; padding-bottom: 8px; margin-bottom: 8px;">
+                  <strong>PATIENT INFORMATION</strong>
+                </div>
+                <div>ID: ${patient.patientId}</div>
+                <div>Name: ${patient.firstName} ${patient.middleName ? patient.middleName + ' ' : ''}${patient.lastName}</div>
+                <div>DOB: ${formatDate(patient.dateOfBirth)}</div>
+                <div>Age: ${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} years</div>
+                <div>Gender: ${patient.gender}</div>
+                <div>Address: ${patient.address}</div>
+                <div>County: ${patient.county || 'Not specified'}</div>
+                ${patient.occupation ? `<div>Occupation: ${patient.occupation}</div>` : ''}
+                ${patient.bloodType ? `<div>Blood Type: ${patient.bloodType}</div>` : ''}
+                ${patient.insuranceProvider ? `<div>Insurance: ${patient.insuranceProvider}</div>` : ''}
+                ${patient.insuranceNumber ? `<div>Policy #: ${patient.insuranceNumber}</div>` : ''}
+                ${patient.allergies ? `<div>Allergies: ${patient.allergies}</div>` : ''}
+                ${patient.medicalHistory ? `<div>Medical History: ${patient.medicalHistory}</div>` : ''}
               </div>
               
-              <div style="margin-bottom: 20px;">
-                <h3 style="color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Service Details</h3>
-                <table style="width: 100%; border-collapse: collapse;">
-                  <tr style="background-color: #f5f5f5;">
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Description</th>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Amount</th>
-                  </tr>
-                  <tr>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${bill.serviceDescription}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatCurrency(parseFloat(bill.amount || "0"))}</td>
-                  </tr>
-                  ${bill.discount && parseFloat(bill.discount) > 0 ? `
-                    <tr>
-                      <td style="border: 1px solid #ddd; padding: 8px;">Discount</td>
-                      <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">-${formatCurrency(parseFloat(bill.discount))}</td>
-                    </tr>
-                  ` : ''}
-                  <tr style="background-color: #f0f0f0; font-weight: bold;">
-                    <td style="border: 1px solid #ddd; padding: 8px;">Total Amount</td>
-                    <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatCurrency(parseFloat(bill.totalAmount || "0"))}</td>
-                  </tr>
-                </table>
+              <div style="margin-bottom: 15px; font-size: 12px;">
+                <div style="border-bottom: 1px dashed #333; padding-bottom: 8px; margin-bottom: 8px;">
+                  <strong>SERVICE DETAILS</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                  <span>${bill.serviceDescription}</span>
+                  <span>${formatCurrency(parseFloat(bill.amount || "0"))}</span>
+                </div>
+                ${bill.discount && parseFloat(bill.discount) > 0 ? `
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Discount</span>
+                    <span>-${formatCurrency(parseFloat(bill.discount))}</span>
+                  </div>
+                ` : ''}
+                <div style="border-top: 1px dashed #333; padding-top: 5px; margin-top: 10px;">
+                  <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 14px;">
+                    <span>TOTAL AMOUNT</span>
+                    <span>${formatCurrency(parseFloat(bill.totalAmount || "0"))}</span>
+                  </div>
+                </div>
               </div>
               
-              <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">
-                <p>Thank you for choosing Child Mental Haven</p>
-                <p>For inquiries, please contact us</p>
-                <p style="margin-top: 20px;">This is a computer-generated receipt</p>
+              <div style="text-align: center; font-size: 10px; margin-top: 20px; border-top: 1px dashed #333; padding-top: 10px;">
+                <div style="margin-bottom: 5px;">Thank you for choosing</div>
+                <div style="font-weight: bold; margin-bottom: 5px;">CHILD MENTAL HAVEN</div>
+                <div style="margin-bottom: 10px;">For inquiries, please contact us</div>
+                <div>*** COMPUTER GENERATED RECEIPT ***</div>
               </div>
             </div>
           `;
