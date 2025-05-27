@@ -109,7 +109,7 @@ export default function TherapyPage() {
             <div><strong>Name:</strong> {patient.firstName} {patient.lastName}</div>
             <div><strong>ID:</strong> {patient.patientId}</div>
             <div><strong>Age:</strong> {new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()}</div>
-            <div><strong>Department:</strong> {patient.department || 'Mental Health'}</div>
+            <div><strong>Type:</strong> Therapy Patient</div>
           </div>
         </div>
 
