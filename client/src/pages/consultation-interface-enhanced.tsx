@@ -314,23 +314,7 @@ export default function ConsultationInterface() {
                     </DialogContent>
                   </Dialog>
 
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" className="justify-start h-auto p-3 border-orange-200 hover:bg-orange-50">
-                        <UserPlus className="w-4 h-4 mr-2 text-orange-600" />
-                        <div className="text-left">
-                          <div className="font-medium text-orange-700">Admit Patient</div>
-                          <div className="text-xs text-orange-500">Transfer to inpatient</div>
-                        </div>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Patient Admission Form</DialogTitle>
-                      </DialogHeader>
-                      <PatientAdmissionForm />
-                    </DialogContent>
-                  </Dialog>
+
                 </div>
               </div>
             </CardContent>
