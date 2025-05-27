@@ -223,16 +223,16 @@ export default function TriageVitals() {
           <div style="border: 1px solid #4CAF50; padding: 15px; background-color: #f9f9f9;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
               <div>
-                <strong>Patient ID:</strong> ${patient.patientId}<br>
-                <strong>Name:</strong> ${patient.firstName} ${patient.middleName || ''} ${patient.lastName}<br>
+                <strong>Name:</strong> ${patient.firstName} ${patient.middleName ? patient.middleName + ' ' : ''}${patient.lastName}<br>
                 <strong>Date of Birth:</strong> ${new Date(patient.dateOfBirth).toLocaleDateString()}<br>
-                <strong>Age:</strong> ${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} years
+                <strong>Age:</strong> ${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} years<br>
+                <strong>Gender:</strong> ${patient.gender}
               </div>
               <div>
-                <strong>Gender:</strong> ${patient.gender}<br>
                 <strong>Address:</strong> ${patient.address}<br>
-                <strong>County:</strong> ${patient.county || 'Not specified'}<br>
-                ${patient.phone ? `<strong>Emergency Contact:</strong> ${patient.emergencyContactName}` : ''}
+                <strong>Blood Type:</strong> ${patient.bloodType || 'Not specified'}<br>
+                <strong>Registration Type:</strong> ${patient.registrationType || 'General'}<br>
+                <strong>Marital Status:</strong> ${patient.maritalStatus || 'Not specified'}
               </div>
             </div>
           </div>
