@@ -628,18 +628,27 @@ Date: ${new Date().toLocaleDateString()}`;
   );
 }
 
-// Medical Report Form
+// Medical Report Form - Enhanced Admission Form
 function MedicalReportForm() {
   const [formData, setFormData] = useState({
     patientName: "",
     patientId: "",
-    admissionDate: new Date().toISOString().split('T')[0],
+    modeOfAdmission: "",
+    allegation: "",
+    patientReaction: "",
+    onset: "",
+    duration: "",
+    department: "",
+    ward: "",
+    bed: "",
+    dailyCharges: "",
+    dateOfAdmission: new Date().toISOString().slice(0, 16), // datetime-local format
     admittingDoctor: "Dr. Smith",
     reasonForAdmission: "",
     clinicalFindings: "",
     provisionalDiagnosis: "",
     treatmentPlan: "",
-    wardAssignment: ""
+    patientPhoto: null
   });
 
   const handlePrint = () => {
@@ -652,17 +661,25 @@ function MedicalReportForm() {
           <p style="margin: 0; font-size: 14px;">Tel: 254746170159 | Email: info@childmentalhaven.org</p>
         </div>
         
-        <h2 style="color: #0066cc; border-bottom: 1px solid #ccc; padding-bottom: 10px;">MEDICAL REPORT - ADMISSION</h2>
+        <h2 style="color: #0066cc; border-bottom: 1px solid #ccc; padding-bottom: 10px;">PATIENT ADMISSION FORM</h2>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
           <div>
             <p><strong>Patient Name:</strong> ${formData.patientName}</p>
             <p><strong>Patient ID:</strong> ${formData.patientId}</p>
-            <p><strong>Admission Date:</strong> ${formData.admissionDate}</p>
+            <p><strong>Mode of Admission:</strong> ${formData.modeOfAdmission}</p>
+            <p><strong>Allegation:</strong> ${formData.allegation}</p>
+            <p><strong>Patient Reaction:</strong> ${formData.patientReaction}</p>
+            <p><strong>Onset:</strong> ${formData.onset}</p>
+            <p><strong>Duration:</strong> ${formData.duration}</p>
           </div>
           <div>
+            <p><strong>Department:</strong> ${formData.department}</p>
+            <p><strong>Ward:</strong> ${formData.ward}</p>
+            <p><strong>Bed:</strong> ${formData.bed}</p>
+            <p><strong>Daily Charges:</strong> ${formData.dailyCharges}</p>
+            <p><strong>Date of Admission:</strong> ${formData.dateOfAdmission}</p>
             <p><strong>Admitting Doctor:</strong> ${formData.admittingDoctor}</p>
-            <p><strong>Ward Assignment:</strong> ${formData.wardAssignment}</p>
           </div>
         </div>
 
@@ -733,7 +750,7 @@ Date: ${new Date().toLocaleDateString()}`;
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-semibold">Medical Report - Admission</h3>
+        <h3 className="text-xl font-semibold">Patient Admission Form</h3>
         <div className="flex space-x-2">
           <Button onClick={handlePrint} variant="outline" size="sm">
             <FileText className="w-4 h-4 mr-2" />
@@ -746,90 +763,239 @@ Date: ${new Date().toLocaleDateString()}`;
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column */}
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="patientName">Patient Name</Label>
+            <Input
+              id="patientName"
+              value={formData.patientName}
+              onChange={(e) => setFormData(prev => ({ ...prev, patientName: e.target.value }))}
+              placeholder="Enter patient name"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="modeOfAdmission">Mode of Admission</Label>
+            <select
+              id="modeOfAdmission"
+              value={formData.modeOfAdmission}
+              onChange={(e) => setFormData(prev => ({ ...prev, modeOfAdmission: e.target.value }))}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="">Select mode of admission</option>
+              <option value="emergency">Emergency</option>
+              <option value="elective">Elective</option>
+              <option value="urgent">Urgent</option>
+              <option value="routine">Routine</option>
+            </select>
+          </div>
+
+          <div>
+            <Label htmlFor="allegation">Allegation</Label>
+            <Input
+              id="allegation"
+              value={formData.allegation}
+              onChange={(e) => setFormData(prev => ({ ...prev, allegation: e.target.value }))}
+              placeholder="Enter allegation"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="patientReaction">Patient Reaction</Label>
+            <select
+              id="patientReaction"
+              value={formData.patientReaction}
+              onChange={(e) => setFormData(prev => ({ ...prev, patientReaction: e.target.value }))}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="">Select patient reaction</option>
+              <option value="cooperative">Cooperative</option>
+              <option value="agitated">Agitated</option>
+              <option value="withdrawn">Withdrawn</option>
+              <option value="confused">Confused</option>
+              <option value="combative">Combative</option>
+            </select>
+          </div>
+
+          <div>
+            <Label htmlFor="onset">Onset</Label>
+            <select
+              id="onset"
+              value={formData.onset}
+              onChange={(e) => setFormData(prev => ({ ...prev, onset: e.target.value }))}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="">Select onset</option>
+              <option value="sudden">Sudden</option>
+              <option value="gradual">Gradual</option>
+              <option value="acute">Acute</option>
+              <option value="chronic">Chronic</option>
+            </select>
+          </div>
+
+          <div>
+            <Label htmlFor="duration">Duration</Label>
+            <Input
+              id="duration"
+              value={formData.duration}
+              onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
+              placeholder="e.g., 2 weeks, 3 months"
+            />
+          </div>
+        </div>
+
+        {/* Middle Column */}
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="department">Department</Label>
+            <select
+              id="department"
+              value={formData.department}
+              onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="">Select department</option>
+              <option value="psychiatry">Psychiatry</option>
+              <option value="psychology">Psychology</option>
+              <option value="pediatric-mental-health">Pediatric Mental Health</option>
+              <option value="adolescent-services">Adolescent Services</option>
+              <option value="crisis-intervention">Crisis Intervention</option>
+            </select>
+          </div>
+
+          <div>
+            <Label htmlFor="ward">Ward</Label>
+            <select
+              id="ward"
+              value={formData.ward}
+              onChange={(e) => setFormData(prev => ({ ...prev, ward: e.target.value }))}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="">Select ward</option>
+              <option value="general-ward">General Ward</option>
+              <option value="intensive-care">Intensive Care</option>
+              <option value="secure-unit">Secure Unit</option>
+              <option value="adolescent-unit">Adolescent Unit</option>
+              <option value="family-unit">Family Unit</option>
+            </select>
+          </div>
+
+          <div>
+            <Label htmlFor="bed">Bed</Label>
+            <select
+              id="bed"
+              value={formData.bed}
+              onChange={(e) => setFormData(prev => ({ ...prev, bed: e.target.value }))}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="">Select bed</option>
+              <option value="bed-1">Bed 1</option>
+              <option value="bed-2">Bed 2</option>
+              <option value="bed-3">Bed 3</option>
+              <option value="bed-4">Bed 4</option>
+              <option value="bed-5">Bed 5</option>
+              <option value="private-room">Private Room</option>
+            </select>
+          </div>
+
+          <div>
+            <Label htmlFor="dailyCharges">Daily Charges (KShs)</Label>
+            <Input
+              id="dailyCharges"
+              value={formData.dailyCharges}
+              onChange={(e) => setFormData(prev => ({ ...prev, dailyCharges: e.target.value }))}
+              placeholder="Enter daily charges"
+              type="number"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="dateOfAdmission">Date of Admission</Label>
+            <Input
+              id="dateOfAdmission"
+              type="datetime-local"
+              value={formData.dateOfAdmission}
+              onChange={(e) => setFormData(prev => ({ ...prev, dateOfAdmission: e.target.value }))}
+            />
+          </div>
+        </div>
+
+        {/* Right Column - Patient Photo and Additional Info */}
+        <div className="space-y-4">
+          <div className="text-center">
+            <Label>Patient Photo</Label>
+            <div className="mt-2 flex flex-col items-center">
+              <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                {formData.patientPhoto ? (
+                  <img src={formData.patientPhoto} alt="Patient" className="w-full h-full rounded-full object-cover" />
+                ) : (
+                  <div className="text-gray-400 text-center">
+                    <User className="w-12 h-12 mx-auto mb-2" />
+                    <span className="text-sm">No Photo</span>
+                  </div>
+                )}
+              </div>
+              <Button variant="outline" size="sm">
+                Upload Image
+              </Button>
+            </div>
+          </div>
+
+          <div>
+            <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              Save Admission Details
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Medical Information */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 pt-6 border-t">
         <div>
-          <Label htmlFor="patientName">Patient Name</Label>
-          <Input
-            id="patientName"
-            value={formData.patientName}
-            onChange={(e) => setFormData(prev => ({ ...prev, patientName: e.target.value }))}
-            placeholder="Enter patient name"
+          <Label htmlFor="reasonForAdmission">Reason for Admission</Label>
+          <Textarea
+            id="reasonForAdmission"
+            value={formData.reasonForAdmission}
+            onChange={(e) => setFormData(prev => ({ ...prev, reasonForAdmission: e.target.value }))}
+            placeholder="Enter reason for admission..."
+            rows={3}
           />
         </div>
+
         <div>
-          <Label htmlFor="patientId">Patient ID</Label>
-          <Input
-            id="patientId"
-            value={formData.patientId}
-            onChange={(e) => setFormData(prev => ({ ...prev, patientId: e.target.value }))}
-            placeholder="Enter patient ID"
+          <Label htmlFor="clinicalFindings">Clinical Findings</Label>
+          <Textarea
+            id="clinicalFindings"
+            value={formData.clinicalFindings}
+            onChange={(e) => setFormData(prev => ({ ...prev, clinicalFindings: e.target.value }))}
+            placeholder="Enter clinical findings..."
+            rows={3}
           />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="admissionDate">Admission Date</Label>
-          <Input
-            id="admissionDate"
-            type="date"
-            value={formData.admissionDate}
-            onChange={(e) => setFormData(prev => ({ ...prev, admissionDate: e.target.value }))}
+          <Label htmlFor="provisionalDiagnosis">Provisional Diagnosis</Label>
+          <Textarea
+            id="provisionalDiagnosis"
+            value={formData.provisionalDiagnosis}
+            onChange={(e) => setFormData(prev => ({ ...prev, provisionalDiagnosis: e.target.value }))}
+            placeholder="Enter provisional diagnosis..."
+            rows={3}
           />
         </div>
+
         <div>
-          <Label htmlFor="wardAssignment">Ward Assignment</Label>
-          <Input
-            id="wardAssignment"
-            value={formData.wardAssignment}
-            onChange={(e) => setFormData(prev => ({ ...prev, wardAssignment: e.target.value }))}
-            placeholder="Enter ward assignment"
+          <Label htmlFor="treatmentPlan">Treatment Plan</Label>
+          <Textarea
+            id="treatmentPlan"
+            value={formData.treatmentPlan}
+            onChange={(e) => setFormData(prev => ({ ...prev, treatmentPlan: e.target.value }))}
+            placeholder="Enter treatment plan..."
+            rows={3}
           />
         </div>
-      </div>
-
-      <div>
-        <Label htmlFor="reasonForAdmission">Reason for Admission</Label>
-        <Textarea
-          id="reasonForAdmission"
-          value={formData.reasonForAdmission}
-          onChange={(e) => setFormData(prev => ({ ...prev, reasonForAdmission: e.target.value }))}
-          placeholder="Enter reason for admission..."
-          rows={3}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="clinicalFindings">Clinical Findings</Label>
-        <Textarea
-          id="clinicalFindings"
-          value={formData.clinicalFindings}
-          onChange={(e) => setFormData(prev => ({ ...prev, clinicalFindings: e.target.value }))}
-          placeholder="Enter clinical findings..."
-          rows={4}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="provisionalDiagnosis">Provisional Diagnosis</Label>
-        <Textarea
-          id="provisionalDiagnosis"
-          value={formData.provisionalDiagnosis}
-          onChange={(e) => setFormData(prev => ({ ...prev, provisionalDiagnosis: e.target.value }))}
-          placeholder="Enter provisional diagnosis..."
-          rows={3}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="treatmentPlan">Treatment Plan</Label>
-        <Textarea
-          id="treatmentPlan"
-          value={formData.treatmentPlan}
-          onChange={(e) => setFormData(prev => ({ ...prev, treatmentPlan: e.target.value }))}
-          placeholder="Enter treatment plan..."
-          rows={4}
-        />
       </div>
     </div>
   );
