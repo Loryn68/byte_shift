@@ -183,6 +183,230 @@ export default function TriageVitals() {
     saveVitalsMutation.mutate(vitals);
   };
 
+  const generateTriageReportContent = (patient: Patient, vitalsData: VitalSigns) => {
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: white;">
+        <!-- Header with Logo -->
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #4CAF50; padding-bottom: 20px;">
+          <div style="margin-bottom: 15px;">
+            <svg width="120" height="100" viewBox="0 0 300 200" style="margin: 0 auto; display: block;">
+              <!-- Colorful brain -->
+              <path d="M150 40 C130 35, 110 45, 115 60 C105 65, 110 80, 125 85 C120 95, 135 100, 145 95 C155 100, 170 95, 165 85 C180 80, 185 65, 175 60 C190 45, 170 35, 150 40 Z" fill="#4CAF50"/>
+              <path d="M155 45 C175 40, 185 50, 180 60 C190 65, 185 75, 175 75 C180 85, 165 90, 160 85 C155 90, 145 85, 150 80 C135 75, 135 65, 145 60 C135 50, 145 40, 155 45 Z" fill="#2196F3"/>
+              <path d="M160 50 C170 55, 175 65, 165 70 C175 75, 170 85, 160 80 C165 90, 155 95, 150 90 C145 95, 135 90, 140 80 C130 85, 125 75, 135 70 C125 65, 130 55, 140 60 C135 50, 145 45, 160 50 Z" fill="#FF5722"/>
+              <path d="M145 55 C155 60, 160 70, 150 75 C160 80, 155 90, 145 85 C150 95, 140 100, 135 95 C130 100, 120 95, 125 85 C115 90, 110 80, 120 75 C110 70, 115 60, 125 65 C120 55, 130 50, 145 55 Z" fill="#9C27B0"/>
+              <path d="M150 60 C160 65, 165 75, 155 80 C165 85, 160 95, 150 90 C155 100, 145 105, 140 100 C135 105, 125 100, 130 90 C120 95, 115 85, 125 80 C115 75, 120 65, 130 70 C125 60, 135 55, 150 60 Z" fill="#FF9800"/>
+              
+              <!-- Two children figures -->
+              <g transform="translate(100, 120)">
+                <!-- Left child -->
+                <circle cx="20" cy="20" r="12" fill="#4CAF50"/>
+                <path d="M8 35 L8 70 L16 70 L16 50 L24 50 L24 70 L32 70 L32 35 C32 28, 28 20, 20 20 C12 20, 8 28, 8 35 Z" fill="#4CAF50"/>
+                <path d="M4 55 L4 75 L12 75 L12 55 Z" fill="#4CAF50"/>
+                <path d="M28 55 L28 75 L36 75 L36 55 Z" fill="#4CAF50"/>
+              </g>
+              
+              <g transform="translate(160, 120)">
+                <!-- Right child -->
+                <circle cx="20" cy="20" r="12" fill="#4CAF50"/>
+                <path d="M8 35 L8 70 L16 70 L16 50 L24 50 L24 70 L32 70 L32 35 C32 28, 28 20, 20 20 C12 20, 8 28, 8 35 Z" fill="#4CAF50"/>
+                <path d="M4 55 L4 75 L12 75 L12 55 Z" fill="#4CAF50"/>
+                <path d="M28 55 L28 75 L36 75 L36 55 Z" fill="#4CAF50"/>
+              </g>
+              
+              <!-- Connection line -->
+              <line x1="120" y1="175" x2="160" y2="175" stroke="#4CAF50" stroke-width="4"/>
+            </svg>
+          </div>
+          <h1 style="color: #4CAF50; margin: 10px 0; font-size: 28px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
+          <p style="color: #333; margin: 5px 0; font-size: 16px;">Where Young Minds Evolve</p>
+          <h2 style="color: #333; margin: 15px 0; font-size: 20px; letter-spacing: 1px;">TRIAGE ASSESSMENT REPORT</h2>
+        </div>
+
+        <!-- Patient Information -->
+        <div style="margin-bottom: 25px;">
+          <h3 style="background-color: #4CAF50; color: white; padding: 8px; margin: 0; font-size: 16px;">PATIENT INFORMATION</h3>
+          <div style="border: 1px solid #4CAF50; padding: 15px; background-color: #f9f9f9;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div>
+                <strong>Patient ID:</strong> ${patient.patientId}<br>
+                <strong>Name:</strong> ${patient.firstName} ${patient.middleName || ''} ${patient.lastName}<br>
+                <strong>Date of Birth:</strong> ${new Date(patient.dateOfBirth).toLocaleDateString()}<br>
+                <strong>Age:</strong> ${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} years
+              </div>
+              <div>
+                <strong>Gender:</strong> ${patient.gender}<br>
+                <strong>Address:</strong> ${patient.address}<br>
+                <strong>County:</strong> ${patient.county || 'Not specified'}<br>
+                ${patient.phone ? `<strong>Emergency Contact:</strong> ${patient.emergencyContactName}` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assessment Details -->
+        <div style="margin-bottom: 25px;">
+          <h3 style="background-color: #2196F3; color: white; padding: 8px; margin: 0; font-size: 16px;">ASSESSMENT DETAILS</h3>
+          <div style="border: 1px solid #2196F3; padding: 15px; background-color: #f9f9f9;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div>
+                <strong>Assessment Date:</strong> ${vitalsData.measurementDate}<br>
+                <strong>Assessment Time:</strong> ${vitalsData.measurementTime}<br>
+                <strong>Assessed By:</strong> ${vitalsData.clinician}
+              </div>
+              <div>
+                <strong>Report Generated:</strong> ${new Date().toLocaleString()}<br>
+                <strong>Department:</strong> Triage/Nursing
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vital Signs -->
+        <div style="margin-bottom: 25px;">
+          <h3 style="background-color: #FF5722; color: white; padding: 8px; margin: 0; font-size: 16px;">VITAL SIGNS MEASUREMENTS</h3>
+          <div style="border: 1px solid #FF5722; padding: 15px; background-color: #f9f9f9;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px; font-weight: bold; width: 30%;">Measurement</td>
+                <td style="padding: 8px; font-weight: bold; width: 30%;">Value</td>
+                <td style="padding: 8px; font-weight: bold; width: 40%;">Normal Range</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">Height</td>
+                <td style="padding: 8px;">${vitalsData.height} cm</td>
+                <td style="padding: 8px;">Varies by age</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">Weight</td>
+                <td style="padding: 8px;">${vitalsData.weight} kg</td>
+                <td style="padding: 8px;">Varies by age/height</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">BMI</td>
+                <td style="padding: 8px;">${vitalsData.bmi}</td>
+                <td style="padding: 8px;">18.5-24.9 (adults)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">Temperature</td>
+                <td style="padding: 8px;">${vitalsData.temperature}°C</td>
+                <td style="padding: 8px;">36.1-37.2°C</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">Blood Pressure</td>
+                <td style="padding: 8px;">${vitalsData.bloodPressureSystolic}/${vitalsData.bloodPressureDiastolic} mmHg</td>
+                <td style="padding: 8px;">90-120/60-80 mmHg</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">Pulse Rate</td>
+                <td style="padding: 8px;">${vitalsData.pulseRate} bpm</td>
+                <td style="padding: 8px;">60-100 bpm (adults)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">Respiration Rate</td>
+                <td style="padding: 8px;">${vitalsData.respirationRate} breaths/min</td>
+                <td style="padding: 8px;">12-20 breaths/min</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">Oxygen Saturation</td>
+                <td style="padding: 8px;">${vitalsData.oxygenSaturation}%</td>
+                <td style="padding: 8px;">95-100%</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px;">Blood Sugar</td>
+                <td style="padding: 8px;">${vitalsData.bloodSugar} mmol/L</td>
+                <td style="padding: 8px;">3.5-5.5 mmol/L</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Clinical Notes -->
+        ${vitalsData.notes ? `
+        <div style="margin-bottom: 25px;">
+          <h3 style="background-color: #9C27B0; color: white; padding: 8px; margin: 0; font-size: 16px;">CLINICAL NOTES & OBSERVATIONS</h3>
+          <div style="border: 1px solid #9C27B0; padding: 15px; background-color: #f9f9f9; min-height: 60px;">
+            ${vitalsData.notes}
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- Recommendations -->
+        <div style="margin-bottom: 25px;">
+          <h3 style="background-color: #FF9800; color: white; padding: 8px; margin: 0; font-size: 16px;">TRIAGE RECOMMENDATIONS</h3>
+          <div style="border: 1px solid #FF9800; padding: 15px; background-color: #f9f9f9;">
+            <p style="margin: 5px 0;">☐ Proceed to Doctor Consultation</p>
+            <p style="margin: 5px 0;">☐ Urgent Medical Attention Required</p>
+            <p style="margin: 5px 0;">☐ Monitor Vital Signs</p>
+            <p style="margin: 5px 0;">☐ Additional Assessment Needed</p>
+            <p style="margin: 5px 0;">☐ Follow-up Required</p>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #4CAF50; font-size: 12px; color: #666;">
+          <p style="margin: 5px 0;"><strong>Child Mental Haven</strong> - Where Young Minds Evolve</p>
+          <p style="margin: 5px 0;">Professional Pediatric Mental Health Services</p>
+          <p style="margin: 10px 0;">This is a computer-generated medical report</p>
+          <p style="margin: 5px 0;">Generated on: ${new Date().toLocaleString()}</p>
+        </div>
+      </div>
+    `;
+  };
+
+  const printTriageReport = () => {
+    if (!selectedPatient) return;
+    
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Triage Assessment - ${selectedPatient.firstName} ${selectedPatient.lastName}</title>
+            <style>
+              @media print {
+                body { margin: 0; }
+                @page { margin: 1cm; }
+              }
+            </style>
+          </head>
+          <body>
+            ${generateTriageReportContent(selectedPatient, vitals)}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const downloadTriagePDF = () => {
+    if (!selectedPatient) return;
+    
+    const pdfWindow = window.open('', '_blank');
+    if (pdfWindow) {
+      pdfWindow.document.write(`
+        <html>
+          <head>
+            <title>Triage Assessment - ${selectedPatient.firstName} ${selectedPatient.lastName}</title>
+            <style>
+              body { margin: 0; font-family: Arial, sans-serif; }
+            </style>
+          </head>
+          <body>
+            ${generateTriageReportContent(selectedPatient, vitals)}
+            <script>
+              window.onload = function() {
+                window.print();
+              }
+            </script>
+          </body>
+        </html>
+      `);
+      pdfWindow.document.close();
+    }
+  };
+
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center justify-between mb-6">
@@ -511,6 +735,22 @@ export default function TriageVitals() {
             <div className="flex space-x-2">
               <Button variant="outline" onClick={() => setShowVitalsModal(false)}>
                 Cancel
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={printTriageReport}
+                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+              >
+                <Activity className="w-4 h-4 mr-1" />
+                Print Report
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={downloadTriagePDF}
+                className="text-purple-600 border-purple-600 hover:bg-purple-50"
+              >
+                <Save className="w-4 h-4 mr-1" />
+                Download PDF
               </Button>
               <Button 
                 onClick={handleSaveVitals}
