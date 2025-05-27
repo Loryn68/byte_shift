@@ -180,10 +180,10 @@ export default function TriageVitals() {
   const generateTriageReportContent = (patient: Patient, vitalsData: VitalSigns) => {
     return `
       <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: white;">
-        <!-- Header with Logo -->
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #4CAF50; padding-bottom: 20px;">
-          <div style="margin-bottom: 15px;">
-            <svg width="120" height="100" viewBox="0 0 300 200" style="margin: 0 auto; display: block;">
+        <!-- Header with Logo and Hospital Details -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
+          <div style="flex: 1;">
+            <svg width="80" height="70" viewBox="0 0 300 200">
               <!-- Colorful brain -->
               <path d="M150 40 C130 35, 110 45, 115 60 C105 65, 110 80, 125 85 C120 95, 135 100, 145 95 C155 100, 170 95, 165 85 C180 80, 185 65, 175 60 C190 45, 170 35, 150 40 Z" fill="#4CAF50"/>
               <path d="M155 45 C175 40, 185 50, 180 60 C190 65, 185 75, 175 75 C180 85, 165 90, 160 85 C155 90, 145 85, 150 80 C135 75, 135 65, 145 60 C135 50, 145 40, 155 45 Z" fill="#2196F3"/>
@@ -193,7 +193,6 @@ export default function TriageVitals() {
               
               <!-- Two children figures -->
               <g transform="translate(100, 120)">
-                <!-- Left child -->
                 <circle cx="20" cy="20" r="12" fill="#4CAF50"/>
                 <path d="M8 35 L8 70 L16 70 L16 50 L24 50 L24 70 L32 70 L32 35 C32 28, 28 20, 20 20 C12 20, 8 28, 8 35 Z" fill="#4CAF50"/>
                 <path d="M4 55 L4 75 L12 75 L12 55 Z" fill="#4CAF50"/>
@@ -201,20 +200,45 @@ export default function TriageVitals() {
               </g>
               
               <g transform="translate(160, 120)">
-                <!-- Right child -->
                 <circle cx="20" cy="20" r="12" fill="#4CAF50"/>
                 <path d="M8 35 L8 70 L16 70 L16 50 L24 50 L24 70 L32 70 L32 35 C32 28, 28 20, 20 20 C12 20, 8 28, 8 35 Z" fill="#4CAF50"/>
                 <path d="M4 55 L4 75 L12 75 L12 55 Z" fill="#4CAF50"/>
                 <path d="M28 55 L28 75 L36 75 L36 55 Z" fill="#4CAF50"/>
               </g>
               
-              <!-- Connection line -->
               <line x1="120" y1="175" x2="160" y2="175" stroke="#4CAF50" stroke-width="4"/>
             </svg>
           </div>
-          <h1 style="color: #4CAF50; margin: 10px 0; font-size: 28px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
-          <p style="color: #333; margin: 5px 0; font-size: 16px;">Where Young Minds Evolve</p>
-          <h2 style="color: #333; margin: 15px 0; font-size: 20px; letter-spacing: 1px;">TRIAGE ASSESSMENT REPORT</h2>
+          
+          <div style="flex: 2; text-align: center;">
+            <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
+            <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
+            <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
+              <div>Muchai Drive Off Ngong Road</div>
+              <div>P.O Box 41622-00100, Nairobi, Kenya</div>
+              <div>Tel: +254 746 170 159</div>
+              <div>Email: info@childmentalhaven.org</div>
+            </div>
+          </div>
+          
+          <div style="flex: 1; text-align: right; font-size: 12px; color: #666;">
+            <div style="border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+              <strong>Report ID:</strong><br>
+              TRG-${Math.random().toString(36).substr(2, 9).toUpperCase()}<br><br>
+              <strong>Date:</strong><br>
+              ${new Date().toLocaleDateString()}<br><br>
+              <strong>Time:</strong><br>
+              ${new Date().toLocaleTimeString()}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Report Title -->
+        <div style="text-align: center; margin-bottom: 25px;">
+          <h2 style="color: #333; margin: 0; font-size: 18px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">
+            TRIAGE ASSESSMENT REPORT
+          </h2>
+          <div style="width: 100px; height: 3px; background: #4CAF50; margin: 10px auto;"></div>
         </div>
 
         <!-- Patient Information -->
