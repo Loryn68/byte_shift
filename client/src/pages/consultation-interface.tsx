@@ -493,20 +493,215 @@ export default function ConsultationInterface() {
   );
 }
 
-// Import the form components from the original file
+// Clinical Summary Form - Outpatient Doctor Notes
 function ClinicalSummaryForm() {
-  // This would be the same component from outpatient-consultation.tsx
-  return <div className="p-4 text-center text-gray-500">Clinical Summary Form will be loaded here</div>;
-}
+  const [formData, setFormData] = useState({
+    patientName: "",
+    patientId: "",
+    consultationDate: new Date().toISOString().split('T')[0],
+    consultationTime: new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5),
+    chiefComplaint: "",
+    historyOfPresentIllness: "",
+    pastMedicalHistory: "",
+    familyHistory: "",
+    socialHistory: "",
+    physicalExamination: "",
+    vitalSigns: "",
+    assessment: "",
+    diagnosis: "",
+    treatmentPlan: "",
+    medications: "",
+    followUpInstructions: "",
+    doctorName: "Dr. Smith",
+    doctorSignature: ""
+  });
 
-function MedicalReportForm() {
-  return <div className="p-4 text-center text-gray-500">Medical Report Form will be loaded here</div>;
-}
+  const handlePrint = () => {
+    const printContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0066cc; padding-bottom: 20px;">
+          <h1 style="color: #0066cc; margin: 0; font-size: 28px;">CHILD MENTAL HAVEN</h1>
+          <p style="margin: 5px 0; color: #666; font-size: 16px;">Where Young Minds Evolve</p>
+          <p style="margin: 0; font-size: 14px;">Muchai Drive Off Ngong Road | P.O Box 41622-00100</p>
+          <p style="margin: 0; font-size: 14px;">Tel: 254746170159 | Email: info@childmentalhaven.org</p>
+        </div>
+        
+        <h2 style="color: #0066cc; border-bottom: 1px solid #ccc; padding-bottom: 10px;">CLINICAL SUMMARY - OUTPATIENT</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+          <div>
+            <p><strong>Patient Name:</strong> ${formData.patientName}</p>
+            <p><strong>Patient ID:</strong> ${formData.patientId}</p>
+            <p><strong>Date:</strong> ${formData.consultationDate}</p>
+          </div>
+          <div>
+            <p><strong>Time:</strong> ${formData.consultationTime}</p>
+            <p><strong>Doctor:</strong> ${formData.doctorName}</p>
+          </div>
+        </div>
 
-function ReferralOutForm() {
-  return <div className="p-4 text-center text-gray-500">Referral Out Form will be loaded here</div>;
-}
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #0066cc;">Chief Complaint</h3>
+          <p style="border: 1px solid #ddd; padding: 10px; min-height: 60px;">${formData.chiefComplaint}</p>
+        </div>
 
-function LabRequestForm() {
-  return <div className="p-4 text-center text-gray-500">Lab Request Form will be loaded here</div>;
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #0066cc;">History of Present Illness</h3>
+          <p style="border: 1px solid #ddd; padding: 10px; min-height: 80px;">${formData.historyOfPresentIllness}</p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #0066cc;">Physical Examination</h3>
+          <p style="border: 1px solid #ddd; padding: 10px; min-height: 80px;">${formData.physicalExamination}</p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #0066cc;">Assessment & Diagnosis</h3>
+          <p style="border: 1px solid #ddd; padding: 10px; min-height: 60px;">${formData.assessment}</p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #0066cc;">Treatment Plan</h3>
+          <p style="border: 1px solid #ddd; padding: 10px; min-height: 80px;">${formData.treatmentPlan}</p>
+        </div>
+
+        <div style="margin-top: 40px; text-align: right;">
+          <p><strong>Doctor's Signature:</strong> _________________________</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+      </div>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow!.document.write(printContent);
+    printWindow!.document.close();
+    printWindow!.print();
+  };
+
+  const handleDownload = () => {
+    const content = `CHILD MENTAL HAVEN - CLINICAL SUMMARY\n
+Patient: ${formData.patientName}
+ID: ${formData.patientId}
+Date: ${formData.consultationDate}
+
+CHIEF COMPLAINT:
+${formData.chiefComplaint}
+
+HISTORY OF PRESENT ILLNESS:
+${formData.historyOfPresentIllness}
+
+PHYSICAL EXAMINATION:
+${formData.physicalExamination}
+
+ASSESSMENT & DIAGNOSIS:
+${formData.assessment}
+
+TREATMENT PLAN:
+${formData.treatmentPlan}
+
+Doctor: ${formData.doctorName}
+Date: ${new Date().toLocaleDateString()}`;
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `clinical-summary-${formData.patientId}-${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-xl font-semibold">Clinical Summary - Outpatient</h3>
+        <div className="flex space-x-2">
+          <Button onClick={handlePrint} variant="outline" size="sm">
+            <FileText className="w-4 h-4 mr-2" />
+            Print
+          </Button>
+          <Button onClick={handleDownload} variant="outline" size="sm">
+            <Download className="w-4 h-4 mr-2" />
+            Download
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="patientName">Patient Name</Label>
+          <Input
+            id="patientName"
+            value={formData.patientName}
+            onChange={(e) => setFormData(prev => ({ ...prev, patientName: e.target.value }))}
+            placeholder="Enter patient name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="patientId">Patient ID</Label>
+          <Input
+            id="patientId"
+            value={formData.patientId}
+            onChange={(e) => setFormData(prev => ({ ...prev, patientId: e.target.value }))}
+            placeholder="Enter patient ID"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="chiefComplaint">Chief Complaint</Label>
+        <Textarea
+          id="chiefComplaint"
+          value={formData.chiefComplaint}
+          onChange={(e) => setFormData(prev => ({ ...prev, chiefComplaint: e.target.value }))}
+          placeholder="Patient's main concern or reason for visit..."
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="historyOfPresentIllness">History of Present Illness</Label>
+        <Textarea
+          id="historyOfPresentIllness"
+          value={formData.historyOfPresentIllness}
+          onChange={(e) => setFormData(prev => ({ ...prev, historyOfPresentIllness: e.target.value }))}
+          placeholder="Detailed description of current illness..."
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="physicalExamination">Physical Examination</Label>
+        <Textarea
+          id="physicalExamination"
+          value={formData.physicalExamination}
+          onChange={(e) => setFormData(prev => ({ ...prev, physicalExamination: e.target.value }))}
+          placeholder="Physical examination findings..."
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="assessment">Assessment & Diagnosis</Label>
+        <Textarea
+          id="assessment"
+          value={formData.assessment}
+          onChange={(e) => setFormData(prev => ({ ...prev, assessment: e.target.value }))}
+          placeholder="Clinical assessment and diagnosis..."
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="treatmentPlan">Treatment Plan</Label>
+        <Textarea
+          id="treatmentPlan"
+          value={formData.treatmentPlan}
+          onChange={(e) => setFormData(prev => ({ ...prev, treatmentPlan: e.target.value }))}
+          placeholder="Treatment recommendations and plan..."
+          rows={4}
+        />
+      </div>
+    </div>
+  );
 }
