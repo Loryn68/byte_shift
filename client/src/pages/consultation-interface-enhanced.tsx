@@ -225,18 +225,36 @@ export default function ConsultationInterface() {
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="justify-start h-auto p-3">
-                        <UserPlus className="w-4 h-4 mr-2" />
+                        <FileText className="w-4 h-4 mr-2" />
                         <div className="text-left">
                           <div className="font-medium">Medical Report</div>
-                          <div className="text-xs text-gray-500">Admit patient</div>
+                          <div className="text-xs text-gray-500">Patient report</div>
                         </div>
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
-                        <DialogTitle>Medical Report - Admission</DialogTitle>
+                        <DialogTitle>Medical Report</DialogTitle>
                       </DialogHeader>
                       <MedicalReportForm />
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="justify-start h-auto p-3">
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        <div className="text-left">
+                          <div className="font-medium">Admit Patient</div>
+                          <div className="text-xs text-gray-500">Inpatient admission</div>
+                        </div>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Patient Admission Form</DialogTitle>
+                      </DialogHeader>
+                      <PatientAdmissionForm />
                     </DialogContent>
                   </Dialog>
 
@@ -628,27 +646,18 @@ Date: ${new Date().toLocaleDateString()}`;
   );
 }
 
-// Medical Report Form - Enhanced Admission Form
+// Medical Report Form
 function MedicalReportForm() {
   const [formData, setFormData] = useState({
     patientName: "",
     patientId: "",
-    modeOfAdmission: "",
-    allegation: "",
-    patientReaction: "",
-    onset: "",
-    duration: "",
-    department: "",
-    ward: "",
-    bed: "",
-    dailyCharges: "",
-    dateOfAdmission: new Date().toISOString().slice(0, 16), // datetime-local format
+    admissionDate: new Date().toISOString().split('T')[0],
     admittingDoctor: "Dr. Smith",
     reasonForAdmission: "",
     clinicalFindings: "",
     provisionalDiagnosis: "",
     treatmentPlan: "",
-    patientPhoto: null
+    wardAssignment: ""
   });
 
   const handlePrint = () => {
@@ -661,25 +670,17 @@ function MedicalReportForm() {
           <p style="margin: 0; font-size: 14px;">Tel: 254746170159 | Email: info@childmentalhaven.org</p>
         </div>
         
-        <h2 style="color: #0066cc; border-bottom: 1px solid #ccc; padding-bottom: 10px;">PATIENT ADMISSION FORM</h2>
+        <h2 style="color: #0066cc; border-bottom: 1px solid #ccc; padding-bottom: 10px;">MEDICAL REPORT</h2>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
           <div>
             <p><strong>Patient Name:</strong> ${formData.patientName}</p>
             <p><strong>Patient ID:</strong> ${formData.patientId}</p>
-            <p><strong>Mode of Admission:</strong> ${formData.modeOfAdmission}</p>
-            <p><strong>Allegation:</strong> ${formData.allegation}</p>
-            <p><strong>Patient Reaction:</strong> ${formData.patientReaction}</p>
-            <p><strong>Onset:</strong> ${formData.onset}</p>
-            <p><strong>Duration:</strong> ${formData.duration}</p>
+            <p><strong>Admission Date:</strong> ${formData.admissionDate}</p>
           </div>
           <div>
-            <p><strong>Department:</strong> ${formData.department}</p>
-            <p><strong>Ward:</strong> ${formData.ward}</p>
-            <p><strong>Bed:</strong> ${formData.bed}</p>
-            <p><strong>Daily Charges:</strong> ${formData.dailyCharges}</p>
-            <p><strong>Date of Admission:</strong> ${formData.dateOfAdmission}</p>
             <p><strong>Admitting Doctor:</strong> ${formData.admittingDoctor}</p>
+            <p><strong>Ward Assignment:</strong> ${formData.wardAssignment}</p>
           </div>
         </div>
 
@@ -743,6 +744,241 @@ Date: ${new Date().toLocaleDateString()}`;
     const a = document.createElement('a');
     a.href = url;
     a.download = `medical-report-${formData.patientId}-${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-xl font-semibold">Medical Report</h3>
+        <div className="flex space-x-2">
+          <Button onClick={handlePrint} variant="outline" size="sm">
+            <FileText className="w-4 h-4 mr-2" />
+            Print
+          </Button>
+          <Button onClick={handleDownload} variant="outline" size="sm">
+            <Download className="w-4 h-4 mr-2" />
+            Download
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="patientName">Patient Name</Label>
+          <Input
+            id="patientName"
+            value={formData.patientName}
+            onChange={(e) => setFormData(prev => ({ ...prev, patientName: e.target.value }))}
+            placeholder="Enter patient name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="patientId">Patient ID</Label>
+          <Input
+            id="patientId"
+            value={formData.patientId}
+            onChange={(e) => setFormData(prev => ({ ...prev, patientId: e.target.value }))}
+            placeholder="Enter patient ID"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="admissionDate">Admission Date</Label>
+          <Input
+            id="admissionDate"
+            type="date"
+            value={formData.admissionDate}
+            onChange={(e) => setFormData(prev => ({ ...prev, admissionDate: e.target.value }))}
+          />
+        </div>
+        <div>
+          <Label htmlFor="wardAssignment">Ward Assignment</Label>
+          <Input
+            id="wardAssignment"
+            value={formData.wardAssignment}
+            onChange={(e) => setFormData(prev => ({ ...prev, wardAssignment: e.target.value }))}
+            placeholder="Enter ward assignment"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="reasonForAdmission">Reason for Admission</Label>
+        <Textarea
+          id="reasonForAdmission"
+          value={formData.reasonForAdmission}
+          onChange={(e) => setFormData(prev => ({ ...prev, reasonForAdmission: e.target.value }))}
+          placeholder="Enter reason for admission..."
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="clinicalFindings">Clinical Findings</Label>
+        <Textarea
+          id="clinicalFindings"
+          value={formData.clinicalFindings}
+          onChange={(e) => setFormData(prev => ({ ...prev, clinicalFindings: e.target.value }))}
+          placeholder="Enter clinical findings..."
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="provisionalDiagnosis">Provisional Diagnosis</Label>
+        <Textarea
+          id="provisionalDiagnosis"
+          value={formData.provisionalDiagnosis}
+          onChange={(e) => setFormData(prev => ({ ...prev, provisionalDiagnosis: e.target.value }))}
+          placeholder="Enter provisional diagnosis..."
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="treatmentPlan">Treatment Plan</Label>
+        <Textarea
+          id="treatmentPlan"
+          value={formData.treatmentPlan}
+          onChange={(e) => setFormData(prev => ({ ...prev, treatmentPlan: e.target.value }))}
+          placeholder="Enter treatment plan..."
+          rows={4}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Patient Admission Form
+function PatientAdmissionForm() {
+  const [formData, setFormData] = useState({
+    patientName: "",
+    patientId: "",
+    modeOfAdmission: "",
+    allegation: "",
+    patientReaction: "",
+    onset: "",
+    duration: "",
+    department: "",
+    ward: "",
+    bed: "",
+    dailyCharges: "",
+    dateOfAdmission: new Date().toISOString().slice(0, 16),
+    admittingDoctor: "Dr. Smith",
+    reasonForAdmission: "",
+    clinicalFindings: "",
+    provisionalDiagnosis: "",
+    treatmentPlan: "",
+    patientPhoto: null
+  });
+
+  const handlePrint = () => {
+    const printContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0066cc; padding-bottom: 20px;">
+          <h1 style="color: #0066cc; margin: 0; font-size: 28px;">CHILD MENTAL HAVEN</h1>
+          <p style="margin: 5px 0; color: #666; font-size: 16px;">Where Young Minds Evolve</p>
+          <p style="margin: 0; font-size: 14px;">Muchai Drive Off Ngong Road | P.O Box 41622-00100</p>
+          <p style="margin: 0; font-size: 14px;">Tel: 254746170159 | Email: info@childmentalhaven.org</p>
+        </div>
+        
+        <h2 style="color: #0066cc; border-bottom: 1px solid #ccc; padding-bottom: 10px;">PATIENT ADMISSION FORM</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+          <div>
+            <p><strong>Patient Name:</strong> ${formData.patientName}</p>
+            <p><strong>Patient ID:</strong> ${formData.patientId}</p>
+            <p><strong>Mode of Admission:</strong> ${formData.modeOfAdmission}</p>
+            <p><strong>Allegation:</strong> ${formData.allegation}</p>
+            <p><strong>Patient Reaction:</strong> ${formData.patientReaction}</p>
+            <p><strong>Onset:</strong> ${formData.onset}</p>
+            <p><strong>Duration:</strong> ${formData.duration}</p>
+          </div>
+          <div>
+            <p><strong>Department:</strong> ${formData.department}</p>
+            <p><strong>Ward:</strong> ${formData.ward}</p>
+            <p><strong>Bed:</strong> ${formData.bed}</p>
+            <p><strong>Daily Charges:</strong> KShs ${formData.dailyCharges}</p>
+            <p><strong>Date of Admission:</strong> ${formData.dateOfAdmission}</p>
+            <p><strong>Admitting Doctor:</strong> ${formData.admittingDoctor}</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #0066cc;">Reason for Admission</h3>
+          <p style="border: 1px solid #ddd; padding: 10px; min-height: 60px;">${formData.reasonForAdmission}</p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #0066cc;">Clinical Findings</h3>
+          <p style="border: 1px solid #ddd; padding: 10px; min-height: 80px;">${formData.clinicalFindings}</p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #0066cc;">Provisional Diagnosis</h3>
+          <p style="border: 1px solid #ddd; padding: 10px; min-height: 60px;">${formData.provisionalDiagnosis}</p>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #0066cc;">Treatment Plan</h3>
+          <p style="border: 1px solid #ddd; padding: 10px; min-height: 80px;">${formData.treatmentPlan}</p>
+        </div>
+
+        <div style="margin-top: 40px; text-align: right;">
+          <p><strong>Doctor's Signature:</strong> _________________________</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+      </div>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow!.document.write(printContent);
+    printWindow!.document.close();
+    printWindow!.print();
+  };
+
+  const handleDownload = () => {
+    const content = `CHILD MENTAL HAVEN - PATIENT ADMISSION FORM
+
+Patient Name: ${formData.patientName}
+Patient ID: ${formData.patientId}
+Mode of Admission: ${formData.modeOfAdmission}
+Allegation: ${formData.allegation}
+Patient Reaction: ${formData.patientReaction}
+Onset: ${formData.onset}
+Duration: ${formData.duration}
+
+Department: ${formData.department}
+Ward: ${formData.ward}
+Bed: ${formData.bed}
+Daily Charges: KShs ${formData.dailyCharges}
+Date of Admission: ${formData.dateOfAdmission}
+Admitting Doctor: ${formData.admittingDoctor}
+
+REASON FOR ADMISSION:
+${formData.reasonForAdmission}
+
+CLINICAL FINDINGS:
+${formData.clinicalFindings}
+
+PROVISIONAL DIAGNOSIS:
+${formData.provisionalDiagnosis}
+
+TREATMENT PLAN:
+${formData.treatmentPlan}
+
+Generated on: ${new Date().toLocaleDateString()}
+    `;
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `admission_form_${formData.patientName || 'patient'}_${new Date().toISOString().split('T')[0]}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
