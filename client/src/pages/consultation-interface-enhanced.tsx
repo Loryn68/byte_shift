@@ -455,6 +455,17 @@ function ClinicalSummaryForm() {
     doctorName: "Dr. Smith"
   });
 
+  // Auto-populate form with patient data when available
+  useEffect(() => {
+    if (patient) {
+      setFormData(prev => ({
+        ...prev,
+        patientName: `${patient.firstName} ${patient.lastName}`.trim(),
+        patientId: patient.patientId || ""
+      }));
+    }
+  }, [patient]);
+
   const handlePrint = () => {
     const printContent = `
       <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
@@ -1290,8 +1301,8 @@ Generated on: ${new Date().toLocaleDateString()}
 // Referral Out Form
 function ReferralOutForm() {
   const [formData, setFormData] = useState({
-    patientName: patient ? `${patient.firstName} ${patient.lastName}`.trim() : "",
-    patientId: patient?.patientId || "",
+    patientName: "",
+    patientId: "",
     referralDate: new Date().toISOString().split('T')[0],
     referringFacility: "Child Mental Haven",
     referringDoctor: "Dr. Smith",
