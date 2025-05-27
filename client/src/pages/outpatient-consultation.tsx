@@ -34,7 +34,13 @@ import {
   Plus,
   User,
   Calendar,
-  Clock
+  Clock,
+  Download,
+  Printer,
+  ClipboardList,
+  UserPlus,
+  Send,
+  TestTube
 } from "lucide-react";
 import { formatDateTime, getTimeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -192,10 +198,14 @@ export default function OutpatientConsultation() {
       </div>
 
       <Tabs defaultValue="patients" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="patients" className="flex items-center space-x-2">
             <Users className="w-4 h-4" />
             <span>Patients for Consultation</span>
+          </TabsTrigger>
+          <TabsTrigger value="forms" className="flex items-center space-x-2">
+            <ClipboardList className="w-4 h-4" />
+            <span>Medical Forms</span>
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center space-x-2">
             <FileText className="w-4 h-4" />
@@ -285,6 +295,126 @@ export default function OutpatientConsultation() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="forms" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Clinical Summary Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                  <span>Clinical Summary (Outpatient)</span>
+                </CardTitle>
+                <CardDescription>
+                  For patients being managed under outpatient care
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      <ClipboardList className="w-4 h-4 mr-2" />
+                      Fill Clinical Summary
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Clinical Summary - Outpatient</DialogTitle>
+                    </DialogHeader>
+                    <ClinicalSummaryForm />
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+
+            {/* Medical Report Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <UserPlus className="w-5 h-5 text-green-600" />
+                  <span>Medical Report (Admission)</span>
+                </CardTitle>
+                <CardDescription>
+                  For patients being admitted to the hospital
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-green-600 hover:bg-green-700">
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Fill Medical Report
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Medical Report - Admission</DialogTitle>
+                    </DialogHeader>
+                    <MedicalReportForm />
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+
+            {/* Referral Out Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Send className="w-5 h-5 text-orange-600" />
+                  <span>Referral Out Form</span>
+                </CardTitle>
+                <CardDescription>
+                  For patients being referred to other facilities
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-orange-600 hover:bg-orange-700">
+                      <Send className="w-4 h-4 mr-2" />
+                      Fill Referral Form
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Referral Out Form</DialogTitle>
+                    </DialogHeader>
+                    <ReferralOutForm />
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+
+            {/* Lab Request Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <TestTube className="w-5 h-5 text-purple-600" />
+                  <span>Lab Request Form</span>
+                </CardTitle>
+                <CardDescription>
+                  For requesting laboratory investigations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                      <TestTube className="w-4 h-4 mr-2" />
+                      Fill Lab Request
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Laboratory Request Form</DialogTitle>
+                    </DialogHeader>
+                    <LabRequestForm />
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="history" className="mt-6">
@@ -538,6 +668,1383 @@ export default function OutpatientConsultation() {
           </div>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// Clinical Summary Form Component
+function ClinicalSummaryForm() {
+  const [formData, setFormData] = useState({
+    patientName: "",
+    age: "",
+    gender: "",
+    dateOfVisit: new Date().toISOString().split('T')[0],
+    opNumber: "",
+    presentingComplaints: "",
+    historyOfPresentIllness: "",
+    impression: "",
+    investigations: "",
+    finalDiagnosis: "",
+    management: "",
+    doctorName: "",
+    date: new Date().toISOString().split('T')[0]
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(generateClinicalSummaryHTML());
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleDownload = () => {
+    const pdfWindow = window.open('', '_blank');
+    if (pdfWindow) {
+      pdfWindow.document.write(`
+        <html>
+          <head>
+            <title>Clinical Summary - ${formData.patientName}</title>
+            <style>body { margin: 0; font-family: Arial, sans-serif; }</style>
+          </head>
+          <body>
+            ${generateClinicalSummaryHTML()}
+            <script>window.onload = function() { window.print(); }</script>
+          </body>
+        </html>
+      `);
+      pdfWindow.document.close();
+    }
+  };
+
+  const generateClinicalSummaryHTML = () => {
+    return `
+      <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+        <!-- Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
+          <div style="flex: 1;">
+            <div style="width: 60px; height: 60px; background: #4CAF50; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+              <svg width="40" height="40" viewBox="0 0 300 200" style="fill: white;">
+                <path d="M150 40 C130 35, 110 45, 115 60 C105 65, 110 80, 125 85 C120 95, 135 100, 145 95 C155 100, 170 95, 165 85 C180 80, 185 65, 175 60 C190 45, 170 35, 150 40 Z" fill="white"/>
+              </svg>
+            </div>
+          </div>
+          
+          <div style="flex: 2; text-align: center;">
+            <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
+            <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
+            <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
+              <div>Muchai Drive Off Ngong Road</div>
+              <div>P.O Box 41622-00100, Nairobi, Kenya</div>
+              <div>Tel: +254 746 170 159</div>
+              <div>Email: info@childmentalhaven.org</div>
+            </div>
+          </div>
+          
+          <div style="flex: 1;"></div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 25px;">
+          <h2 style="color: #333; margin: 0; font-size: 20px; text-decoration: underline;">CLINICAL SUMMARY</h2>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; margin-bottom: 15px;">
+            <span style="width: 150px; font-weight: bold;">PT NAME(S):</span>
+            <span style="border-bottom: 1px solid #333; flex: 1; padding-left: 5px;">${formData.patientName}</span>
+            <span style="margin-left: 20px; font-weight: bold;">AGE:</span>
+            <span style="border-bottom: 1px solid #333; width: 60px; text-align: center; margin-left: 5px;">${formData.age}</span>
+            <span style="margin-left: 20px; font-weight: bold;">GENDER:</span>
+            <span style="border-bottom: 1px solid #333; width: 80px; text-align: center; margin-left: 5px;">${formData.gender}</span>
+          </div>
+          
+          <div style="display: flex; margin-bottom: 15px;">
+            <span style="width: 150px; font-weight: bold;">DATE OF VISIT:</span>
+            <span style="border-bottom: 1px solid #333; width: 150px; text-align: center; margin-right: 20px;">${formData.dateOfVisit}</span>
+            <span style="font-weight: bold;">OP NO:</span>
+            <span style="border-bottom: 1px solid #333; width: 150px; text-align: center; margin-left: 10px;">${formData.opNumber}</span>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">PRESENTING COMPLAINTS:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.presentingComplaints}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">HISTORY OF PRESENTING ILLNESS:</div>
+          <div style="border: 1px solid #333; min-height: 80px; padding: 8px; white-space: pre-wrap;">${formData.historyOfPresentIllness}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">IMPRESSION:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.impression}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">INVESTIGATIONS:</div>
+          <div style="border: 1px solid #333; min-height: 80px; padding: 8px; white-space: pre-wrap;">${formData.investigations}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">FINAL DIAGNOSIS:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.finalDiagnosis}</div>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">MANAGEMENT:</div>
+          <div style="border: 1px solid #333; min-height: 80px; padding: 8px; white-space: pre-wrap;">${formData.management}</div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 40px;">
+          <div>
+            <div style="font-weight: bold; margin-bottom: 5px;">DOCTOR'S NAME:</div>
+            <div style="border-bottom: 1px solid #333; width: 250px; padding: 5px;">${formData.doctorName}</div>
+          </div>
+          <div>
+            <div style="font-weight: bold; margin-bottom: 5px;">SIGNATURE:</div>
+            <div style="border-bottom: 1px solid #333; width: 200px; padding: 5px;"></div>
+          </div>
+          <div>
+            <div style="font-weight: bold; margin-bottom: 5px;">DATE:</div>
+            <div style="border-bottom: 1px solid #333; width: 150px; padding: 5px;">${formData.date}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <Label htmlFor="patientName">Patient Name</Label>
+          <Input
+            id="patientName"
+            value={formData.patientName}
+            onChange={(e) => handleInputChange('patientName', e.target.value)}
+            placeholder="Enter patient name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="age">Age</Label>
+          <Input
+            id="age"
+            value={formData.age}
+            onChange={(e) => handleInputChange('age', e.target.value)}
+            placeholder="Enter age"
+          />
+        </div>
+        <div>
+          <Label htmlFor="gender">Gender</Label>
+          <Input
+            id="gender"
+            value={formData.gender}
+            onChange={(e) => handleInputChange('gender', e.target.value)}
+            placeholder="Enter gender"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="dateOfVisit">Date of Visit</Label>
+          <Input
+            id="dateOfVisit"
+            type="date"
+            value={formData.dateOfVisit}
+            onChange={(e) => handleInputChange('dateOfVisit', e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="opNumber">OP Number</Label>
+          <Input
+            id="opNumber"
+            value={formData.opNumber}
+            onChange={(e) => handleInputChange('opNumber', e.target.value)}
+            placeholder="Enter OP number"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="presentingComplaints">Presenting Complaints</Label>
+        <Textarea
+          id="presentingComplaints"
+          value={formData.presentingComplaints}
+          onChange={(e) => handleInputChange('presentingComplaints', e.target.value)}
+          placeholder="Enter presenting complaints"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="historyOfPresentIllness">History of Present Illness</Label>
+        <Textarea
+          id="historyOfPresentIllness"
+          value={formData.historyOfPresentIllness}
+          onChange={(e) => handleInputChange('historyOfPresentIllness', e.target.value)}
+          placeholder="Enter history of present illness"
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="impression">Impression</Label>
+        <Textarea
+          id="impression"
+          value={formData.impression}
+          onChange={(e) => handleInputChange('impression', e.target.value)}
+          placeholder="Enter clinical impression"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="investigations">Investigations</Label>
+        <Textarea
+          id="investigations"
+          value={formData.investigations}
+          onChange={(e) => handleInputChange('investigations', e.target.value)}
+          placeholder="Enter investigations"
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="finalDiagnosis">Final Diagnosis</Label>
+        <Textarea
+          id="finalDiagnosis"
+          value={formData.finalDiagnosis}
+          onChange={(e) => handleInputChange('finalDiagnosis', e.target.value)}
+          placeholder="Enter final diagnosis"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="management">Management</Label>
+        <Textarea
+          id="management"
+          value={formData.management}
+          onChange={(e) => handleInputChange('management', e.target.value)}
+          placeholder="Enter management plan"
+          rows={4}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="doctorName">Doctor's Name</Label>
+          <Input
+            id="doctorName"
+            value={formData.doctorName}
+            onChange={(e) => handleInputChange('doctorName', e.target.value)}
+            placeholder="Enter doctor's name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="date">Date</Label>
+          <Input
+            id="date"
+            type="date"
+            value={formData.date}
+            onChange={(e) => handleInputChange('date', e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4 border-t">
+        <Button variant="outline" onClick={handlePrint}>
+          <Printer className="w-4 h-4 mr-2" />
+          Print
+        </Button>
+        <Button onClick={handleDownload} className="bg-blue-600 hover:bg-blue-700">
+          <Download className="w-4 h-4 mr-2" />
+          Download PDF
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Medical Report Form Component
+function MedicalReportForm() {
+  const [formData, setFormData] = useState({
+    patientName: "",
+    age: "",
+    gender: "",
+    admissionDate: new Date().toISOString().split('T')[0],
+    ward: "",
+    medicalHistory: "",
+    presentingComplaints: "",
+    physicalExamination: "",
+    investigations: "",
+    diagnosis: "",
+    treatmentPlan: "",
+    prognosis: "",
+    doctorName: "",
+    date: new Date().toISOString().split('T')[0]
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(generateMedicalReportHTML());
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleDownload = () => {
+    const pdfWindow = window.open('', '_blank');
+    if (pdfWindow) {
+      pdfWindow.document.write(`
+        <html>
+          <head>
+            <title>Medical Report - ${formData.patientName}</title>
+            <style>body { margin: 0; font-family: Arial, sans-serif; }</style>
+          </head>
+          <body>
+            ${generateMedicalReportHTML()}
+            <script>window.onload = function() { window.print(); }</script>
+          </body>
+        </html>
+      `);
+      pdfWindow.document.close();
+    }
+  };
+
+  const generateMedicalReportHTML = () => {
+    return `
+      <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+        <!-- Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
+          <div style="flex: 1;">
+            <div style="width: 60px; height: 60px; background: #4CAF50; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+              <svg width="40" height="40" viewBox="0 0 300 200" style="fill: white;">
+                <path d="M150 40 C130 35, 110 45, 115 60 C105 65, 110 80, 125 85 C120 95, 135 100, 145 95 C155 100, 170 95, 165 85 C180 80, 185 65, 175 60 C190 45, 170 35, 150 40 Z" fill="white"/>
+              </svg>
+            </div>
+          </div>
+          
+          <div style="flex: 2; text-align: center;">
+            <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
+            <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
+            <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
+              <div>Muchai Drive Off Ngong Road</div>
+              <div>P.O Box 41622-00100, Nairobi, Kenya</div>
+              <div>Tel: +254 746 170 159</div>
+              <div>Email: info@childmentalhaven.org</div>
+            </div>
+          </div>
+          
+          <div style="flex: 1;"></div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 25px;">
+          <h2 style="color: #333; margin: 0; font-size: 20px; text-decoration: underline;">MEDICAL REPORT - ADMISSION</h2>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; margin-bottom: 15px;">
+            <span style="width: 150px; font-weight: bold;">PATIENT NAME:</span>
+            <span style="border-bottom: 1px solid #333; flex: 1; padding-left: 5px;">${formData.patientName}</span>
+            <span style="margin-left: 20px; font-weight: bold;">AGE:</span>
+            <span style="border-bottom: 1px solid #333; width: 60px; text-align: center; margin-left: 5px;">${formData.age}</span>
+            <span style="margin-left: 20px; font-weight: bold;">GENDER:</span>
+            <span style="border-bottom: 1px solid #333; width: 80px; text-align: center; margin-left: 5px;">${formData.gender}</span>
+          </div>
+          
+          <div style="display: flex; margin-bottom: 15px;">
+            <span style="width: 150px; font-weight: bold;">ADMISSION DATE:</span>
+            <span style="border-bottom: 1px solid #333; width: 150px; text-align: center; margin-right: 20px;">${formData.admissionDate}</span>
+            <span style="font-weight: bold;">WARD:</span>
+            <span style="border-bottom: 1px solid #333; flex: 1; margin-left: 10px; padding-left: 5px;">${formData.ward}</span>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">MEDICAL HISTORY:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.medicalHistory}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">PRESENTING COMPLAINTS:</div>
+          <div style="border: 1px solid #333; min-height: 80px; padding: 8px; white-space: pre-wrap;">${formData.presentingComplaints}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">PHYSICAL EXAMINATION:</div>
+          <div style="border: 1px solid #333; min-height: 100px; padding: 8px; white-space: pre-wrap;">${formData.physicalExamination}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">INVESTIGATIONS:</div>
+          <div style="border: 1px solid #333; min-height: 80px; padding: 8px; white-space: pre-wrap;">${formData.investigations}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">DIAGNOSIS:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.diagnosis}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">TREATMENT PLAN:</div>
+          <div style="border: 1px solid #333; min-height: 80px; padding: 8px; white-space: pre-wrap;">${formData.treatmentPlan}</div>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">PROGNOSIS:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.prognosis}</div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 40px;">
+          <div>
+            <div style="font-weight: bold; margin-bottom: 5px;">DOCTOR'S NAME:</div>
+            <div style="border-bottom: 1px solid #333; width: 250px; padding: 5px;">${formData.doctorName}</div>
+          </div>
+          <div>
+            <div style="font-weight: bold; margin-bottom: 5px;">SIGNATURE:</div>
+            <div style="border-bottom: 1px solid #333; width: 200px; padding: 5px;"></div>
+          </div>
+          <div>
+            <div style="font-weight: bold; margin-bottom: 5px;">DATE:</div>
+            <div style="border-bottom: 1px solid #333; width: 150px; padding: 5px;">${formData.date}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <Label htmlFor="patientName">Patient Name</Label>
+          <Input
+            id="patientName"
+            value={formData.patientName}
+            onChange={(e) => handleInputChange('patientName', e.target.value)}
+            placeholder="Enter patient name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="age">Age</Label>
+          <Input
+            id="age"
+            value={formData.age}
+            onChange={(e) => handleInputChange('age', e.target.value)}
+            placeholder="Enter age"
+          />
+        </div>
+        <div>
+          <Label htmlFor="gender">Gender</Label>
+          <Input
+            id="gender"
+            value={formData.gender}
+            onChange={(e) => handleInputChange('gender', e.target.value)}
+            placeholder="Enter gender"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="admissionDate">Admission Date</Label>
+          <Input
+            id="admissionDate"
+            type="date"
+            value={formData.admissionDate}
+            onChange={(e) => handleInputChange('admissionDate', e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="ward">Ward</Label>
+          <Input
+            id="ward"
+            value={formData.ward}
+            onChange={(e) => handleInputChange('ward', e.target.value)}
+            placeholder="Enter ward"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="medicalHistory">Medical History</Label>
+        <Textarea
+          id="medicalHistory"
+          value={formData.medicalHistory}
+          onChange={(e) => handleInputChange('medicalHistory', e.target.value)}
+          placeholder="Enter medical history"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="presentingComplaints">Presenting Complaints</Label>
+        <Textarea
+          id="presentingComplaints"
+          value={formData.presentingComplaints}
+          onChange={(e) => handleInputChange('presentingComplaints', e.target.value)}
+          placeholder="Enter presenting complaints"
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="physicalExamination">Physical Examination</Label>
+        <Textarea
+          id="physicalExamination"
+          value={formData.physicalExamination}
+          onChange={(e) => handleInputChange('physicalExamination', e.target.value)}
+          placeholder="Enter physical examination findings"
+          rows={5}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="investigations">Investigations</Label>
+        <Textarea
+          id="investigations"
+          value={formData.investigations}
+          onChange={(e) => handleInputChange('investigations', e.target.value)}
+          placeholder="Enter investigations"
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="diagnosis">Diagnosis</Label>
+        <Textarea
+          id="diagnosis"
+          value={formData.diagnosis}
+          onChange={(e) => handleInputChange('diagnosis', e.target.value)}
+          placeholder="Enter diagnosis"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="treatmentPlan">Treatment Plan</Label>
+        <Textarea
+          id="treatmentPlan"
+          value={formData.treatmentPlan}
+          onChange={(e) => handleInputChange('treatmentPlan', e.target.value)}
+          placeholder="Enter treatment plan"
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="prognosis">Prognosis</Label>
+        <Textarea
+          id="prognosis"
+          value={formData.prognosis}
+          onChange={(e) => handleInputChange('prognosis', e.target.value)}
+          placeholder="Enter prognosis"
+          rows={3}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="doctorName">Doctor's Name</Label>
+          <Input
+            id="doctorName"
+            value={formData.doctorName}
+            onChange={(e) => handleInputChange('doctorName', e.target.value)}
+            placeholder="Enter doctor's name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="date">Date</Label>
+          <Input
+            id="date"
+            type="date"
+            value={formData.date}
+            onChange={(e) => handleInputChange('date', e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4 border-t">
+        <Button variant="outline" onClick={handlePrint}>
+          <Printer className="w-4 h-4 mr-2" />
+          Print
+        </Button>
+        <Button onClick={handleDownload} className="bg-green-600 hover:bg-green-700">
+          <Download className="w-4 h-4 mr-2" />
+          Download PDF
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Referral Out Form Component
+function ReferralOutForm() {
+  const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    patientName: "",
+    cmhNumber: "",
+    phoneNumber: "",
+    age: "",
+    sex: "",
+    briefHistory: "",
+    investigations: "",
+    treatment: "",
+    diagnosis: "",
+    reasonForReferral: "",
+    referredTo: "",
+    referredBy: "",
+    additionalComments: ""
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(generateReferralOutHTML());
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleDownload = () => {
+    const pdfWindow = window.open('', '_blank');
+    if (pdfWindow) {
+      pdfWindow.document.write(`
+        <html>
+          <head>
+            <title>Referral Out Form - ${formData.patientName}</title>
+            <style>body { margin: 0; font-family: Arial, sans-serif; }</style>
+          </head>
+          <body>
+            ${generateReferralOutHTML()}
+            <script>window.onload = function() { window.print(); }</script>
+          </body>
+        </html>
+      `);
+      pdfWindow.document.close();
+    }
+  };
+
+  const generateReferralOutHTML = () => {
+    return `
+      <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+        <!-- Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
+          <div style="flex: 1;">
+            <div style="width: 60px; height: 60px; background: #4CAF50; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+              <svg width="40" height="40" viewBox="0 0 300 200" style="fill: white;">
+                <path d="M150 40 C130 35, 110 45, 115 60 C105 65, 110 80, 125 85 C120 95, 135 100, 145 95 C155 100, 170 95, 165 85 C180 80, 185 65, 175 60 C190 45, 170 35, 150 40 Z" fill="white"/>
+              </svg>
+            </div>
+          </div>
+          
+          <div style="flex: 2; text-align: center;">
+            <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
+            <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
+            <p style="color: #333; margin: 2px 0; font-size: 12px; font-weight: bold;">COMPREHENSIVE MENTAL HEALTH / REHABILITATION</p>
+            <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
+              <div>Muchai Drive Off Ngong Road, Nairobi</div>
+              <div>P.O Box 41622-00100</div>
+              <div>Nairobi</div>
+              <div>+254 746 170 159</div>
+              <div>info@childmentalhaven.org</div>
+            </div>
+          </div>
+          
+          <div style="flex: 1;"></div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 25px;">
+          <h2 style="color: #333; margin: 0; font-size: 20px; text-decoration: underline;">REFERRAL OUT FORM</h2>
+        </div>
+        
+        <div style="text-align: right; margin-bottom: 20px;">
+          <span style="font-weight: bold;">DATE: </span>
+          <span style="border-bottom: 1px solid #333; padding: 5px; min-width: 150px; display: inline-block;">${formData.date}</span>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; margin-bottom: 15px;">
+            <span style="width: 150px; font-weight: bold;">PATIENT NAME:</span>
+            <span style="border-bottom: 1px solid #333; flex: 1; padding-left: 5px; margin-right: 20px;">${formData.patientName}</span>
+            <span style="font-weight: bold;">CMH NO:</span>
+            <span style="border-bottom: 1px solid #333; width: 150px; text-align: center; margin-left: 10px;">${formData.cmhNumber}</span>
+          </div>
+          
+          <div style="display: flex; margin-bottom: 15px;">
+            <span style="width: 150px; font-weight: bold;">PHONE NUMBER:</span>
+            <span style="border-bottom: 1px solid #333; width: 150px; text-align: center; margin-right: 20px;">${formData.phoneNumber}</span>
+            <span style="font-weight: bold;">AGE:</span>
+            <span style="border-bottom: 1px solid #333; width: 80px; text-align: center; margin-left: 10px; margin-right: 20px;">${formData.age}</span>
+            <span style="font-weight: bold;">SEX:</span>
+            <span style="border-bottom: 1px solid #333; width: 80px; text-align: center; margin-left: 10px;">${formData.sex}</span>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">Brief History:</div>
+          <div style="border: 1px solid #333; min-height: 80px; padding: 8px; white-space: pre-wrap;">${formData.briefHistory}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">Investigations:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.investigations}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">Treatment:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.treatment}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">Diagnosis:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.diagnosis}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">Referred to:</div>
+          <div style="border: 1px solid #333; min-height: 40px; padding: 8px; white-space: pre-wrap;">${formData.referredTo}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">Reason for referral:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.reasonForReferral}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; margin-bottom: 15px;">
+            <span style="font-weight: bold; margin-right: 10px;">Referred by:</span>
+            <span style="border-bottom: 1px solid #333; flex: 1; padding: 5px;">${formData.referredBy}</span>
+            <span style="font-weight: bold; margin-left: 20px; margin-right: 10px;">Signature:</span>
+            <span style="border-bottom: 1px solid #333; width: 200px; padding: 5px;"></span>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">Additional Comments:</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.additionalComments}</div>
+        </div>
+      </div>
+    `;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="date">Date</Label>
+          <Input
+            id="date"
+            type="date"
+            value={formData.date}
+            onChange={(e) => handleInputChange('date', e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="cmhNumber">CMH Number</Label>
+          <Input
+            id="cmhNumber"
+            value={formData.cmhNumber}
+            onChange={(e) => handleInputChange('cmhNumber', e.target.value)}
+            placeholder="Enter CMH number"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="patientName">Patient Name</Label>
+        <Input
+          id="patientName"
+          value={formData.patientName}
+          onChange={(e) => handleInputChange('patientName', e.target.value)}
+          placeholder="Enter patient name"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <Label htmlFor="phoneNumber">Phone Number</Label>
+          <Input
+            id="phoneNumber"
+            value={formData.phoneNumber}
+            onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+            placeholder="Enter phone number"
+          />
+        </div>
+        <div>
+          <Label htmlFor="age">Age</Label>
+          <Input
+            id="age"
+            value={formData.age}
+            onChange={(e) => handleInputChange('age', e.target.value)}
+            placeholder="Enter age"
+          />
+        </div>
+        <div>
+          <Label htmlFor="sex">Sex</Label>
+          <Input
+            id="sex"
+            value={formData.sex}
+            onChange={(e) => handleInputChange('sex', e.target.value)}
+            placeholder="Enter sex"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="briefHistory">Brief History</Label>
+        <Textarea
+          id="briefHistory"
+          value={formData.briefHistory}
+          onChange={(e) => handleInputChange('briefHistory', e.target.value)}
+          placeholder="Enter brief history"
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="investigations">Investigations</Label>
+        <Textarea
+          id="investigations"
+          value={formData.investigations}
+          onChange={(e) => handleInputChange('investigations', e.target.value)}
+          placeholder="Enter investigations"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="treatment">Treatment</Label>
+        <Textarea
+          id="treatment"
+          value={formData.treatment}
+          onChange={(e) => handleInputChange('treatment', e.target.value)}
+          placeholder="Enter treatment"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="diagnosis">Diagnosis</Label>
+        <Textarea
+          id="diagnosis"
+          value={formData.diagnosis}
+          onChange={(e) => handleInputChange('diagnosis', e.target.value)}
+          placeholder="Enter diagnosis"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="referredTo">Referred To</Label>
+        <Input
+          id="referredTo"
+          value={formData.referredTo}
+          onChange={(e) => handleInputChange('referredTo', e.target.value)}
+          placeholder="Enter facility/doctor being referred to"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="reasonForReferral">Reason for Referral</Label>
+        <Textarea
+          id="reasonForReferral"
+          value={formData.reasonForReferral}
+          onChange={(e) => handleInputChange('reasonForReferral', e.target.value)}
+          placeholder="Enter reason for referral"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="referredBy">Referred By</Label>
+        <Input
+          id="referredBy"
+          value={formData.referredBy}
+          onChange={(e) => handleInputChange('referredBy', e.target.value)}
+          placeholder="Enter referring doctor's name"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="additionalComments">Additional Comments</Label>
+        <Textarea
+          id="additionalComments"
+          value={formData.additionalComments}
+          onChange={(e) => handleInputChange('additionalComments', e.target.value)}
+          placeholder="Enter additional comments"
+          rows={3}
+        />
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4 border-t">
+        <Button variant="outline" onClick={handlePrint}>
+          <Printer className="w-4 h-4 mr-2" />
+          Print
+        </Button>
+        <Button onClick={handleDownload} className="bg-orange-600 hover:bg-orange-700">
+          <Download className="w-4 h-4 mr-2" />
+          Download PDF
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Lab Request Form Component
+function LabRequestForm() {
+  const [formData, setFormData] = useState({
+    patientName: "",
+    age: "",
+    sex: "",
+    residence: "",
+    ipOpNumber: "",
+    reportTo: "",
+    specimen: "",
+    collectionDateTime: new Date().toISOString().slice(0, 16),
+    labNumber: "",
+    investigationRequested: "",
+    history: "",
+    diagnosis: "",
+    requestingClinician: "",
+    date: new Date().toISOString().split('T')[0],
+    // Specimen destination checkboxes
+    bloodBank: false,
+    histology: false,
+    bacteriology: false,
+    serology: false,
+    parasitology: false,
+    hematology: false,
+    biochemistry: false,
+    others: "",
+    otherSpecify: ""
+  });
+
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(generateLabRequestHTML());
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleDownload = () => {
+    const pdfWindow = window.open('', '_blank');
+    if (pdfWindow) {
+      pdfWindow.document.write(`
+        <html>
+          <head>
+            <title>Lab Request Form - ${formData.patientName}</title>
+            <style>body { margin: 0; font-family: Arial, sans-serif; }</style>
+          </head>
+          <body>
+            ${generateLabRequestHTML()}
+            <script>window.onload = function() { window.print(); }</script>
+          </body>
+        </html>
+      `);
+      pdfWindow.document.close();
+    }
+  };
+
+  const generateLabRequestHTML = () => {
+    return `
+      <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
+          <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
+          <p style="color: #333; margin: 2px 0; font-size: 14px; font-weight: bold;">COMPREHENSIVE MENTAL HEALTH / REHABILITATION</p>
+          <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
+            <div>Muchai Drive Off Ngong Road</div>
+            <div>P.O Box 41622-00100</div>
+            <div>Phone: +254 746 170 159</div>
+            <div>Email: info@childmentalhaven.org</div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 25px;">
+          <h2 style="color: #333; margin: 0; font-size: 18px; text-decoration: underline;">LABORATORY REQUEST AND REPORT FORM</h2>
+        </div>
+        
+        <div style="font-weight: bold; margin-bottom: 15px; color: red;">
+          NOTE: Incompletely filled forms will not be processed
+        </div>
+        
+        <div style="display: flex; gap: 30px; margin-bottom: 20px;">
+          <!-- Patient Details -->
+          <div style="flex: 2;">
+            <h3 style="font-weight: bold; margin-bottom: 10px; text-decoration: underline;">I. Patient Details</h3>
+            <div style="margin-bottom: 8px;">
+              <span style="font-weight: bold;">Name: </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 250px; padding: 2px;">${formData.patientName}</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              <span style="font-weight: bold;">Age: (yrs/months) </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 100px; padding: 2px;">${formData.age}</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              <span style="font-weight: bold;">Sex: </span>
+              <span style="margin-right: 20px;">M ${formData.sex.toLowerCase() === 'male' ? '☑' : '☐'}</span>
+              <span>F ${formData.sex.toLowerCase() === 'female' ? '☑' : '☐'}</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              <span style="font-weight: bold;">Residence/Village: </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 200px; padding: 2px;">${formData.residence}</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              <span style="font-weight: bold;">IP/OP No: </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 150px; padding: 2px;">${formData.ipOpNumber}</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              <span style="font-weight: bold;">Report to (specify clinic/ward/clinician): </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 200px; padding: 2px;">${formData.reportTo}</span>
+            </div>
+          </div>
+          
+          <!-- Specimen Destination -->
+          <div style="flex: 1;">
+            <h3 style="font-weight: bold; margin-bottom: 10px; text-decoration: underline;">II. Specimen Destination</h3>
+            <p style="font-weight: bold; margin-bottom: 8px;">Tick appropriate box</p>
+            <div style="margin-bottom: 4px;">${formData.bloodBank ? '☑' : '☐'} Blood bank</div>
+            <div style="margin-bottom: 4px;">${formData.histology ? '☑' : '☐'} Histology/cytology</div>
+            <div style="margin-bottom: 4px;">${formData.bacteriology ? '☑' : '☐'} Bacteriology</div>
+            <div style="margin-bottom: 4px;">${formData.serology ? '☑' : '☐'} Serology</div>
+            <div style="margin-bottom: 4px;">${formData.parasitology ? '☑' : '☐'} Parasitology</div>
+            <div style="margin-bottom: 4px;">${formData.hematology ? '☑' : '☐'} Hematology/CD4</div>
+            <div style="margin-bottom: 4px;">${formData.biochemistry ? '☑' : '☐'} Biochemistry</div>
+            <div style="margin-bottom: 4px;">
+              Others(specify)
+              <div style="border-bottom: 1px solid #333; min-height: 20px; padding: 2px; margin-top: 4px;">${formData.otherSpecify}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <span style="font-weight: bold;">II. Specimen: </span>
+          <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 200px; padding: 2px;">${formData.specimen}</span>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <span style="font-weight: bold;">III. Collection date/time: </span>
+          <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 200px; padding: 2px;">${formData.collectionDateTime}</span>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <span style="font-weight: bold;">IV. Lab. No: </span>
+          <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 200px; padding: 2px;">${formData.labNumber}</span>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">V. Investigation requested:</div>
+          <div style="border: 1px solid #333; min-height: 80px; padding: 8px; white-space: pre-wrap;">${formData.investigationRequested}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">VI. History (including drugs used):</div>
+          <div style="border: 1px solid #333; min-height: 60px; padding: 8px; white-space: pre-wrap;">${formData.history}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">VII. Diagnosis:</div>
+          <div style="border-bottom: 1px solid #333; min-height: 30px; padding: 8px;">${formData.diagnosis}</div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">VIII. Requesting Clinician's Name:</div>
+          <div style="border-bottom: 1px solid #333; min-height: 30px; padding: 8px;">${formData.requestingClinician}</div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
+          <div>
+            <span style="font-weight: bold;">Signature: </span>
+            <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 200px; padding: 5px;"></span>
+          </div>
+          <div>
+            <span style="font-weight: bold;">Date: </span>
+            <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 150px; padding: 5px;">${formData.date}</span>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">IX. Report (including macroscopic examination):</div>
+          <div style="border: 1px solid #333; min-height: 100px; padding: 8px;"></div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between;">
+          <div>
+            <div style="margin-bottom: 10px;">
+              <span style="font-weight: bold;">Test done by (initial): </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 100px; padding: 2px;"></span>
+              <span style="margin-left: 20px; font-weight: bold;">Sign: </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 100px; padding: 2px;"></span>
+              <span style="margin-left: 20px; font-weight: bold;">Date: </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 100px; padding: 2px;"></span>
+            </div>
+            <div>
+              <span style="font-weight: bold;">Approved by (initial): </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 100px; padding: 2px;"></span>
+              <span style="margin-left: 20px; font-weight: bold;">Sign: </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 100px; padding: 2px;"></span>
+              <span style="margin-left: 20px; font-weight: bold;">Date: </span>
+              <span style="border-bottom: 1px solid #333; display: inline-block; min-width: 100px; padding: 2px;"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <Label htmlFor="patientName">Patient Name</Label>
+          <Input
+            id="patientName"
+            value={formData.patientName}
+            onChange={(e) => handleInputChange('patientName', e.target.value)}
+            placeholder="Enter patient name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="age">Age (years/months)</Label>
+          <Input
+            id="age"
+            value={formData.age}
+            onChange={(e) => handleInputChange('age', e.target.value)}
+            placeholder="Enter age"
+          />
+        </div>
+        <div>
+          <Label htmlFor="sex">Sex</Label>
+          <Input
+            id="sex"
+            value={formData.sex}
+            onChange={(e) => handleInputChange('sex', e.target.value)}
+            placeholder="Male/Female"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="residence">Residence/Village</Label>
+          <Input
+            id="residence"
+            value={formData.residence}
+            onChange={(e) => handleInputChange('residence', e.target.value)}
+            placeholder="Enter residence"
+          />
+        </div>
+        <div>
+          <Label htmlFor="ipOpNumber">IP/OP Number</Label>
+          <Input
+            id="ipOpNumber"
+            value={formData.ipOpNumber}
+            onChange={(e) => handleInputChange('ipOpNumber', e.target.value)}
+            placeholder="Enter IP/OP number"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="reportTo">Report To (clinic/ward/clinician)</Label>
+          <Input
+            id="reportTo"
+            value={formData.reportTo}
+            onChange={(e) => handleInputChange('reportTo', e.target.value)}
+            placeholder="Specify clinic/ward/clinician"
+          />
+        </div>
+        <div>
+          <Label htmlFor="specimen">Specimen</Label>
+          <Input
+            id="specimen"
+            value={formData.specimen}
+            onChange={(e) => handleInputChange('specimen', e.target.value)}
+            placeholder="Enter specimen type"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="collectionDateTime">Collection Date/Time</Label>
+          <Input
+            id="collectionDateTime"
+            type="datetime-local"
+            value={formData.collectionDateTime}
+            onChange={(e) => handleInputChange('collectionDateTime', e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="labNumber">Lab Number</Label>
+          <Input
+            id="labNumber"
+            value={formData.labNumber}
+            onChange={(e) => handleInputChange('labNumber', e.target.value)}
+            placeholder="Enter lab number"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label>Specimen Destination (Tick appropriate boxes)</Label>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.bloodBank}
+              onChange={(e) => handleInputChange('bloodBank', e.target.checked)}
+            />
+            <span>Blood bank</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.histology}
+              onChange={(e) => handleInputChange('histology', e.target.checked)}
+            />
+            <span>Histology/cytology</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.bacteriology}
+              onChange={(e) => handleInputChange('bacteriology', e.target.checked)}
+            />
+            <span>Bacteriology</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.serology}
+              onChange={(e) => handleInputChange('serology', e.target.checked)}
+            />
+            <span>Serology</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.parasitology}
+              onChange={(e) => handleInputChange('parasitology', e.target.checked)}
+            />
+            <span>Parasitology</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.hematology}
+              onChange={(e) => handleInputChange('hematology', e.target.checked)}
+            />
+            <span>Hematology/CD4</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.biochemistry}
+              onChange={(e) => handleInputChange('biochemistry', e.target.checked)}
+            />
+            <span>Biochemistry</span>
+          </label>
+        </div>
+        <div className="mt-2">
+          <Label htmlFor="otherSpecify">Others (specify)</Label>
+          <Input
+            id="otherSpecify"
+            value={formData.otherSpecify}
+            onChange={(e) => handleInputChange('otherSpecify', e.target.value)}
+            placeholder="Specify other destination"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="investigationRequested">Investigation Requested</Label>
+        <Textarea
+          id="investigationRequested"
+          value={formData.investigationRequested}
+          onChange={(e) => handleInputChange('investigationRequested', e.target.value)}
+          placeholder="Enter investigation requested"
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="history">History (including drugs used)</Label>
+        <Textarea
+          id="history"
+          value={formData.history}
+          onChange={(e) => handleInputChange('history', e.target.value)}
+          placeholder="Enter patient history including drugs used"
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="diagnosis">Diagnosis</Label>
+        <Input
+          id="diagnosis"
+          value={formData.diagnosis}
+          onChange={(e) => handleInputChange('diagnosis', e.target.value)}
+          placeholder="Enter diagnosis"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="requestingClinician">Requesting Clinician's Name</Label>
+          <Input
+            id="requestingClinician"
+            value={formData.requestingClinician}
+            onChange={(e) => handleInputChange('requestingClinician', e.target.value)}
+            placeholder="Enter requesting clinician's name"
+          />
+        </div>
+        <div>
+          <Label htmlFor="date">Date</Label>
+          <Input
+            id="date"
+            type="date"
+            value={formData.date}
+            onChange={(e) => handleInputChange('date', e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4 border-t">
+        <Button variant="outline" onClick={handlePrint}>
+          <Printer className="w-4 h-4 mr-2" />
+          Print
+        </Button>
+        <Button onClick={handleDownload} className="bg-purple-600 hover:bg-purple-700">
+          <Download className="w-4 h-4 mr-2" />
+          Download PDF
+        </Button>
+      </div>
     </div>
   );
 }
