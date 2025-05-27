@@ -45,6 +45,11 @@ const navigationItems = [
         icon: Stethoscope
       },
       {
+        title: "Therapy",
+        href: "/therapy",
+        icon: Users
+      },
+      {
         title: "Outpatient",
         href: "/outpatient",
         icon: UserCheck
