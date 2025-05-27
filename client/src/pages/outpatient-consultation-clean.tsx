@@ -34,6 +34,10 @@ export default function OutpatientConsultation() {
     queryKey: ["/api/patients"],
   });
 
+  const { data: billingRecords = [] } = useQuery({
+    queryKey: ["/api/billing"],
+  });
+
   // Get triaged patients from localStorage
   const getTriagedPatients = () => {
     try {
@@ -49,6 +53,17 @@ export default function OutpatientConsultation() {
   const filteredPatients = patients.filter((patient: Patient) => {
     // Only show patients who have been triaged
     if (!triagedPatientIds.includes(patient.id)) return false;
+    
+    // Exclude therapy patients (those with counseling services)
+    const isTherapyPatient = billingRecords.some((bill: any) => 
+      bill.patientId === patient.id && 
+      (bill.serviceType?.toLowerCase().includes('counseling') ||
+       bill.serviceType?.toLowerCase().includes('therapy') ||
+       bill.serviceDescription?.toLowerCase().includes('counseling') ||
+       bill.serviceDescription?.toLowerCase().includes('therapy'))
+    );
+    
+    if (isTherapyPatient) return false;
     
     if (!searchQuery) return true;
     return (
