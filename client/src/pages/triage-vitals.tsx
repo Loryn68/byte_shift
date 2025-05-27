@@ -65,6 +65,7 @@ export default function TriageVitals() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [showVitalsModal, setShowVitalsModal] = useState(false);
   const [activeTab, setActiveTab] = useState("queue");
+  const [refreshKey, setRefreshKey] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -179,14 +180,18 @@ export default function TriageVitals() {
       // Save vital signs and mark patient as triaged
       console.log("Saving vital signs:", vitalsData);
       
-      // Store vital signs in localStorage for this session
-      const existingVitals = JSON.parse(localStorage.getItem('patientVitals') || '[]');
-      const newVitalRecord = {
+      // Store vital signs in localStorage with patient-specific key
+      const vitalsKey = `patient-vitals-${vitalsData.patientId}`;
+      const vitalRecord = {
         ...vitalsData,
         id: Date.now(),
         status: 'triaged'
       };
-      existingVitals.push(newVitalRecord);
+      localStorage.setItem(vitalsKey, JSON.stringify(vitalRecord));
+      
+      // Also store in general vitals list for history tracking
+      const existingVitals = JSON.parse(localStorage.getItem('patientVitals') || '[]');
+      existingVitals.push(vitalRecord);
       localStorage.setItem('patientVitals', JSON.stringify(existingVitals));
       
       return vitalsData;
@@ -197,14 +202,22 @@ export default function TriageVitals() {
       
       toast({
         title: "Vital Signs Recorded",
-        description: "Patient has been triaged and will appear in outpatient queue.",
+        description: "Patient moved to Served Patients - ready for doctor consultation.",
       });
+      
+      // Force component refresh to update patient lists
+      setRefreshKey(prev => prev + 1);
       
       // Invalidate queries to refresh patient lists
       queryClient.invalidateQueries({ queryKey: ['/api/patients'] });
       
-      // Don't close the modal immediately, let user print if needed
-      // setShowVitalsModal(false);
+      // Auto-switch to served patients tab to show the patient moved
+      setActiveTab("served");
+      
+      // Close the modal after a short delay
+      setTimeout(() => {
+        setShowVitalsModal(false);
+      }, 1500);
     },
   });
 
