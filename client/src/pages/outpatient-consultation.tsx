@@ -726,27 +726,15 @@ function ClinicalSummaryForm() {
     return `
       <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <!-- Header -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
-          <div style="flex: 1;">
-            <div style="width: 60px; height: 60px; background: #4CAF50; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-              <svg width="40" height="40" viewBox="0 0 300 200" style="fill: white;">
-                <path d="M150 40 C130 35, 110 45, 115 60 C105 65, 110 80, 125 85 C120 95, 135 100, 145 95 C155 100, 170 95, 165 85 C180 80, 185 65, 175 60 C190 45, 170 35, 150 40 Z" fill="white"/>
-              </svg>
-            </div>
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
+          <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
+          <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
+          <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
+            <div>Muchai Drive Off Ngong Road</div>
+            <div>P.O Box 41622-00100, Nairobi, Kenya</div>
+            <div>Tel: +254 746 170 159</div>
+            <div>Email: info@childmentalhaven.org</div>
           </div>
-          
-          <div style="flex: 2; text-align: center;">
-            <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
-            <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
-            <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
-              <div>Muchai Drive Off Ngong Road</div>
-              <div>P.O Box 41622-00100, Nairobi, Kenya</div>
-              <div>Tel: +254 746 170 159</div>
-              <div>Email: info@childmentalhaven.org</div>
-            </div>
-          </div>
-          
-          <div style="flex: 1;"></div>
         </div>
         
         <div style="text-align: center; margin-bottom: 25px;">
@@ -1028,27 +1016,15 @@ function MedicalReportForm() {
     return `
       <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <!-- Header -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
-          <div style="flex: 1;">
-            <div style="width: 60px; height: 60px; background: #4CAF50; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-              <svg width="40" height="40" viewBox="0 0 300 200" style="fill: white;">
-                <path d="M150 40 C130 35, 110 45, 115 60 C105 65, 110 80, 125 85 C120 95, 135 100, 145 95 C155 100, 170 95, 165 85 C180 80, 185 65, 175 60 C190 45, 170 35, 150 40 Z" fill="white"/>
-              </svg>
-            </div>
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
+          <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
+          <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
+          <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
+            <div>Muchai Drive Off Ngong Road</div>
+            <div>P.O Box 41622-00100, Nairobi, Kenya</div>
+            <div>Tel: +254 746 170 159</div>
+            <div>Email: info@childmentalhaven.org</div>
           </div>
-          
-          <div style="flex: 2; text-align: center;">
-            <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
-            <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
-            <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
-              <div>Muchai Drive Off Ngong Road</div>
-              <div>P.O Box 41622-00100, Nairobi, Kenya</div>
-              <div>Tel: +254 746 170 159</div>
-              <div>Email: info@childmentalhaven.org</div>
-            </div>
-          </div>
-          
-          <div style="flex: 1;"></div>
         </div>
         
         <div style="text-align: center; margin-bottom: 25px;">
@@ -1346,29 +1322,17 @@ function ReferralOutForm() {
     return `
       <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <!-- Header -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
-          <div style="flex: 1;">
-            <div style="width: 60px; height: 60px; background: #4CAF50; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-              <svg width="40" height="40" viewBox="0 0 300 200" style="fill: white;">
-                <path d="M150 40 C130 35, 110 45, 115 60 C105 65, 110 80, 125 85 C120 95, 135 100, 145 95 C155 100, 170 95, 165 85 C180 80, 185 65, 175 60 C190 45, 170 35, 150 40 Z" fill="white"/>
-              </svg>
-            </div>
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 15px;">
+          <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
+          <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
+          <p style="color: #333; margin: 2px 0; font-size: 12px; font-weight: bold;">COMPREHENSIVE MENTAL HEALTH / REHABILITATION</p>
+          <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
+            <div>Muchai Drive Off Ngong Road, Nairobi</div>
+            <div>P.O Box 41622-00100</div>
+            <div>Nairobi</div>
+            <div>+254 746 170 159</div>
+            <div>info@childmentalhaven.org</div>
           </div>
-          
-          <div style="flex: 2; text-align: center;">
-            <h1 style="color: #4CAF50; margin: 0; font-size: 24px; font-weight: bold;">CHILD MENTAL HAVEN</h1>
-            <p style="color: #333; margin: 2px 0; font-size: 14px; font-style: italic;">Where Young Minds Evolve</p>
-            <p style="color: #333; margin: 2px 0; font-size: 12px; font-weight: bold;">COMPREHENSIVE MENTAL HEALTH / REHABILITATION</p>
-            <div style="font-size: 12px; color: #666; margin-top: 8px; line-height: 1.4;">
-              <div>Muchai Drive Off Ngong Road, Nairobi</div>
-              <div>P.O Box 41622-00100</div>
-              <div>Nairobi</div>
-              <div>+254 746 170 159</div>
-              <div>info@childmentalhaven.org</div>
-            </div>
-          </div>
-          
-          <div style="flex: 1;"></div>
         </div>
         
         <div style="text-align: center; margin-bottom: 25px;">
