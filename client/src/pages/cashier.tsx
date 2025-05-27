@@ -339,37 +339,7 @@ export default function Cashier() {
           return `
             <div style="font-family: 'Courier New', monospace; max-width: 400px; margin: 0 auto; padding: 20px; background: white;">
               <div style="text-align: center; border-bottom: 2px dashed #333; padding-bottom: 15px; margin-bottom: 15px;">
-                <div style="margin-bottom: 10px;">
-                  <svg width="100" height="80" viewBox="0 0 200 150" style="margin: 0 auto; display: block;">
-                    <!-- Colorful brain -->
-                    <path d="M100 30 C80 25, 60 35, 65 50 C55 55, 60 70, 75 75 C70 85, 85 90, 95 85 C105 90, 120 85, 115 75 C130 70, 135 55, 125 50 C140 35, 120 25, 100 30 Z" fill="#4CAF50"/>
-                    <path d="M105 35 C125 30, 135 40, 130 50 C140 55, 135 65, 125 65 C130 75, 115 80, 110 75 C105 80, 95 75, 100 70 C85 65, 85 55, 95 50 C85 40, 95 30, 105 35 Z" fill="#2196F3"/>
-                    <path d="M110 40 C120 45, 125 55, 115 60 C125 65, 120 75, 110 70 C115 80, 105 85, 100 80 C95 85, 85 80, 90 70 C80 75, 75 65, 85 60 C75 55, 80 45, 90 50 C85 40, 95 35, 110 40 Z" fill="#FF5722"/>
-                    <path d="M95 45 C105 50, 110 60, 100 65 C110 70, 105 80, 95 75 C100 85, 90 90, 85 85 C80 90, 70 85, 75 75 C65 80, 60 70, 70 65 C60 60, 65 50, 75 55 C70 45, 80 40, 95 45 Z" fill="#9C27B0"/>
-                    <path d="M100 50 C110 55, 115 65, 105 70 C115 75, 110 85, 100 80 C105 90, 95 95, 90 90 C85 95, 75 90, 80 80 C70 85, 65 75, 75 70 C65 65, 70 55, 80 60 C75 50, 85 45, 100 50 Z" fill="#FF9800"/>
-                    
-                    <!-- Two children figures holding hands -->
-                    <g transform="translate(60, 80)">
-                      <!-- Left child -->
-                      <circle cx="15" cy="15" r="8" fill="#4CAF50"/>
-                      <path d="M7 25 L7 50 L12 50 L12 35 L18 35 L18 50 L23 50 L23 25 C23 20, 20 15, 15 15 C10 15, 7 20, 7 25 Z" fill="#4CAF50"/>
-                      <path d="M5 40 L5 55 L10 55 L10 40 Z" fill="#4CAF50"/>
-                      <path d="M20 40 L20 55 L25 55 L25 40 Z" fill="#4CAF50"/>
-                    </g>
-                    
-                    <g transform="translate(110, 80)">
-                      <!-- Right child -->
-                      <circle cx="15" cy="15" r="8" fill="#4CAF50"/>
-                      <path d="M7 25 L7 50 L12 50 L12 35 L18 35 L18 50 L23 50 L23 25 C23 20, 20 15, 15 15 C10 15, 7 20, 7 25 Z" fill="#4CAF50"/>
-                      <path d="M5 40 L5 55 L10 55 L10 40 Z" fill="#4CAF50"/>
-                      <path d="M20 40 L20 55 L25 55 L25 40 Z" fill="#4CAF50"/>
-                    </g>
-                    
-                    <!-- Connection line between children -->
-                    <line x1="85" y1="115" x2="115" y2="115" stroke="#4CAF50" stroke-width="3"/>
-                  </svg>
-                </div>
-                <h1 style="font-size: 18px; font-weight: bold; margin: 5px 0; letter-spacing: 1px;">CHILD MENTAL HAVEN</h1>
+                <h1 style="font-size: 18px; font-weight: bold; margin: 10px 0; letter-spacing: 1px;">CHILD MENTAL HAVEN</h1>
                 <p style="font-size: 12px; margin: 5px 0;">Where Young Minds Evolve</p>
                 <h2 style="font-size: 14px; margin: 10px 0; letter-spacing: 2px;">PAYMENT RECEIPT</h2>
               </div>
