@@ -334,22 +334,69 @@ export default function OutpatientConsultation() {
                 </div>
               )}
 
-              {/* Vital Signs */}
+              {/* Complete Triage Results */}
               {selectedPatient && getPatientVitals(selectedPatient.id) && (
                 <div>
-                  <h4 className="font-medium mb-2">Recent Vital Signs</h4>
-                  <div className="bg-blue-50 p-4 rounded-lg text-sm space-y-1">
+                  <h4 className="font-medium mb-2 flex items-center space-x-2">
+                    <Activity className="w-4 h-4" />
+                    <span>Triage Assessment Results</span>
+                  </h4>
+                  <div className="bg-blue-50 p-4 rounded-lg text-sm space-y-3">
                     {(() => {
                       const vitals = getPatientVitals(selectedPatient.id);
                       return (
                         <>
-                          <div><strong>Height:</strong> {vitals.height} cm</div>
-                          <div><strong>Weight:</strong> {vitals.weight} kg</div>
-                          <div><strong>BMI:</strong> {vitals.bmi}</div>
-                          <div><strong>Temperature:</strong> {vitals.temperature}°C</div>
-                          <div><strong>Blood Pressure:</strong> {vitals.bloodPressureSystolic}/{vitals.bloodPressureDiastolic} mmHg</div>
-                          <div><strong>Pulse:</strong> {vitals.pulseRate} bpm</div>
-                          <div><strong>Oxygen Saturation:</strong> {vitals.oxygenSaturation}%</div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <h5 className="font-semibold text-blue-800 mb-2">Physical Measurements</h5>
+                              <div className="space-y-1">
+                                <div><strong>Height:</strong> {vitals.height} cm</div>
+                                <div><strong>Weight:</strong> {vitals.weight} kg</div>
+                                <div><strong>BMI:</strong> {vitals.bmi}</div>
+                              </div>
+                            </div>
+                            <div>
+                              <h5 className="font-semibold text-blue-800 mb-2">Vital Signs</h5>
+                              <div className="space-y-1">
+                                <div><strong>Temperature:</strong> {vitals.temperature}°C</div>
+                                <div><strong>Blood Pressure:</strong> {vitals.bloodPressureSystolic}/{vitals.bloodPressureDiastolic} mmHg</div>
+                                <div><strong>Pulse Rate:</strong> {vitals.pulseRate} bpm</div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <h5 className="font-semibold text-blue-800 mb-2">Respiratory</h5>
+                              <div className="space-y-1">
+                                <div><strong>Respiration Rate:</strong> {vitals.respirationRate} breaths/min</div>
+                                <div><strong>Oxygen Saturation:</strong> {vitals.oxygenSaturation}%</div>
+                              </div>
+                            </div>
+                            <div>
+                              <h5 className="font-semibold text-blue-800 mb-2">Laboratory Values</h5>
+                              <div className="space-y-1">
+                                <div><strong>Blood Sugar:</strong> {vitals.bloodSugar} mmol/L</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <h5 className="font-semibold text-blue-800 mb-2">Triage Assessment</h5>
+                            <div className="space-y-1">
+                              <div><strong>Assessment Date:</strong> {vitals.measurementDate}</div>
+                              <div><strong>Assessment Time:</strong> {vitals.measurementTime}</div>
+                              <div><strong>Assessed By:</strong> {vitals.clinician}</div>
+                              {vitals.notes && <div><strong>Nursing Notes:</strong> {vitals.notes}</div>}
+                            </div>
+                          </div>
+
+                          <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded">
+                            <div className="text-green-800 font-medium mb-1">Triage Status: Complete ✓</div>
+                            <div className="text-green-700 text-xs">
+                              Patient has been assessed by nursing staff and is ready for doctor consultation
+                            </div>
+                          </div>
                         </>
                       );
                     })()}
