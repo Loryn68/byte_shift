@@ -316,6 +316,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       console.log("Updating billing record:", id, "with data:", req.body);
+      
+      // Convert paymentDate string to Date object if present
+      if (req.body.paymentDate && typeof req.body.paymentDate === 'string') {
+        req.body.paymentDate = new Date(req.body.paymentDate);
+      }
+      
       const validatedData = insertBillingSchema.partial().parse(req.body);
       const billing = await storage.updateBilling(id, validatedData);
       
