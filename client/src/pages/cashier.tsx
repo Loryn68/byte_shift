@@ -326,7 +326,7 @@ export default function Cashier() {
         );
 
       case 'receipts':
-        const cashReceipts = filterBillingByStatus(["paid"]).filter((bill: Billing) => bill.paymentMethod === "cash");
+        const allReceipts = filterBillingByStatus(["paid"]); // Show all payment method receipts
         
         const generateReceiptContent = (bill: Billing) => {
           const patient = patients.find((p: Patient) => p.id === bill.patientId);
@@ -456,7 +456,7 @@ export default function Cashier() {
         
         return (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Cash Receipts</h3>
+            <h3 className="text-lg font-semibold">All Payment Receipts</h3>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -470,7 +470,7 @@ export default function Cashier() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {cashReceipts.map((bill: Billing) => (
+                {allReceipts.map((bill: Billing) => (
                   <TableRow key={bill.id}>
                     <TableCell>#{bill.billId}</TableCell>
                     <TableCell>{getPatientName(bill.patientId)}</TableCell>
@@ -478,7 +478,18 @@ export default function Cashier() {
                     <TableCell>{formatCurrency(parseFloat(bill.totalAmount || "0"))}</TableCell>
                     <TableCell>{bill.paymentDate ? formatDate(bill.paymentDate) : "-"}</TableCell>
                     <TableCell>
-                      <Badge className="bg-green-100 text-green-800">Cash</Badge>
+                      <Badge className={
+                        bill.paymentMethod === 'cash' ? 'bg-green-100 text-green-800' :
+                        bill.paymentMethod === 'mobile' ? 'bg-purple-100 text-purple-800' :
+                        bill.paymentMethod === 'card' ? 'bg-blue-100 text-blue-800' :
+                        bill.paymentMethod === 'bank' ? 'bg-orange-100 text-orange-800' :
+                        'bg-gray-100 text-gray-800'
+                      }>
+                        {bill.paymentMethod === 'mobile' ? 'M-Pesa' : 
+                         bill.paymentMethod === 'card' ? 'Card' :
+                         bill.paymentMethod === 'bank' ? 'Bank' :
+                         bill.paymentMethod === 'cash' ? 'Cash' : 'Unknown'}
+                      </Badge>
                     </TableCell>
                     <TableCell className="space-x-2">
                       <Button
@@ -718,7 +729,7 @@ export default function Cashier() {
                 onClick={() => setSelectedView('receipts')}
               >
                 <Receipt className="w-4 h-4 mr-2" />
-                Cash Receipts
+                Receipts
               </Button>
               <Button
                 variant={selectedView === 'insurance' ? 'default' : 'ghost'}
