@@ -40,7 +40,8 @@ import {
   ClipboardList,
   UserPlus,
   Send,
-  TestTube
+  TestTube,
+  Pill
 } from "lucide-react";
 import { formatDateTime, getTimeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -198,14 +199,10 @@ export default function OutpatientConsultation() {
       </div>
 
       <Tabs defaultValue="patients" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="patients" className="flex items-center space-x-2">
             <Users className="w-4 h-4" />
             <span>Patients for Consultation</span>
-          </TabsTrigger>
-          <TabsTrigger value="forms" className="flex items-center space-x-2">
-            <ClipboardList className="w-4 h-4" />
-            <span>Medical Forms</span>
           </TabsTrigger>
           <TabsTrigger value="history" className="flex items-center space-x-2">
             <FileText className="w-4 h-4" />
@@ -295,126 +292,6 @@ export default function OutpatientConsultation() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="forms" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Clinical Summary Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <FileText className="w-5 h-5 text-blue-600" />
-                  <span>Clinical Summary (Outpatient)</span>
-                </CardTitle>
-                <CardDescription>
-                  For patients being managed under outpatient care
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                      <ClipboardList className="w-4 h-4 mr-2" />
-                      Fill Clinical Summary
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Clinical Summary - Outpatient</DialogTitle>
-                    </DialogHeader>
-                    <ClinicalSummaryForm />
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
-
-            {/* Medical Report Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <UserPlus className="w-5 h-5 text-green-600" />
-                  <span>Medical Report (Admission)</span>
-                </CardTitle>
-                <CardDescription>
-                  For patients being admitted to the hospital
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full bg-green-600 hover:bg-green-700">
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      Fill Medical Report
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Medical Report - Admission</DialogTitle>
-                    </DialogHeader>
-                    <MedicalReportForm />
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
-
-            {/* Referral Out Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Send className="w-5 h-5 text-orange-600" />
-                  <span>Referral Out Form</span>
-                </CardTitle>
-                <CardDescription>
-                  For patients being referred to other facilities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full bg-orange-600 hover:bg-orange-700">
-                      <Send className="w-4 h-4 mr-2" />
-                      Fill Referral Form
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Referral Out Form</DialogTitle>
-                    </DialogHeader>
-                    <ReferralOutForm />
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
-
-            {/* Lab Request Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <TestTube className="w-5 h-5 text-purple-600" />
-                  <span>Lab Request Form</span>
-                </CardTitle>
-                <CardDescription>
-                  For requesting laboratory investigations
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                      <TestTube className="w-4 h-4 mr-2" />
-                      Fill Lab Request
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Laboratory Request Form</DialogTitle>
-                    </DialogHeader>
-                    <LabRequestForm />
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
 
         <TabsContent value="history" className="mt-6">
@@ -533,6 +410,136 @@ export default function OutpatientConsultation() {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Medical Action Buttons */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-4">Medical Actions</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="h-auto p-3 text-left justify-start">
+                      <div className="flex flex-col items-start space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="w-4 h-4" />
+                          <span className="font-medium">Outpatient Doctor Notes</span>
+                        </div>
+                        <span className="text-xs text-gray-500">Clinical summary form</span>
+                      </div>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Clinical Summary - Outpatient</DialogTitle>
+                    </DialogHeader>
+                    <ClinicalSummaryForm />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="h-auto p-3 text-left justify-start">
+                      <div className="flex flex-col items-start space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <Clock className="w-4 h-4" />
+                          <span className="font-medium">Patient History</span>
+                        </div>
+                        <span className="text-xs text-gray-500">View patient records</span>
+                      </div>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Patient Medical History</DialogTitle>
+                    </DialogHeader>
+                    <div className="p-4 text-center text-gray-500">
+                      Patient history records will be displayed here
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="h-auto p-3 text-left justify-start">
+                      <div className="flex flex-col items-start space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <Send className="w-4 h-4" />
+                          <span className="font-medium">Refer to Another Facility</span>
+                        </div>
+                        <span className="text-xs text-gray-500">External referral form</span>
+                      </div>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Referral Out Form</DialogTitle>
+                    </DialogHeader>
+                    <ReferralOutForm />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="h-auto p-3 text-left justify-start">
+                      <div className="flex flex-col items-start space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <UserPlus className="w-4 h-4" />
+                          <span className="font-medium">Admit Patient</span>
+                        </div>
+                        <span className="text-xs text-gray-500">Admission medical report</span>
+                      </div>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Medical Report - Admission</DialogTitle>
+                    </DialogHeader>
+                    <MedicalReportForm />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="h-auto p-3 text-left justify-start">
+                      <div className="flex flex-col items-start space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <TestTube className="w-4 h-4" />
+                          <span className="font-medium">Laboratory</span>
+                        </div>
+                        <span className="text-xs text-gray-500">Lab request form</span>
+                      </div>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Laboratory Request Form</DialogTitle>
+                    </DialogHeader>
+                    <LabRequestForm />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="h-auto p-3 text-left justify-start">
+                      <div className="flex flex-col items-start space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <Pill className="w-4 h-4" />
+                          <span className="font-medium">Prescription</span>
+                        </div>
+                        <span className="text-xs text-gray-500">Medication prescription</span>
+                      </div>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Prescription Form</DialogTitle>
+                    </DialogHeader>
+                    <div className="p-4 text-center text-gray-500">
+                      Prescription form will be implemented here
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
 
             {/* Consultation Form */}
