@@ -239,9 +239,8 @@ export default function Cashier() {
 
       case 'queue':
         const pendingPayments = filterBillingByStatus(["pending"]);
-        const todayPayments = filterBillingByStatus(["paid"]).filter((bill: Billing) => 
-          bill.paymentDate && new Date(bill.paymentDate).toDateString() === new Date().toDateString()
-        );
+        // Show all paid receipts for now to debug the issue
+        const todayPayments = filterBillingByStatus(["paid"]);
 
         const paymentsByMethod = todayPayments.reduce((acc: any, bill: Billing) => {
           const method = bill.paymentMethod || 'unknown';
