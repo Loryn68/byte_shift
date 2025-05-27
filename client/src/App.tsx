@@ -8,7 +8,7 @@ import Sidebar from "@/components/layout/sidebar";
 import Dashboard from "@/pages/dashboard";
 import PatientRegistration from "@/pages/patient-registration-new";
 import PatientFlowDashboard from "@/pages/patient-flow-dashboard";
-import OutpatientConsultation from "@/pages/outpatient-consultation";
+import OutpatientConsultation from "@/pages/outpatient-consultation-clean";
 import ConsultationInterface from "@/pages/consultation-interface";
 import TriageVitals from "@/pages/triage-vitals";
 import Appointments from "@/pages/appointments";

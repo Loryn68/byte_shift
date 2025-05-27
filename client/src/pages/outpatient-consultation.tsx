@@ -300,9 +300,6 @@ export default function OutpatientConsultation() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Consultation Modal */}
-      <Dialog open={showConsultationModal} onOpenChange={setShowConsultationModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
