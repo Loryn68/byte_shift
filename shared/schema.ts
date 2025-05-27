@@ -190,6 +190,8 @@ export const insertBillingSchema = createInsertSchema(billing).omit({
   billId: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  paymentDate: z.union([z.date(), z.string()]).optional(),
 });
 
 // Types
