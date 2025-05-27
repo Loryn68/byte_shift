@@ -3,6 +3,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -21,28 +25,63 @@ import {
 import { 
   Users, 
   Search, 
-  Clock, 
-  DollarSign, 
-  CheckCircle,
-  AlertCircle,
+  Activity, 
+  Heart,
+  Thermometer,
+  Weight,
+  Ruler,
   UserCheck,
-  Stethoscope
+  Stethoscope,
+  Save,
+  AlertTriangle
 } from "lucide-react";
-import { formatCurrency, formatDateTime, getTimeAgo } from "@/lib/utils";
+import { formatDateTime, getTimeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { Patient, Billing } from "@shared/schema";
+import type { Patient } from "@shared/schema";
+
+interface VitalSigns {
+  measurementDate: string;
+  measurementTime: string;
+  height: string;
+  weight: string;
+  bmi: string;
+  temperature: string;
+  bloodPressureSystolic: string;
+  bloodPressureDiastolic: string;
+  respirationRate: string;
+  pulseRate: string;
+  oxygenSaturation: string;
+  bloodSugar: string;
+  notes: string;
+  clinician: string;
+}
 
 export default function OutpatientQueue() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [amountPaid, setAmountPaid] = useState("");
-  const [transactionRef, setTransactionRef] = useState("");
-  const [changeAmount, setChangeAmount] = useState(0);
+  const [showVitalsModal, setShowVitalsModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("queue");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Vital Signs Form State
+  const [vitals, setVitals] = useState<VitalSigns>({
+    measurementDate: new Date().toISOString().split('T')[0],
+    measurementTime: new Date().toTimeString().slice(0, 5),
+    height: "",
+    weight: "",
+    bmi: "",
+    temperature: "",
+    bloodPressureSystolic: "",
+    bloodPressureDiastolic: "",
+    respirationRate: "",
+    pulseRate: "",
+    oxygenSaturation: "",
+    bloodSugar: "",
+    notes: "",
+    clinician: "Nurse"
+  });
 
   const { data: patients = [], isLoading } = useQuery({
     queryKey: ["/api/patients"],

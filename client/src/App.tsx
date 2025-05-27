@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import PatientRegistration from "@/pages/patient-registration-new";
 import PatientFlowDashboard from "@/pages/patient-flow-dashboard";
 import OutpatientQueue from "@/pages/outpatient-queue";
+import TriageVitals from "@/pages/triage-vitals";
 import DoctorPortal from "@/pages/doctor-portal";
 import Appointments from "@/pages/appointments";
 import Laboratory from "@/pages/laboratory";
@@ -31,7 +32,7 @@ function Router() {
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/patient-registration" component={PatientRegistration} />
             <Route path="/cashier" component={Cashier} />
-            <Route path="/triage" component={OutpatientQueue} />
+            <Route path="/triage" component={TriageVitals} />
             <Route path="/outpatient" component={Appointments} />
             <Route path="/inpatient" component={Appointments} />
             <Route path="/patient-flow" component={PatientFlowDashboard} />
