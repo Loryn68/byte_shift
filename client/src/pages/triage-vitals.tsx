@@ -230,9 +230,9 @@ export default function TriageVitals() {
               </div>
               <div>
                 <strong>Address:</strong> ${patient.address}<br>
-                <strong>Blood Type:</strong> ${patient.bloodType || 'Not specified'}<br>
-                <strong>Registration Type:</strong> ${patient.registrationType || 'General'}<br>
-                <strong>Marital Status:</strong> ${patient.maritalStatus || 'Not specified'}
+                <strong>National ID:</strong> ${patient.nationalId || 'Not provided'}<br>
+                <strong>Occupation:</strong> ${patient.occupation || 'Not specified'}<br>
+                <strong>Religion:</strong> ${patient.religion || 'Not specified'}
               </div>
             </div>
           </div>
