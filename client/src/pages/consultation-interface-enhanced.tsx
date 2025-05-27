@@ -443,8 +443,8 @@ export default function ConsultationInterface() {
 // Clinical Summary Form
 function ClinicalSummaryForm() {
   const [formData, setFormData] = useState({
-    patientName: `${patient?.firstName || ""} ${patient?.lastName || ""}`.trim(),
-    patientId: patient?.patientId || "",
+    patientName: "",
+    patientId: "",
     consultationDate: new Date().toISOString().split('T')[0],
     consultationTime: new Date().toLocaleTimeString('en-GB', { hour12: false }).slice(0, 5),
     chiefComplaint: "",
@@ -649,8 +649,8 @@ Date: ${new Date().toLocaleDateString()}`;
 // Medical Report Form
 function MedicalReportForm() {
   const [formData, setFormData] = useState({
-    patientName: `${patient?.firstName || ""} ${patient?.lastName || ""}`.trim(),
-    patientId: patient?.patientId || "",
+    patientName: "",
+    patientId: "",
     admissionDate: new Date().toISOString().split('T')[0],
     admittingDoctor: "Dr. Smith",
     reasonForAdmission: "",
@@ -856,8 +856,8 @@ Date: ${new Date().toLocaleDateString()}`;
 // Patient Admission Form
 function PatientAdmissionForm() {
   const [formData, setFormData] = useState({
-    patientName: `${patient?.firstName || ""} ${patient?.lastName || ""}`.trim(),
-    patientId: patient?.patientId || "",
+    patientName: "",
+    patientId: "",
     modeOfAdmission: "",
     allegation: "",
     patientReaction: "",
@@ -1290,7 +1290,7 @@ Generated on: ${new Date().toLocaleDateString()}
 // Referral Out Form
 function ReferralOutForm() {
   const [formData, setFormData] = useState({
-    patientName: `${patient?.firstName || ""} ${patient?.lastName || ""}`.trim(),
+    patientName: patient ? `${patient.firstName} ${patient.lastName}`.trim() : "",
     patientId: patient?.patientId || "",
     referralDate: new Date().toISOString().split('T')[0],
     referringFacility: "Child Mental Haven",
