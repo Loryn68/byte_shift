@@ -254,7 +254,9 @@ export default function ConsultationInterface() {
                       <DialogHeader>
                         <DialogTitle>Patient Admission Form</DialogTitle>
                       </DialogHeader>
-                      <PatientAdmissionForm />
+                      <div className="p-4 text-center text-gray-500">
+                        Patient admission functionality coming soon
+                      </div>
                     </DialogContent>
                   </Dialog>
 
