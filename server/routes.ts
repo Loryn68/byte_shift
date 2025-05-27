@@ -166,6 +166,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Consultation notes endpoint
+  app.post("/api/consultations", async (req, res) => {
+    try {
+      // For now, we'll store consultation notes in memory or localStorage
+      // In a real implementation, this would be saved to a database
+      console.log("Consultation notes received:", req.body);
+      res.status(201).json({ 
+        message: "Consultation notes saved successfully",
+        id: Date.now() // Simple ID generation
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to save consultation notes" });
+    }
+  });
+
   // Laboratory routes
   app.get("/api/lab-tests", async (req, res) => {
     try {

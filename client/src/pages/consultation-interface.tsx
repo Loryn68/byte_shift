@@ -104,11 +104,14 @@ export default function ConsultationInterface() {
 
   const saveConsultationMutation = useMutation({
     mutationFn: async (consultationData: ConsultationNotes) => {
-      const response = await apiRequest("/api/consultations", {
+      const response = await fetch("/api/consultations", {
         method: "POST",
-        body: consultationData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(consultationData),
       });
-      return response;
+      return response.json();
     },
     onSuccess: () => {
       toast({
