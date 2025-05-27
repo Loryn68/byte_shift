@@ -96,6 +96,13 @@ export default function TriageVitals() {
     queryKey: ["/api/billing"],
   });
 
+  // Helper function to get patient vitals from localStorage
+  const getPatientVitals = (patientId: number) => {
+    const vitalsKey = `patient-vitals-${patientId}`;
+    const saved = localStorage.getItem(vitalsKey);
+    return saved ? JSON.parse(saved) : null;
+  };
+
   // Filter patients who have paid and need vital signs
   const patientsForTriage = patients.filter((patient: Patient) => {
     const patientBills = billingRecords.filter((bill: Billing) => 
@@ -104,7 +111,23 @@ export default function TriageVitals() {
     return patientBills.length > 0;
   });
 
-  const filteredPatients = patientsForTriage.filter((patient: Patient) => {
+  // Get patients who haven't been triaged yet (Patient Queue)
+  const getPendingTriagePatients = () => {
+    return patientsForTriage.filter((patient: Patient) => {
+      const vitalsData = getPatientVitals(patient.id);
+      return !vitalsData; // No vitals recorded = pending triage
+    });
+  };
+
+  // Get patients who have completed triage (Served Patients)
+  const getServedPatients = () => {
+    return patientsForTriage.filter((patient: Patient) => {
+      const vitalsData = getPatientVitals(patient.id);
+      return vitalsData; // Vitals recorded = triage complete
+    });
+  };
+
+  const filteredPatients = getPendingTriagePatients().filter((patient: Patient) => {
     if (!searchQuery) return true;
     return (
       patient.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -481,6 +504,7 @@ export default function TriageVitals() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="queue">Patient Queue</TabsTrigger>
+          <TabsTrigger value="served">Served Patients</TabsTrigger>
           <TabsTrigger value="history">Vital Signs History</TabsTrigger>
           <TabsTrigger value="screening">Health Screening</TabsTrigger>
         </TabsList>
@@ -558,6 +582,121 @@ export default function TriageVitals() {
                 <div className="text-center py-8 text-gray-500">
                   <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                   <p>No patients awaiting triage assessment</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="served">
+          <Card>
+            <CardHeader>
+              <CardTitle>Served Patients</CardTitle>
+              <CardDescription>
+                Patients who have completed nursing assessment and vital signs recording
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search served patients..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
+              </div>
+
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Patient ID</TableHead>
+                    <TableHead>Patient Name</TableHead>
+                    <TableHead>Age</TableHead>
+                    <TableHead>Gender</TableHead>
+                    <TableHead>Service Type</TableHead>
+                    <TableHead>Triage Status</TableHead>
+                    <TableHead>Assessment Date</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {getServedPatients().filter((patient: Patient) => {
+                    if (!searchQuery) return true;
+                    return (
+                      patient.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      patient.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      patient.patientId.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                  }).map((patient: Patient) => {
+                    const vitalsData = getPatientVitals(patient.id);
+                    return (
+                      <TableRow key={patient.id}>
+                        <TableCell className="font-medium">{patient.patientId}</TableCell>
+                        <TableCell>{patient.firstName} {patient.lastName}</TableCell>
+                        <TableCell>
+                          {new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} years
+                        </TableCell>
+                        <TableCell className="capitalize">{patient.gender}</TableCell>
+                        <TableCell>
+                          {billingRecords
+                            .filter((bill: Billing) => bill.patientId === patient.id && bill.paymentStatus === "paid")
+                            .map((bill: Billing) => bill.serviceType)
+                            .join(", ")}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="default" className="bg-green-100 text-green-800 border-green-300">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Triage Complete
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {vitalsData ? new Date(vitalsData.recordedAt).toLocaleDateString() : "-"}
+                        </TableCell>
+                        <TableCell className="space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedPatient(patient);
+                              const savedData = getPatientVitals(patient.id);
+                              if (savedData) {
+                                setSavedVitals(savedData);
+                                printTriageReport();
+                              }
+                            }}
+                            className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                          >
+                            Print Report
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedPatient(patient);
+                              const savedData = getPatientVitals(patient.id);
+                              if (savedData) {
+                                setSavedVitals(savedData);
+                                downloadTriagePDF();
+                              }
+                            }}
+                            className="text-green-600 border-green-600 hover:bg-green-50"
+                          >
+                            Download PDF
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+
+              {getServedPatients().length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <UserCheck className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <p>No patients have completed triage assessment yet</p>
                 </div>
               )}
             </CardContent>
