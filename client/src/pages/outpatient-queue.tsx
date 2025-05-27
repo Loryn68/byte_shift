@@ -33,7 +33,9 @@ import {
   UserCheck,
   Stethoscope,
   Save,
-  AlertTriangle
+  FileText,
+  Eye,
+  Plus
 } from "lucide-react";
 import { formatDateTime, getTimeAgo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
