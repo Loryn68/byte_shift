@@ -37,12 +37,25 @@ export default function TherapyPage() {
     queryKey: ["/api/patients"],
   });
 
-  // For now, show all patients - will be filtered by service type during registration
-  const therapyPatients = (patients as Patient[] || []).filter(patient => 
-    patient.patientType === 'therapy' || 
-    patient.notes?.toLowerCase().includes('counseling') ||
-    patient.notes?.toLowerCase().includes('therapy')
-  );
+  // Get billing data to identify therapy patients by service type
+  const { data: billingRecords } = useQuery({
+    queryKey: ["/api/billing"],
+  });
+
+  // Filter therapy patients based on billing records for counseling services
+  const therapyPatients = (patients as Patient[] || []).filter(patient => {
+    if (!billingRecords) return false;
+    
+    const patientBilling = (billingRecords as any[]).find(
+      bill => bill.patientId === patient.id && 
+      (bill.serviceType?.toLowerCase().includes('counseling') ||
+       bill.serviceType?.toLowerCase().includes('therapy') ||
+       bill.serviceDescription?.toLowerCase().includes('counseling') ||
+       bill.serviceDescription?.toLowerCase().includes('therapy'))
+    );
+    
+    return !!patientBilling;
+  });
 
   // Filter patients based on search term
   const filteredPatients = therapyPatients.filter(patient =>
