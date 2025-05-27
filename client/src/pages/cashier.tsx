@@ -135,6 +135,14 @@ export default function Cashier() {
     return patient?.patientId || "";
   };
 
+  const formatDate = (date: string | Date) => {
+    return new Date(date).toLocaleDateString();
+  };
+
+  const formatDateTime = (date: string | Date) => {
+    return new Date(date).toLocaleString();
+  };
+
   const filterBillingByStatus = (status: string[]) => {
     return billingRecords.filter((bill: Billing) => 
       status.includes(bill.paymentStatus) &&
@@ -318,6 +326,131 @@ export default function Cashier() {
         );
 
       case 'receipts':
+        const cashReceipts = filterBillingByStatus(["paid"]).filter((bill: Billing) => bill.paymentMethod === "cash");
+        
+        const generateReceiptContent = (bill: Billing) => {
+          const patient = patients.find((p: Patient) => p.id === bill.patientId);
+          if (!patient) return "";
+
+          const formatDateTime = (date: string | Date) => {
+            return new Date(date).toLocaleString();
+          };
+          
+          return `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px;">
+                <h1 style="color: #2563eb; margin: 0;">Child Mental Haven</h1>
+                <p style="margin: 5px 0; color: #666;">Hospital Information Management</p>
+                <h2 style="margin: 10px 0; color: #333;">PAYMENT RECEIPT</h2>
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <h3 style="color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Receipt Information</h3>
+                <p><strong>Receipt #:</strong> ${bill.billId}</p>
+                <p><strong>Date:</strong> ${bill.paymentDate ? formatDateTime(bill.paymentDate) : formatDateTime(new Date())}</p>
+                <p><strong>Payment Method:</strong> Cash</p>
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <h3 style="color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Patient Information</h3>
+                <p><strong>Patient ID:</strong> ${patient.patientId}</p>
+                <p><strong>Name:</strong> ${patient.firstName} ${patient.middleName ? patient.middleName + ' ' : ''}${patient.lastName}</p>
+                <p><strong>Date of Birth:</strong> ${formatDate(patient.dateOfBirth)}</p>
+                <p><strong>Age:</strong> ${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} years</p>
+                <p><strong>Gender:</strong> ${patient.gender}</p>
+                <p><strong>Address:</strong> ${patient.address}</p>
+                <p><strong>County:</strong> ${patient.county || 'Not specified'}</p>
+                ${patient.occupation ? `<p><strong>Occupation:</strong> ${patient.occupation}</p>` : ''}
+                ${patient.bloodType ? `<p><strong>Blood Type:</strong> ${patient.bloodType}</p>` : ''}
+                ${patient.insuranceProvider ? `<p><strong>Insurance Provider:</strong> ${patient.insuranceProvider}</p>` : ''}
+                ${patient.insuranceNumber ? `<p><strong>Insurance Number:</strong> ${patient.insuranceNumber}</p>` : ''}
+                ${patient.allergies ? `<p><strong>Allergies:</strong> ${patient.allergies}</p>` : ''}
+                ${patient.medicalHistory ? `<p><strong>Medical History:</strong> ${patient.medicalHistory}</p>` : ''}
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <h3 style="color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Service Details</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr style="background-color: #f5f5f5;">
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Description</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Amount</th>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${bill.serviceDescription}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatCurrency(parseFloat(bill.amount || "0"))}</td>
+                  </tr>
+                  ${bill.discount && parseFloat(bill.discount) > 0 ? `
+                    <tr>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Discount</td>
+                      <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">-${formatCurrency(parseFloat(bill.discount))}</td>
+                    </tr>
+                  ` : ''}
+                  <tr style="background-color: #f0f0f0; font-weight: bold;">
+                    <td style="border: 1px solid #ddd; padding: 8px;">Total Amount</td>
+                    <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatCurrency(parseFloat(bill.totalAmount || "0"))}</td>
+                  </tr>
+                </table>
+              </div>
+              
+              <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">
+                <p>Thank you for choosing Child Mental Haven</p>
+                <p>For inquiries, please contact us</p>
+                <p style="margin-top: 20px;">This is a computer-generated receipt</p>
+              </div>
+            </div>
+          `;
+        };
+        
+        const printReceipt = (bill: Billing) => {
+          const printWindow = window.open('', '_blank');
+          if (printWindow) {
+            printWindow.document.write(`
+              <html>
+                <head>
+                  <title>Receipt ${bill.billId}</title>
+                  <style>
+                    @media print {
+                      body { margin: 0; }
+                      @page { margin: 1cm; }
+                    }
+                  </style>
+                </head>
+                <body>
+                  ${generateReceiptContent(bill)}
+                </body>
+              </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+          }
+        };
+        
+        const downloadPDF = (bill: Billing) => {
+          // Create a new window for PDF generation
+          const pdfWindow = window.open('', '_blank');
+          if (pdfWindow) {
+            pdfWindow.document.write(`
+              <html>
+                <head>
+                  <title>Receipt ${bill.billId}</title>
+                  <style>
+                    body { margin: 0; font-family: Arial, sans-serif; }
+                  </style>
+                </head>
+                <body>
+                  ${generateReceiptContent(bill)}
+                  <script>
+                    window.onload = function() {
+                      window.print();
+                    }
+                  </script>
+                </body>
+              </html>
+            `);
+            pdfWindow.document.close();
+          }
+        };
+        
         return (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Cash Receipts</h3>
@@ -330,10 +463,11 @@ export default function Cashier() {
                   <TableHead>Amount</TableHead>
                   <TableHead>Payment Date</TableHead>
                   <TableHead>Method</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filterBillingByStatus(["paid"]).filter((bill: Billing) => bill.paymentMethod === "cash").map((bill: Billing) => (
+                {cashReceipts.map((bill: Billing) => (
                   <TableRow key={bill.id}>
                     <TableCell>#{bill.billId}</TableCell>
                     <TableCell>{getPatientName(bill.patientId)}</TableCell>
@@ -342,6 +476,24 @@ export default function Cashier() {
                     <TableCell>{bill.paymentDate ? formatDate(bill.paymentDate) : "-"}</TableCell>
                     <TableCell>
                       <Badge className="bg-green-100 text-green-800">Cash</Badge>
+                    </TableCell>
+                    <TableCell className="space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => printReceipt(bill)}
+                        className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                      >
+                        Print
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => downloadPDF(bill)}
+                        className="text-green-600 border-green-600 hover:bg-green-50"
+                      >
+                        PDF
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
