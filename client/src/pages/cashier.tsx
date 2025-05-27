@@ -72,6 +72,7 @@ export default function Cashier() {
       const updateData: any = {
         paymentStatus: "paid",
         paymentMethod,
+        paymentDate: new Date().toISOString(),
       };
       
       if (transactionNumber) {
