@@ -164,7 +164,7 @@ export default function OutpatientConsultation() {
                           <TableCell>
                             <div className="flex items-center text-sm text-gray-500">
                               <Calendar className="w-4 h-4 mr-1" />
-                              {formatDateTime(patient.createdAt)}
+                              {formatDateTime(patient.registrationDate)}
                             </div>
                           </TableCell>
                           <TableCell>
