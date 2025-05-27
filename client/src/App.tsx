@@ -9,7 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import PatientRegistration from "@/pages/patient-registration-new";
 import PatientFlowDashboard from "@/pages/patient-flow-dashboard";
 import OutpatientConsultation from "@/pages/outpatient-consultation-clean";
-import ConsultationInterface from "@/pages/consultation-interface";
+import ConsultationInterface from "@/pages/consultation-interface-enhanced";
 import TriageVitals from "@/pages/triage-vitals";
 import Appointments from "@/pages/appointments";
 import Laboratory from "@/pages/laboratory";
