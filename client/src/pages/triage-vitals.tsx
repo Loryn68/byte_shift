@@ -226,13 +226,15 @@ export default function TriageVitals() {
                 <strong>Name:</strong> ${patient.firstName} ${patient.middleName ? patient.middleName + ' ' : ''}${patient.lastName}<br>
                 <strong>Date of Birth:</strong> ${new Date(patient.dateOfBirth).toLocaleDateString()}<br>
                 <strong>Age:</strong> ${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} years<br>
-                <strong>Gender:</strong> ${patient.gender}
+                <strong>Gender:</strong> ${patient.gender}<br>
+                <strong>Address:</strong> ${patient.address}
               </div>
               <div>
-                <strong>Address:</strong> ${patient.address}<br>
                 <strong>National ID:</strong> ${patient.nationalId || 'Not provided'}<br>
                 <strong>Occupation:</strong> ${patient.occupation || 'Not specified'}<br>
-                <strong>Religion:</strong> ${patient.religion || 'Not specified'}
+                <strong>Email:</strong> ${patient.email || 'Not provided'}<br>
+                <strong>Insurance Provider:</strong> ${patient.insuranceProvider || 'None'}<br>
+                <strong>Registration Date:</strong> ${new Date(patient.registrationDate).toLocaleDateString()}
               </div>
             </div>
           </div>
