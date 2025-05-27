@@ -153,9 +153,19 @@ export default function TriageVitals() {
 
   const saveVitalsMutation = useMutation({
     mutationFn: async (vitalsData: VitalSigns) => {
-      // In a real system, this would save to a vitals table
-      // For now, we'll store it in local state for printing
+      // Save vital signs and mark patient as triaged
       console.log("Saving vital signs:", vitalsData);
+      
+      // Store vital signs in localStorage for this session
+      const existingVitals = JSON.parse(localStorage.getItem('patientVitals') || '[]');
+      const newVitalRecord = {
+        ...vitalsData,
+        id: Date.now(),
+        status: 'triaged'
+      };
+      existingVitals.push(newVitalRecord);
+      localStorage.setItem('patientVitals', JSON.stringify(existingVitals));
+      
       return vitalsData;
     },
     onSuccess: (savedData) => {
@@ -164,8 +174,11 @@ export default function TriageVitals() {
       
       toast({
         title: "Vital Signs Recorded",
-        description: "Patient vital signs have been successfully recorded.",
+        description: "Patient has been triaged and will appear in outpatient queue.",
       });
+      
+      // Invalidate queries to refresh patient lists
+      queryClient.invalidateQueries({ queryKey: ['/api/patients'] });
       
       // Don't close the modal immediately, let user print if needed
       // setShowVitalsModal(false);
