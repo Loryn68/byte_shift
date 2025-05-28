@@ -168,17 +168,11 @@ export default function TherapyPage() {
         // Create appointment with therapy findings
         const appointmentData = {
           patientId: patient.id,
-          type: "therapy-referral",
           doctorId: 1,
-          appointmentDate: new Date().toISOString().split('T')[0],
+          appointmentDate: new Date().toISOString(),
           department: "Mental Health",
-          status: "pending",
-          consultationType: referralData.consultationType,
-          therapyFindings: sessionData.counselorFindings || "Therapy session completed",
-          patientResponse: sessionData.patientResponse || "Patient participated in session",
-          riskAssessment: sessionData.riskAssessment || "Assessment pending",
-          recommendedTreatment: sessionData.recommendedTreatment || "Follow-up recommended",
-          referralReason: sessionData.referralReason || "Therapy referral",
+          type: "therapy-referral",
+          status: "scheduled",
           notes: `THERAPY REFERRAL:\n\nCounselor Findings: ${sessionData.counselorFindings || "Session completed"}\n\nPatient Response: ${sessionData.patientResponse || "Patient engaged"}\n\nRisk Assessment: ${sessionData.riskAssessment || "Standard assessment"}\n\nRecommended Treatment: ${sessionData.recommendedTreatment || "Medical consultation"}\n\nReferral Reason: ${sessionData.referralReason || "Therapy follow-up"}\n\nReferred by: ${sessionData.therapistName}\nSession Date: ${sessionData.sessionDate}\n\nConsultation Type: ${referralData.consultationName}`
         };
 
