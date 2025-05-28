@@ -38,21 +38,22 @@ export default function OutpatientConsultation() {
     queryKey: ["/api/billing"],
   });
 
-  // Get triaged patients from localStorage
-  const getTriagedPatients = () => {
-    try {
-      const vitalsData = JSON.parse(localStorage.getItem('patientVitals') || '[]');
-      return vitalsData.map((vital: any) => vital.patientId);
-    } catch {
-      return [];
-    }
-  };
-
-  const triagedPatientIds = getTriagedPatients();
-
+  // Filter patients to show only those ready for outpatient consultation
   const filteredPatients = patients.filter((patient: Patient) => {
-    // Only show patients who have been triaged
-    if (!triagedPatientIds.includes(patient.id)) return false;
+    // Only show patients who have completed triage and are ready for doctor consultation
+    // Check both localStorage (for backward compatibility) and patient status
+    const hasVitalsInLocalStorage = (() => {
+      try {
+        const vitalsData = JSON.parse(localStorage.getItem('patientVitals') || '[]');
+        return vitalsData.some((vital: any) => vital.patientId === patient.id);
+      } catch {
+        return false;
+      }
+    })();
+    
+    const isReadyForDoctor = patient.status === "triaged-ready-for-doctor" || hasVitalsInLocalStorage;
+    
+    if (!isReadyForDoctor) return false;
     
     // Exclude therapy patients (those with counseling services)
     const isTherapyPatient = billingRecords.some((bill: any) => 

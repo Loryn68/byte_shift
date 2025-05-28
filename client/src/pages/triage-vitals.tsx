@@ -194,6 +194,12 @@ export default function TriageVitals() {
       existingVitals.push(vitalRecord);
       localStorage.setItem('patientVitals', JSON.stringify(existingVitals));
       
+      // Update patient status in database to mark as triaged and ready for doctor
+      await apiRequest("PUT", `/api/patients/${vitalsData.patientId}`, {
+        status: "triaged-ready-for-doctor",
+        lastTriageDate: new Date().toISOString()
+      });
+      
       return vitalsData;
     },
     onSuccess: (savedData) => {
