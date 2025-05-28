@@ -161,19 +161,18 @@ export function useAuth() {
   return {
     user,
     isAuthenticated: authService.isAuthenticated(),
-    login: authService.login.bind(authService),
-    logout: authService.logout.bind(authService),
-    hasRole: authService.hasRole.bind(authService),
-    hasAnyRole: authService.hasAnyRole.bind(authService),
-    canAccessModule: authService.canAccessModule.bind(authService),
-    isAdmin: authService.isAdmin(),
-    isDoctor: authService.isDoctor(),
-    isNurse: authService.isNurse(),
-    fullName: authService.getFullName(),
-    displayRole: authService.getDisplayRole()
+    hasRole: (role: string) => authService.hasRole(role),
+    hasAnyRole: (roles: string[]) => authService.hasAnyRole(roles),
+    isAdmin: () => authService.isAdmin(),
+    isDoctor: () => authService.isDoctor(),
+    isNurse: () => authService.isNurse(),
+    canAccessModule: (module: string) => authService.canAccessModule(module),
+    getFullName: () => authService.getFullName(),
+    getDisplayRole: () => authService.getDisplayRole()
   };
 }
 
+// Helper functions for requiring authentication and roles
 export function requireAuth(): User {
   const user = authService.getCurrentUser();
   if (!user) {

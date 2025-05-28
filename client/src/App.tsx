@@ -21,8 +21,18 @@ import ProfessionalBilling from "@/pages/professional-billing";
 import Cashier from "@/pages/cashier";
 import Reports from "@/pages/reports";
 import NotFound from "@/pages/not-found";
+import LoginPage from "@/pages/login";
+import { useAuth } from "@/lib/auth";
 
 function Router() {
+  const { isAuthenticated } = useAuth();
+
+  // If not authenticated, show login page
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  // If authenticated, show the main application
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
