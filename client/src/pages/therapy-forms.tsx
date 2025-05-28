@@ -635,6 +635,243 @@ Regularly acknowledge the good things in your life, no matter how small they may
 
 Remember: Peace of mind comes from acting with integrity and treating yourself with compassion, not from external circumstances or achievements.
       `
+    },
+    {
+      title: "Understanding Triggers",
+      description: "Comprehensive guide to identifying and managing personal triggers",
+      category: "Coping Skills",
+      icon: <Brain className="h-5 w-5" />,
+      content: `
+WHAT IS A TRIGGER?
+
+To be triggered is to experience an emotional reaction to something based on a previous negative experience. Triggers can be people, scents, places, harmful substances, or anything else that serves as reminders for intense or distracting emotions.
+
+EXTERNAL AND INTERNAL TRIGGERS:
+
+INTERNAL TRIGGERS:
+- Shame/guilt/anger/regret
+- Depression and anxiety
+- Inconsistency
+- A loss of control
+- Heartbreak, job loss or grief
+- Stress or fear
+- Feeling unsafe, feeling misunderstood
+
+EXTERNAL TRIGGERS:
+- Specific places (home, streets, cities, countries)
+- Trauma/PTSD and abuse
+- Feeling judged, feeling attacked, feeling invalidated
+- Sights, smells, conflict, aggression, news stories, books, and memories
+
+TRIGGER MANAGEMENT - HEALTHY COPING SKILLS:
+
+✓ Exercising
+✓ Resting
+✓ Therapy or counseling
+✓ Meditation or mindfulness
+✓ Spending time with positive people
+✓ Drinking water or tea for relaxation/hydration
+✓ Joining a support group
+✓ Eating nutritional meals
+✓ Using positive distractions
+✓ Reframing negative attitudes or perceptions
+
+TRIGGER MANAGEMENT - UNHEALTHY COPING SKILLS (TO AVOID):
+
+✗ Misdirected anger
+✗ Violence
+✗ Emotional, psychological, sexual, financial, or mental abuse
+✗ Making excuses for harmful behavior
+✗ Self-harm
+✗ Developing poor behavioral compulsions
+✗ Abusing harmful substances
+✗ Binge eating or drinking
+✗ Lying/Denial
+✗ Bottling it up
+✗ Exploding with anger or rage
+
+Remember: Being self-aware allows for individuals to understand the driving force behind their behavior, or the trigger before and after they react.
+      `
+    },
+    {
+      title: "What is Burnout?",
+      description: "Understanding burnout symptoms, causes, and recovery strategies",
+      category: "Self-Care",
+      icon: <Heart className="h-5 w-5" />,
+      content: `
+WHAT IS BURNOUT?
+
+Burnout is a state of complete mental, physical, and emotional exhaustion. If you are experiencing burnout, you may notice it is difficult to engage in activities you normally find meaningful.
+
+SIGNS AND SYMPTOMS OF BURNOUT:
+
+PHYSICAL SYMPTOMS:
+- Headaches
+- Stomachaches/intestinal issues
+- Fatigue
+- Frequent illness
+- Changes in appetite/sleep
+
+EMOTIONAL SYMPTOMS:
+- Helplessness
+- Cynicism
+- Sense of failure or self-doubt
+- Decreased satisfaction
+- Feeling detached or alone in the world
+- Loss of motivation
+
+BEHAVIORAL SIGNS:
+- Reduced performance in everyday tasks
+- Withdrawal or isolation
+- Procrastination
+- Outbursts
+- Using substances to cope
+
+CAUSES OF BURNOUT:
+
+WORK-RELATED CAUSES:
+- Having little or no control over your work
+- Lack of recognition
+- Overly demanding job expectations
+- Monotonous or unchallenging work
+- Chaotic or high-pressure environment
+
+LIFESTYLE CAUSES:
+- Working too much, without socializing or relaxing
+- Lack of close, supportive relationships
+- Too many responsibilities, without enough help
+- Not enough sleep
+
+PERSONALITY TRAITS:
+- Perfectionistic tendencies
+- Pessimistic view of yourself and the world
+- Need to be in control
+- High achieving in nature
+
+REGAINING BALANCE IN YOUR LIFE:
+
+✓ Turn to other people for support: friends, colleagues, or community groups
+✓ Reframe the way you look at work or your home life by finding value, meaning and balance
+✓ Reevaluate your priorities by taking time off or regular breaks during the day
+✓ Nourishing your creativity by doing something interesting
+✓ Make physical activity a priority to boost your mood and energy
+✓ Support your body with a healthy diet and quality sleep
+
+Taking a few moments each day to nurture your mental wellbeing will help you be a happier and more resilient you. You deserve the best possible you!
+      `
+    },
+    {
+      title: "Understanding Values",
+      description: "Exploring personal values and their impact on behavior and decision-making",
+      category: "Self-Discovery",
+      icon: <Users className="h-5 w-5" />,
+      content: `
+WHAT IS A VALUE?
+
+Values are qualities, characteristics, or ideas about which we feel strongly. Our values affect our decisions, goals and behavior. A belief or feeling that someone or something is worthwhile.
+
+VALUES DEFINE:
+- What is of worth
+- What is beneficial  
+- What is harmful
+- Standards to guide your action, judgments, and attitudes
+
+VALUES GIVE DIRECTION:
+- Values give direction and consistency to behavior
+- Values help you know what to and not to make time for
+- Values establish a relationship between you and the world
+- Values set the direction for one's life
+
+WHERE DO WE GET VALUES?
+- Our homes
+- School
+- Society
+- Friends
+- TV
+- Church
+- Music
+- Books
+- Families
+- Culture
+- Employers
+- Time-period in which you were raised
+
+YOUR AGE INFLUENCES YOUR VALUES:
+- Ages 1-7: Parents
+- Ages 8-13: Teachers, heroes (sports, rocks, TV)
+- Ages 14-20: Peers
+- Ages 21+: Your values are established, but you may test them from time to time
+
+VALUE VERSUS FACTS:
+
+VALUES are things we feel "should", "ought", or "are supposed to" influence our lives.
+FACTS simply state what actually are.
+
+Example:
+VALUE: All people should be active in a specific religion.
+FACT: Many people are active in a specific religion.
+
+TYPES OF VALUES:
+- Moral
+- Material
+- Aesthetic
+- Intrinsic
+- Extrinsic
+- Universal/American
+- Group specific values
+
+REMEMBER:
+"If you stand for nothing, you fall for anything."
+"It's not doing things right, but doing the right things."
+
+Happiness comes from letting values decide your behavior and goals.
+      `
+    },
+    {
+      title: "Understanding Self-Image",
+      description: "Exploring self-perception and building a positive self-image",
+      category: "Self-Discovery",
+      icon: <Brain className="h-5 w-5" />,
+      content: `
+WHAT IS SELF-IMAGE?
+
+Self-image refers to how we see ourselves on a more global level, both internally and externally. It is "the idea, conception, or mental image one has of oneself."
+
+THE THREE ELEMENTS OF SELF-IMAGE:
+
+1. The way a person perceives or thinks of him/herself
+2. The way a person interprets others' perceptions (or what he thinks others think) of him/herself
+3. The way a person would like to be (his ideal self)
+
+THE SIX DIMENSIONS OF SELF-IMAGE:
+
+1. PHYSICAL DIMENSION: How a person evaluates his or her appearance
+2. PSYCHOLOGICAL DIMENSION: How a person evaluates his or her personality
+3. INTELLECTUAL DIMENSION: How a person evaluates his or her intelligence
+4. SKILLS DIMENSION: How a person evaluates his or her social and technical skills
+5. MORAL DIMENSION: How a person evaluates his or her values and principles
+6. SEXUAL DIMENSION: How a person feels he or she fits into society's masculine/feminine norms
+
+EXAMPLES OF POSITIVE SELF-IMAGE:
+✓ Seeing yourself as an attractive and desirable person
+✓ Having an image of yourself as a smart and intelligent person
+✓ Seeing a happy, healthy person when you look in the mirror
+✓ Believing that you are at least somewhat close to your ideal version of yourself
+✓ Thinking that others perceive you positively as well
+
+EXAMPLES OF NEGATIVE SELF-IMAGE:
+✗ Seeing yourself as unattractive and undesirable
+✗ Having an image of yourself as a stupid or unintelligent person
+✗ Seeing an unhappy, unhealthy person when you look in the mirror
+✗ Believing that you are nowhere near your ideal version of yourself
+✗ Thinking that others perceive you negatively
+
+THE IMPORTANCE OF POSITIVE SELF-IMAGE:
+
+Having a distorted self-image means that you have a view of yourself that is not based in reality. When your self-image is greatly detached from reality, it can cause serious emotional and psychological problems.
+
+Remember: A healthy self-image is based on reality and includes both strengths and areas for growth, while maintaining overall self-acceptance and self-respect.
+      `
     }
   ];
 
@@ -816,6 +1053,114 @@ A man found a cocoon and watched a butterfly struggling to emerge. He cut the co
 Moral: Struggles develop our strength. Without them, we never grow stronger.
 
 These stories remind us that our perspective shapes our reality, and challenges often lead to growth and opportunity.
+    `
+  },
+  {
+    title: "Dialectical Behavior Therapy (DBT) Overview",
+    description: "Understanding DBT skills and techniques for emotional regulation",
+    category: "ACT Tools",
+    icon: <Brain className="h-5 w-5" />,
+    content: `
+DIALECTICAL BEHAVIOR THERAPY (DBT)
+
+DBT is a type of psychotherapy that teaches group skills to help people learn and utilize the skills and strategies they need to create a life that they will be able to experience and live with.
+
+FOUR KEY ELEMENTS OF DBT:
+
+1. MINDFULNESS
+Focuses on improving the ability to accept and be present within the moment.
+
+2. DISTRESS TOLERANCE  
+Geared towards increasing the tolerance for negative emotion, rather than trying to escape this.
+
+3. EMOTIONAL REGULATION
+A means and strategy used to manage and change the emotions that are super intense and creating a problem in a person's life.
+
+4. INTERPERSONAL EFFECTIVENESS
+Techniques that allow someone to communicate with others in a way that's assertive, allows for self-respect to be maintained, and strengthen relationships.
+
+WHEN IS DBT USED?
+
+Originally used to treat borderline personality disorder, but now helps treat:
+- Depression
+- Binge-eating
+- Bulimia  
+- PTSD
+- Bipolar disorder
+- Substance abuse
+
+WHY DOES DBT TEACH SKILLS?
+
+Behaviors that are problematic start to evolve as a way to cope with either a situation or solve a problem. While this can provide temporary relief in the short-term, it's not helpful long-term.
+
+DBT assumes that clients are trying as best as possible and that they need to learn behaviors in different contexts. These skills allow the person to navigate and handle situations within everyday life.
+
+HOW DOES IT WORK?
+
+DBT helps with different case management by teaching the client to be their own case manager. The therapist is more of a consultant and can interact and stop anything as necessary.
+
+Those who suffer from intense emotions find these become a problem when they're interacting with other people, including friends, romantic partners, and family members.
+
+DBT SKILLS HELP WITH:
+- Improving and regulating emotions
+- Allowing for more tolerance of distress and negative emotion  
+- Allowing the person to be mindful and present within the moment
+- Improving communication and ability to interact with others
+    `
+  },
+  {
+    title: "Strength-Based Therapy Approach",
+    description: "Focusing on what's right rather than what's wrong",
+    category: "Mindset",
+    icon: <Heart className="h-5 w-5" />,
+    content: `
+WHAT IS RIGHT VS WHAT IS WRONG
+
+TRADITIONAL THERAPY PROBLEMS:
+Much of the therapies focus upon the client's:
+- Problem history
+- Their deficits  
+- Their pathology
+- Their problem patterns
+- Their unresolved issues
+- Their unfinished business
+
+At times it can seem as if not much of the client is functioning well.
+
+A BETTER AND NOT HARMFUL APPROACH IS THE OPPOSITE:
+
+FOCUS ON:
+✓ What is RIGHT not what is WRONG
+✓ What WORKS not what does NOT work  
+✓ What the past has TAUGHT or GIVEN you, not on how it has WEAKENED you
+✓ STRENGTHS not weaknesses
+✓ What you CAN DO, not on what you CANNOT do
+
+BENEFITS OF STRENGTH-BASED APPROACH:
+
+1. BUILDS CONFIDENCE
+Focusing on strengths and capabilities builds self-efficacy and confidence.
+
+2. CREATES POSITIVE MOMENTUM  
+Success builds on success when we acknowledge what's working.
+
+3. DEVELOPS RESILIENCE
+Understanding our strengths helps us navigate future challenges.
+
+4. IMPROVES SELF-IMAGE
+Recognizing our positive qualities and achievements enhances self-worth.
+
+5. ENCOURAGES GROWTH
+Building from strengths provides a solid foundation for continued development.
+
+IMPLEMENTATION:
+- Identify three things you do well
+- Recognize past successes and what made them possible
+- Notice daily accomplishments, however small
+- Ask yourself: "What's working in my life right now?"
+- Build on existing strengths rather than trying to fix weaknesses
+
+Remember: Everyone has strengths, capabilities, and resources. The goal is to identify and build upon these positive aspects to create meaningful change and growth.
     `
   };
 
