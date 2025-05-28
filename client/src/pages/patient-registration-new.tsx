@@ -8,7 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Search, RotateCcw, RefreshCw, Edit, CreditCard, Stethoscope, UserCheck, Bed } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { Search, RotateCcw, RefreshCw, Edit, CreditCard, Stethoscope, UserCheck, Bed, CalendarIcon } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { workflowManager } from "@/lib/workflow-system";
@@ -452,9 +455,40 @@ export default function PatientRegistration() {
                       name="dateOfBirth"
                       render={({ field }) => (
                         <FormItem>
-                          <FormControl>
-                            <Input type="date" {...field} className="mt-1" required />
-                          </FormControl>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  className={`w-full justify-start text-left font-normal mt-1 ${
+                                    !field.value && "text-muted-foreground"
+                                  }`}
+                                >
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {field.value ? (
+                                    format(new Date(field.value), "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    field.onChange(format(date, "yyyy-MM-dd"));
+                                  }
+                                }}
+                                disabled={(date) =>
+                                  date > new Date() || date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
                           <FormMessage />
                         </FormItem>
                       )}
