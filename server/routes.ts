@@ -151,7 +151,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/patients", async (req, res) => {
     try {
       console.log("Received patient data:", req.body);
-      const validatedData = insertPatientSchema.parse(req.body);
+      
+      // Remove fields that shouldn't be in the validation
+      const { registerFor, patientCategory, paymentOption, referralSource, ...patientData } = req.body;
+      
+      console.log("Cleaned patient data for validation:", patientData);
+      const validatedData = insertPatientSchema.parse(patientData);
       console.log("Validated patient data:", validatedData);
       const patient = await storage.createPatient(validatedData);
       res.status(201).json(patient);

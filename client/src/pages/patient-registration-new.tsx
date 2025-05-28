@@ -112,16 +112,18 @@ export default function PatientRegistration() {
         address: data.address,
         emergencyContactName: data.emergencyContactName,
         emergencyContactPhone: data.emergencyContactPhone,
-        emergencyContactRelationship: data.emergencyContactRelationship,
+        emergencyContactRelationship: data.emergencyContactRelationship || null,
         occupation: data.occupation || null,
         bloodType: null,
         insuranceProvider: null,
         policyNumber: null,
+        medicalHistory: null,
+        allergies: null,
+        patientType: "outpatient",
+        wardAssignment: null,
+        bedNumber: null,
+        admissionDate: null,
         isActive: true,
-        registerFor: data.registerFor,
-        patientCategory: data.patientCategory,
-        paymentOption: data.paymentOption,
-        referralSource: data.referralSource,
       };
       
       // Create patient first
