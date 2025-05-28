@@ -492,10 +492,15 @@ export default function TherapyPage() {
               <Button 
                 onClick={handleReferToDoctor}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
-                disabled={!sessionData.counselorFindings || !sessionData.referralReason}
+                disabled={!referralData.consultationType || !sessionData.counselorFindings || !sessionData.referralReason}
               >
                 <FileText className="h-4 w-4 mr-2" />
                 Refer to Doctor
+                {referralData.consultationType && (
+                  <span className="ml-2 text-xs bg-blue-500 px-2 py-1 rounded">
+                    {referralData.consultationName}
+                  </span>
+                )}
               </Button>
             )}
             <Button 
