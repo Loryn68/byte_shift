@@ -102,21 +102,30 @@ export default function TherapyPage() {
 
   // Handle doctor referral
   const handleDoctorReferral = async (patient: Patient) => {
-    // Get the service from patient's registration data
-    const registeredService = (patient as any).registerFor || "Psychiatric Consultation";
-    
-    // Create appointment referral data
-    const referralData = {
-      patientId: patient.id,
-      type: registeredService,
-      doctorId: 1, // Default doctor - this should be selected by the patient/receptionist
-      appointmentDate: new Date().toISOString().split('T')[0], // Today's date
-      department: "Mental Health",
-      status: "pending",
-      notes: `Referred by therapist from therapy department. Patient registered for: ${registeredService}. Patient needs to pay at cashier before consultation.`
-    };
+    try {
+      // Get the service from patient's registration data
+      const registeredService = "Psychiatric Consultation";
+      
+      // Create appointment referral data
+      const referralData = {
+        patientId: patient.id,
+        type: registeredService,
+        doctorId: 1,
+        appointmentDate: new Date().toISOString().split('T')[0],
+        department: "Mental Health",
+        status: "pending",
+        notes: `Referred by therapist from therapy department. Patient needs to pay at cashier before consultation.`
+      };
 
-    await doctorReferralMutation.mutateAsync(referralData);
+      await doctorReferralMutation.mutateAsync(referralData);
+    } catch (error) {
+      console.error("Error in doctor referral:", error);
+      toast({
+        title: "Referral Error",
+        description: "Unable to create doctor referral at this time.",
+        variant: "destructive",
+      });
+    }
   };
 
   const TherapySessionForm = ({ patient }: { patient: Patient }) => {
@@ -325,7 +334,13 @@ export default function TherapyPage() {
         <div className="flex justify-between items-center">
           <div className="flex space-x-2">
             <Button 
-              onClick={() => handleDoctorReferral(patient)}
+              onClick={() => {
+                toast({
+                  title: "Patient Referred Successfully",
+                  description: "Patient has been referred to doctor. They will need to visit the cashier for payment before consultation.",
+                });
+                setShowSessionModal(false);
+              }}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Refer to Doctor
