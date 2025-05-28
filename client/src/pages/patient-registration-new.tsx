@@ -269,14 +269,14 @@ export default function PatientRegistration() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 p-4">
       {/* Header Section */}
-      <div className="bg-white rounded-lg shadow-sm border mb-4 p-4">
+      <div className="bg-white rounded-lg shadow-sm border border-blue-200 mb-4 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <img src={logoPath} alt="Child Mental Haven Logo" className="h-16 w-16 object-contain" />
             <div>
-              <h1 className="text-xl font-bold text-blue-800">CHILD MENTAL HAVEN - [PATIENTS REGISTRY]</h1>
+              <h1 className="text-xl font-bold text-blue-400">CHILD MENTAL HAVEN - [PATIENTS REGISTRY]</h1>
             </div>
           </div>
         </div>
@@ -289,7 +289,7 @@ export default function PatientRegistration() {
           <div className="mt-2">
             <Button 
               onClick={() => setShowPatientList(!showPatientList)}
-              className="w-full mb-3 bg-yellow-500 hover:bg-yellow-600 text-black font-medium text-xs sm:text-sm px-1 sm:px-2 py-2 h-auto leading-tight"
+              className="w-full mb-3 bg-green-400 hover:bg-green-500 text-white font-medium text-xs sm:text-sm px-1 sm:px-2 py-2 h-auto leading-tight"
             >
               <span className="break-words text-center">Load List of Registered Patients</span>
             </Button>
@@ -318,14 +318,14 @@ export default function PatientRegistration() {
 
         {/* Main Registration Form */}
         <div className="col-span-2 bg-white rounded-lg shadow-sm border">
-          <div className="bg-blue-100 p-3 border-b">
+          <div className="bg-blue-50 p-3 border-b border-blue-200">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold">Add New Patient</h3>
-              <div className="text-sm">Search by Surname/ID/Tel/OP-No:</div>
+              <h3 className="font-semibold text-blue-400">Add New Patient</h3>
+              <div className="text-sm text-blue-400">Search by Surname/ID/Tel/OP-No:</div>
             </div>
             <div className="flex gap-2 mt-2">
               <Input 
-                className="flex-1" 
+                className="flex-1 border-blue-200 focus:border-blue-400" 
                 placeholder="Search by Surname/ID/Tel/OP-No..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -334,7 +334,7 @@ export default function PatientRegistration() {
                 variant="outline" 
                 size="sm"
                 onClick={() => setShowPatientList(true)}
-                className="bg-blue-600 text-white hover:bg-blue-700"
+                className="bg-blue-400 text-white hover:bg-blue-500 border-blue-400"
               >
                 <Search className="w-4 h-4 mr-1" />
                 Search
@@ -629,8 +629,8 @@ export default function PatientRegistration() {
                   
                   {/* Laboratory Upload Section - appears when Laboratory Only is selected */}
                   {form.watch("registerFor") === "laboratory-only" && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-4">
-                      <h4 className="font-medium text-gray-800">Laboratory Request Upload</h4>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-4">
+                      <h4 className="font-medium text-green-700">Laboratory Request Upload</h4>
                       
                       {/* File Upload */}
                       <div>
@@ -935,14 +935,14 @@ export default function PatientRegistration() {
                   <Button 
                     type="submit" 
                     disabled={createPatientMutation.isPending} 
-                    className="bg-green-600 text-white hover:bg-green-700 px-6"
+                    className="bg-green-400 text-white hover:bg-green-500 px-6"
                   >
                     {editingPatient ? (updatePatientMutation.isPending ? "Updating..." : "Update Record") : (createPatientMutation.isPending ? "Registering..." : "Register Patient")}
                   </Button>
                   <Button 
                     type="button" 
                     variant="outline" 
-                    className="bg-blue-600 text-white hover:bg-blue-700 px-6" 
+                    className="bg-blue-400 text-white hover:bg-blue-500 px-6" 
                     onClick={resetForm}
                   >
                     <RotateCcw className="w-4 h-4 mr-1" />
@@ -951,7 +951,7 @@ export default function PatientRegistration() {
                   <Button 
                     type="button" 
                     variant="outline" 
-                    className="bg-purple-600 text-white hover:bg-purple-700 px-6"
+                    className="bg-green-500 text-white hover:bg-green-600 px-6"
                     onClick={refreshData}
                   >
                     <RefreshCw className="w-4 h-4 mr-1" />
