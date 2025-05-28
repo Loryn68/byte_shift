@@ -63,17 +63,17 @@ export default function TherapyPage() {
     patient.patientId.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle doctor referral mutation
+  // Handle doctor referral mutation - creates appointment referral, not billing
   const doctorReferralMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("/api/billing", "POST", data);
+      return apiRequest("/api/appointments", "POST", data);
     },
     onSuccess: () => {
       toast({
         title: "Patient Referred Successfully",
-        description: "Patient has been sent to cashier for doctor consultation payment",
+        description: "Patient has been referred to doctor. They will need to visit the cashier for payment.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/billing"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
     onError: (error: any) => {
       toast({
@@ -99,23 +99,18 @@ export default function TherapyPage() {
 
   // Handle doctor referral
   const handleDoctorReferral = async (patient: Patient) => {
-    const hasVisitHistory = checkPatientVisitHistory(patient.id);
+    // Get the service from patient's registration data
+    const registeredService = (patient as any).registerFor || "Psychiatric Consultation";
     
-    const serviceType = hasVisitHistory ? "Psychiatric Review" : "Psychiatric Consultation";
-    const amount = hasVisitHistory ? "2500" : "3500"; // Review: KSh 2,500, First Visit: KSh 3,500
-    const serviceDescription = hasVisitHistory 
-      ? "Follow-up psychiatric review consultation" 
-      : "Initial psychiatric consultation - first visit";
-
+    // Create appointment referral data
     const referralData = {
       patientId: patient.id,
-      serviceType,
-      amount,
-      serviceDescription,
-      paymentStatus: "pending",
-      paymentMethod: "",
-      referredFrom: "Therapy Department",
-      notes: `Referred by therapist for ${serviceType.toLowerCase()}`
+      type: registeredService,
+      doctorId: 1, // Default doctor - this should be selected by the patient/receptionist
+      appointmentDate: new Date().toISOString().split('T')[0], // Today's date
+      department: "Mental Health",
+      status: "pending",
+      notes: `Referred by therapist from therapy department. Patient registered for: ${registeredService}. Patient needs to pay at cashier before consultation.`
     };
 
     await doctorReferralMutation.mutateAsync(referralData);
