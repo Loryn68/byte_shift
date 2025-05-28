@@ -468,7 +468,7 @@ export default function PatientRegistration() {
                                   {field.value ? (
                                     <span className="text-gray-900">{format(new Date(field.value), "dd/MM/yyyy")}</span>
                                   ) : (
-                                    <span className="text-gray-500">Select birth date (DD/MM/YYYY)</span>
+                                    <span className="text-gray-500">DD/MM/YYYY</span>
                                   )}
                                 </Button>
                               </FormControl>
