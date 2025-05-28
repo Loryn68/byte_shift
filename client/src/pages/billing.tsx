@@ -255,6 +255,42 @@ export default function BillingPage() {
     }
   };
 
+  const handlePrintConsolidatedInvoice = (consolidatedRecord: any) => {
+    const patient = patients.find((p: Patient) => p.id === consolidatedRecord.patientId);
+    if (patient && consolidatedRecord.services.length > 0) {
+      // Create a consolidated billing object for printing
+      const consolidatedBilling: Billing = {
+        id: consolidatedRecord.services[0].id,
+        billId: `COMBINED-${consolidatedRecord.patientIdCode}`,
+        patientId: consolidatedRecord.patientId,
+        appointmentId: null,
+        serviceType: "Combined Services",
+        serviceDescription: `Professional Bill: ${consolidatedRecord.services.map((s: any) => s.serviceType).join(", ")}`,
+        amount: consolidatedRecord.combinedTotal.toString(),
+        discount: "0",
+        totalAmount: consolidatedRecord.combinedTotal.toString(),
+        paymentStatus: consolidatedRecord.overallPaymentStatus,
+        paymentMethod: consolidatedRecord.services[0].paymentMethod || "",
+        paymentDate: null,
+        insuranceClaimed: false,
+        insuranceAmount: "0",
+        notes: `Consolidated bill containing ${consolidatedRecord.services.length} services`,
+        createdAt: consolidatedRecord.latestDate,
+        updatedAt: consolidatedRecord.latestDate
+      };
+      
+      setSelectedBilling(consolidatedBilling);
+      setSelectedPatient(patient);
+      setShowItemizedBillModal(true);
+    } else {
+      toast({
+        title: "Error",
+        description: "Patient information not found.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getTotalRevenue = () => {
     return billingRecords
       .filter((record: Billing) => record.paymentStatus === "paid")
@@ -800,12 +836,7 @@ export default function BillingPage() {
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        onClick={() => {
-                          // For consolidated bills, we can print the first service as representative
-                          if (consolidatedRecord.services.length > 0) {
-                            handlePrintInvoice(consolidatedRecord.services[0]);
-                          }
-                        }}
+                        onClick={() => handlePrintConsolidatedInvoice(consolidatedRecord)}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         <Printer className="w-4 h-4 mr-1" />
