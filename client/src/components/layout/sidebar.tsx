@@ -126,6 +126,27 @@ const navigationItems = [
         icon: Activity
       }
     ]
+  },
+  {
+    title: "Administrator",
+    section: "administrator",
+    items: [
+      {
+        title: "User Management",
+        href: "/user-management",
+        icon: Users
+      },
+      {
+        title: "System Settings",
+        href: "/system-settings",
+        icon: Shield
+      },
+      {
+        title: "Audit Logs",
+        href: "/audit-logs",
+        icon: FileText
+      }
+    ]
   }
 ];
 
@@ -176,7 +197,7 @@ export default function Sidebar() {
                   )}
                 >
                   <div className="flex items-center space-x-3">
-                    <item.icon className="w-5 h-5" />
+                    {item.icon && <item.icon className="w-5 h-5" />}
                     <span>{item.title}</span>
                   </div>
                 </Link>
