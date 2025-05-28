@@ -152,13 +152,14 @@ const navigationItems = [
 
 export default function Sidebar() {
   const [location] = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isActive = (href: string) => {
     return location === href || (href === "/dashboard" && location === "/");
   };
 
   return (
-    <aside className="w-64 bg-gray-800 text-white flex flex-col min-h-screen">
+    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} bg-gray-800 text-white flex flex-col min-h-screen transition-all duration-300`}>
       {/* Header */}
       <div className="bg-blue-400 px-4 py-4">
         <div className="flex items-center justify-between">
@@ -166,18 +167,23 @@ export default function Sidebar() {
             <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
               <span className="text-blue-400 font-bold text-sm">CMH</span>
             </div>
-            <div>
-              <div className="text-white font-bold text-lg">Child Mental Haven</div>
-              <div className="text-blue-100 text-xs">Where Young Minds Evolve</div>
-            </div>
+            {!isCollapsed && (
+              <div>
+                <div className="text-white font-bold text-lg">Child Mental Haven</div>
+                <div className="text-blue-100 text-xs">Where Young Minds Evolve</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Menu Toggle */}
-      <div className="bg-green-400 px-4 py-3 flex items-center space-x-2 cursor-pointer hover:bg-green-500 transition-colors">
+      <div 
+        className="bg-green-400 px-4 py-3 flex items-center space-x-2 cursor-pointer hover:bg-green-500 transition-colors"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
         <Menu className="w-5 h-5" />
-        <span className="font-medium">MENU</span>
+        {!isCollapsed && <span className="font-medium">MENU</span>}
       </div>
 
       {/* Navigation */}
@@ -190,15 +196,17 @@ export default function Sidebar() {
                   key={item.href}
                   href={item.href!}
                   className={cn(
-                    "flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors hover:bg-gray-700",
+                    "flex items-center justify-between py-3 text-sm font-medium transition-colors hover:bg-gray-700",
+                    isCollapsed ? "px-3 justify-center" : "px-6",
                     isActive(item.href!)
                       ? "bg-green-400 text-white border-r-4 border-green-300"
                       : "text-gray-300"
                   )}
+                  title={isCollapsed ? item.title : undefined}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className={`flex items-center ${isCollapsed ? '' : 'space-x-3'}`}>
                     {item.icon && <item.icon className="w-5 h-5" />}
-                    <span>{item.title}</span>
+                    {!isCollapsed && <span>{item.title}</span>}
                   </div>
                 </Link>
               );
@@ -206,26 +214,30 @@ export default function Sidebar() {
 
             return (
               <div key={item.section} className="py-2">
-                <div className="px-6 py-2">
-                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    {item.title}
-                  </h3>
-                </div>
+                {!isCollapsed && (
+                  <div className="px-6 py-2">
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      {item.title}
+                    </h3>
+                  </div>
+                )}
                 <div className="space-y-1">
                   {item.items?.map((subItem) => (
                     <Link
                       key={subItem.href}
                       href={subItem.href}
                       className={cn(
-                        "flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors hover:bg-gray-700",
+                        "flex items-center justify-between py-3 text-sm font-medium transition-colors hover:bg-gray-700",
+                        isCollapsed ? "px-3 justify-center" : "px-6",
                         isActive(subItem.href)
                           ? "bg-green-400 text-white border-r-4 border-green-300"
                           : "text-gray-300"
                       )}
+                      title={isCollapsed ? subItem.title : undefined}
                     >
-                      <div className="flex items-center space-x-3">
+                      <div className={`flex items-center ${isCollapsed ? '' : 'space-x-3'}`}>
                         <subItem.icon className="w-5 h-5" />
-                        <span>{subItem.title}</span>
+                        {!isCollapsed && <span>{subItem.title}</span>}
                       </div>
                     </Link>
                   ))}
