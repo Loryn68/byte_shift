@@ -31,20 +31,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         
         {/* Left Side - Branding and Welcome */}
         <div className="text-center lg:text-left space-y-6">
           <div className="space-y-4">
             <div className="inline-block">
-              <h1 className="text-4xl lg:text-6xl font-bold text-purple-700">
+              <h1 className="text-4xl lg:text-6xl font-bold text-green-700">
                 Child Mental Haven
               </h1>
-              <p className="text-lg text-purple-600 mt-2">Where Young Minds Evolve</p>
+              <p className="text-lg text-blue-600 mt-2">Where Young Minds Evolve</p>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-purple-100">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-green-100">
               <h2 className="text-xl font-semibold text-gray-800 mb-3">
                 Healthcare Management System
               </h2>
@@ -66,13 +66,13 @@ export default function LoginPage() {
 
         {/* Right Side - Login Form */}
         <div className="flex justify-center lg:justify-end">
-          <Card className="w-full max-w-md shadow-lg border-purple-100">
+          <Card className="w-full max-w-md shadow-lg border-green-100">
             <CardHeader className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                <User className="w-8 h-8 text-purple-600" />
+              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <User className="w-8 h-8 text-blue-600" />
               </div>
               <div>
-                <CardTitle className="text-2xl text-purple-800">Welcome Back</CardTitle>
+                <CardTitle className="text-2xl text-green-800">Welcome Back</CardTitle>
                 <CardDescription className="text-gray-600">
                   Please sign in to access the healthcare management platform
                 </CardDescription>
@@ -98,7 +98,7 @@ export default function LoginPage() {
                       placeholder="Enter your username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="pl-10 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                      className="pl-10 border-gray-300 focus:border-green-500 focus:ring-green-500"
                       required
                     />
                   </div>
@@ -114,7 +114,7 @@ export default function LoginPage() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                      className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                       required
                     />
                   </div>
@@ -122,7 +122,7 @@ export default function LoginPage() {
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-lg font-medium"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-medium"
                   disabled={loading}
                 >
                   {loading ? (
