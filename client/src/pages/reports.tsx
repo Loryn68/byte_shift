@@ -875,6 +875,144 @@ export default function Reports() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Consolidated Professional Bills */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Professional Service Bills - Consolidated by Patient</CardTitle>
+              <p className="text-sm text-gray-600">Complete billing breakdown for each patient with all services combined</p>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Patient ID</TableHead>
+                    <TableHead>Patient Name</TableHead>
+                    <TableHead>Services Provided</TableHead>
+                    <TableHead>Total Amount</TableHead>
+                    <TableHead>Payment Status</TableHead>
+                    <TableHead>Date Range</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(() => {
+                    // Consolidate billing by patient for professional reporting
+                    const consolidated = new Map();
+                    
+                    filterByDateRange(billingRecords, 'createdAt').forEach((bill: any) => {
+                      const patientKey = bill.patientId;
+                      const patient = patients.find((p: any) => p.id === bill.patientId);
+                      
+                      if (consolidated.has(patientKey)) {
+                        const existing = consolidated.get(patientKey);
+                        existing.services.push({
+                          serviceType: bill.serviceType,
+                          amount: parseFloat(bill.amount || "0"),
+                          date: new Date(bill.createdAt)
+                        });
+                        existing.totalAmount += parseFloat(bill.amount || "0");
+                        existing.latestDate = new Date(Math.max(existing.latestDate, new Date(bill.createdAt)));
+                        existing.earliestDate = new Date(Math.min(existing.earliestDate, new Date(bill.createdAt)));
+                        
+                        // Update payment status (if any service is pending, mark as partial)
+                        if (bill.paymentStatus === "pending") {
+                          existing.paymentStatus = existing.paymentStatus === "paid" ? "partial" : "pending";
+                        }
+                      } else {
+                        consolidated.set(patientKey, {
+                          patientId: bill.patientId,
+                          patientIdCode: patient?.patientId || "Unknown",
+                          patientName: patient ? `${patient.firstName} ${patient.lastName}` : "Unknown Patient",
+                          services: [{
+                            serviceType: bill.serviceType,
+                            amount: parseFloat(bill.amount || "0"),
+                            date: new Date(bill.createdAt)
+                          }],
+                          totalAmount: parseFloat(bill.amount || "0"),
+                          paymentStatus: bill.paymentStatus,
+                          earliestDate: new Date(bill.createdAt),
+                          latestDate: new Date(bill.createdAt)
+                        });
+                      }
+                    });
+                    
+                    return Array.from(consolidated.values())
+                      .sort((a, b) => b.totalAmount - a.totalAmount)
+                      .map((consolidatedBill: any) => (
+                        <TableRow key={`professional-bill-${consolidatedBill.patientId}`}>
+                          <TableCell className="font-medium">{consolidatedBill.patientIdCode}</TableCell>
+                          <TableCell>{consolidatedBill.patientName}</TableCell>
+                          <TableCell>
+                            <div className="space-y-1 max-w-md">
+                              {consolidatedBill.services.map((service: any, index: number) => (
+                                <div key={index} className="text-sm bg-gray-50 p-2 rounded border-l-2 border-blue-500">
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-medium text-gray-800">{service.serviceType}</span>
+                                    <span className="text-blue-600 font-semibold">{formatCurrency(service.amount)}</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {formatDate(service.date)}
+                                  </div>
+                                </div>
+                              ))}
+                              {consolidatedBill.services.length > 1 && (
+                                <div className="text-xs font-medium text-blue-600 bg-blue-50 p-2 rounded mt-2">
+                                  📋 {consolidatedBill.services.length} services combined in professional bill
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-right">
+                              <div className="text-lg font-bold text-gray-900">
+                                {formatCurrency(consolidatedBill.totalAmount)}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                Total for all services
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge 
+                              variant="outline" 
+                              className={
+                                consolidatedBill.paymentStatus === "paid" 
+                                  ? "text-green-600 border-green-600 bg-green-50" 
+                                  : consolidatedBill.paymentStatus === "partial"
+                                  ? "text-orange-600 border-orange-600 bg-orange-50"
+                                  : "text-red-600 border-red-600 bg-red-50"
+                              }
+                            >
+                              {consolidatedBill.paymentStatus === "paid" ? "Fully Paid" : 
+                               consolidatedBill.paymentStatus === "partial" ? "Partially Paid" : "Pending Payment"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              <div className="font-medium">
+                                {formatDate(consolidatedBill.earliestDate)}
+                              </div>
+                              {consolidatedBill.services.length > 1 && (
+                                <div className="text-xs text-gray-500">
+                                  to {formatDate(consolidatedBill.latestDate)}
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ));
+                  })()}
+                  {filterByDateRange(billingRecords, 'createdAt').length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-gray-500 py-8">
+                        No billing records found in the selected period
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Clinical Tab */}

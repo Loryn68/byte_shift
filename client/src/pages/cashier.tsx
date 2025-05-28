@@ -178,6 +178,48 @@ export default function Cashier() {
     );
   };
 
+  // Function to consolidate billing records by patient
+  const consolidateBillingByPatient = (bills: Billing[]) => {
+    const consolidated = new Map();
+    
+    bills.forEach((bill: Billing) => {
+      const patientKey = bill.patientId;
+      
+      if (consolidated.has(patientKey)) {
+        const existing = consolidated.get(patientKey);
+        existing.services.push({
+          serviceType: bill.serviceType,
+          serviceDescription: bill.serviceDescription,
+          amount: parseFloat(bill.amount || "0"),
+          createdAt: bill.createdAt
+        });
+        existing.totalAmount += parseFloat(bill.amount || "0");
+        existing.billIds.push(bill.id);
+      } else {
+        consolidated.set(patientKey, {
+          id: bill.id,
+          patientId: bill.patientId,
+          patientName: getPatientName(bill.patientId),
+          patientIdCode: getPatientId(bill.patientId),
+          paymentStatus: bill.paymentStatus,
+          paymentMethod: bill.paymentMethod,
+          services: [{
+            serviceType: bill.serviceType,
+            serviceDescription: bill.serviceDescription,
+            amount: parseFloat(bill.amount || "0"),
+            createdAt: bill.createdAt
+          }],
+          totalAmount: parseFloat(bill.amount || "0"),
+          createdAt: bill.createdAt,
+          updatedAt: bill.updatedAt,
+          billIds: [bill.id]
+        });
+      }
+    });
+    
+    return Array.from(consolidated.values());
+  };
+
   const calculateIncomeByDepartment = () => {
     const departments: Record<string, number> = {};
     billingRecords
