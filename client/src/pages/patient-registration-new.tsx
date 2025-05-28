@@ -102,7 +102,9 @@ export default function PatientRegistration() {
     mutationFn: async (data: RegistrationData) => {
       const patientData = {
         firstName: data.firstName,
+        middleName: data.middleName || null,
         lastName: data.lastName,
+        nationalId: data.nationalId || null,
         dateOfBirth: data.dateOfBirth,
         gender: data.gender,
         phone: data.phone,
@@ -111,10 +113,15 @@ export default function PatientRegistration() {
         emergencyContactName: data.emergencyContactName,
         emergencyContactPhone: data.emergencyContactPhone,
         emergencyContactRelationship: data.emergencyContactRelationship,
+        occupation: data.occupation || null,
         bloodType: null,
         insuranceProvider: null,
         policyNumber: null,
         isActive: true,
+        registerFor: data.registerFor,
+        patientCategory: data.patientCategory,
+        paymentOption: data.paymentOption,
+        referralSource: data.referralSource,
       };
       
       // Create patient first

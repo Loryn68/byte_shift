@@ -150,11 +150,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/patients", async (req, res) => {
     try {
+      console.log("Received patient data:", req.body);
       const validatedData = insertPatientSchema.parse(req.body);
+      console.log("Validated patient data:", validatedData);
       const patient = await storage.createPatient(validatedData);
       res.status(201).json(patient);
     } catch (error) {
+      console.error("Patient creation error:", error);
       if (error instanceof z.ZodError) {
+        console.log("Validation errors:", error.errors);
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create patient" });
