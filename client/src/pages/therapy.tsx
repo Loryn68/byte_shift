@@ -66,7 +66,10 @@ export default function TherapyPage() {
   // Handle doctor referral mutation - creates appointment referral, not billing
   const doctorReferralMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("/api/appointments", "POST", data);
+      return apiRequest("/api/appointments", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
     },
     onSuccess: () => {
       toast({
