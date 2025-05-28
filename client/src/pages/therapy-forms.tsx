@@ -1054,30 +1054,108 @@ Moral: Struggles develop our strength. Without them, we never grow stronger.
 
 These stories remind us that our perspective shapes our reality, and challenges often lead to growth and opportunity.
     `
-  },
-  {
-    title: "Dialectical Behavior Therapy (DBT) Overview",
-    description: "Understanding DBT skills and techniques for emotional regulation",
-    category: "ACT Tools",
-    icon: <Brain className="h-5 w-5" />,
-    content: `
-DIALECTICAL BEHAVIOR THERAPY (DBT)
+  };
 
-DBT is a type of psychotherapy that teaches group skills to help people learn and utilize the skills and strategies they need to create a life that they will be able to experience and live with.
+  // All forms array
+  const allForms = [
+    aceQuestionnaire,
+    adhdScreening,
+    addictionSeverityIndex,
+    auditAlcoholScreening,
+    beckDepressionInventory,
+    pcl5PtsdChecklist,
+    bipolarDisorderScreening,
+    defensesMechanisms,
+    strengthBasedApproach,
+    triggerUnderstanding,
+    avoidanceConfrontation,
+    burnoutRecognition,
+    valuesExploration,
+    selfImageBuilding,
+    positiveThinkingStrategies,
+    peaceAndStrength,
+    assertivenessTraining,
+    dbtSkills,
+    actTools,
+    inspirationalStories
+  ];
 
-FOUR KEY ELEMENTS OF DBT:
+  // Categories for filtering
+  const categories = ["All", "Assessments", "Coping Skills", "Self-Discovery", "Mindset", "ACT Tools", "Inspiration"];
 
-1. MINDFULNESS
-Focuses on improving the ability to accept and be present within the moment.
+  // Filter forms by category
+  const filteredForms = selectedCategory === "All" 
+    ? allForms 
+    : allForms.filter(form => form.category === selectedCategory);
 
-2. DISTRESS TOLERANCE  
-Geared towards increasing the tolerance for negative emotion, rather than trying to escape this.
+  const printForm = (content: string, title: string) => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const formattedContent = content.replace(/\n/g, '<br>');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${title}</title>
+            <style>
+              body { font-family: 'Times New Roman', serif; line-height: 1.6; padding: 20px; }
+              h1 { color: #2c5aa0; text-align: center; }
+              h2 { color: #2c5aa0; }
+              .header { text-align: center; margin-bottom: 30px; }
+              .logo { font-size: 24px; font-weight: bold; color: #2c5aa0; }
+              .tagline { font-style: italic; color: #666; }
+              .content { white-space: pre-wrap; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div class="logo">Child Mental Haven</div>
+              <div class="tagline">Where Young Minds Evolve</div>
+            </div>
+            <h1>${title}</h1>
+            <div class="content">${formattedContent}</div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
 
-3. EMOTIONAL REGULATION
-A means and strategy used to manage and change the emotions that are super intense and creating a problem in a person's life.
+  return (
+    <div className="container mx-auto p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-center mb-2">Therapy Forms & Resources</h1>
+        <p className="text-center text-gray-600">Comprehensive mental health assessment tools and therapeutic resources</p>
+      </div>
 
-4. INTERPERSONAL EFFECTIVENESS
-Techniques that allow someone to communicate with others in a way that's assertive, allows for self-respect to be maintained, and strengthen relationships.
+      <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
+        <TabsList className="grid w-full grid-cols-7">
+          {categories.map((category) => (
+            <TabsTrigger key={category} value={category} className="text-xs">
+              {category}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {categories.map((category) => (
+          <TabsContent key={category} value={category} className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredForms.map((form, index) => (
+                <FormCard
+                  key={index}
+                  form={form}
+                  onPrint={() => printForm(form.content, form.title)}
+                />
+              ))}
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  );
+};
+
+export default TherapyForms;
 
 WHEN IS DBT USED?
 
