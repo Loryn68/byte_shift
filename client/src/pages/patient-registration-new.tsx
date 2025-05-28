@@ -460,15 +460,15 @@ export default function PatientRegistration() {
                               <FormControl>
                                 <Button
                                   variant="outline"
-                                  className={`w-full justify-start text-left font-normal mt-1 ${
-                                    !field.value && "text-muted-foreground"
+                                  className={`w-full justify-start text-left font-normal mt-1 h-10 border-gray-300 hover:border-blue-400 ${
+                                    !field.value && "text-gray-500"
                                   }`}
                                 >
-                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  <CalendarIcon className="mr-2 h-4 w-4 text-blue-500" />
                                   {field.value ? (
-                                    format(new Date(field.value), "PPP")
+                                    <span className="text-gray-900">{format(new Date(field.value), "dd/MM/yyyy")}</span>
                                   ) : (
-                                    <span>Pick a date</span>
+                                    <span className="text-gray-500">Select birth date (DD/MM/YYYY)</span>
                                   )}
                                 </Button>
                               </FormControl>
@@ -486,6 +486,10 @@ export default function PatientRegistration() {
                                   date > new Date() || date < new Date("1900-01-01")
                                 }
                                 initialFocus
+                                defaultMonth={field.value ? new Date(field.value) : new Date(2000, 0)}
+                                captionLayout="dropdown-buttons"
+                                fromYear={1900}
+                                toYear={new Date().getFullYear()}
                               />
                             </PopoverContent>
                           </Popover>
