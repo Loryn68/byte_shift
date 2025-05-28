@@ -22,7 +22,8 @@ export default function LoginPage() {
 
     try {
       await authService.login({ username, password });
-      setLocation("/dashboard");
+      // Force page reload to ensure authentication state is recognized
+      window.location.href = "/";
     } catch (err: any) {
       setError(err.message || "Invalid credentials. Please contact your administrator.");
     } finally {

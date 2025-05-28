@@ -1,4 +1,5 @@
 import { apiRequest } from "./queryClient";
+import { useState, useEffect } from "react";
 
 export interface User {
   id: number;
@@ -156,16 +157,31 @@ export const authService = new AuthService();
 
 // Helper hooks for React components
 export function useAuth() {
-  const user = authService.getCurrentUser();
+  const [user, setUser] = useState<User | null>(authService.getCurrentUser());
+  
+  // Check for authentication changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const currentUser = authService.getCurrentUser();
+      if (currentUser !== user) {
+        setUser(currentUser);
+      }
+    };
+    
+    checkAuth();
+    const interval = setInterval(checkAuth, 100); // Check every 100ms
+    
+    return () => clearInterval(interval);
+  }, [user]);
   
   return {
     user,
-    isAuthenticated: authService.isAuthenticated(),
-    hasRole: (role: string) => authService.hasRole(role),
-    hasAnyRole: (roles: string[]) => authService.hasAnyRole(roles),
-    isAdmin: () => authService.isAdmin(),
-    isDoctor: () => authService.isDoctor(),
-    isNurse: () => authService.isNurse(),
+    isAuthenticated: !!user,
+    hasRole: (role: string) => user?.role === role,
+    hasAnyRole: (roles: string[]) => roles.includes(user?.role || ''),
+    isAdmin: () => user?.role === 'admin',
+    isDoctor: () => user?.role === 'doctor',
+    isNurse: () => user?.role === 'nurse',
     canAccessModule: (module: string) => authService.canAccessModule(module),
     getFullName: () => authService.getFullName(),
     getDisplayRole: () => authService.getDisplayRole()
