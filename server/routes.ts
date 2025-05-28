@@ -6,6 +6,38 @@ import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
+  app.post("/api/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      // For demo purposes, create a simple admin user check
+      if (username === "admin" && password === "admin123") {
+        const adminUser = {
+          id: 1,
+          username: "admin",
+          firstName: "System",
+          lastName: "Administrator",
+          email: "admin@childmentalhaven.org",
+          role: "admin"
+        };
+        return res.json({ user: adminUser });
+      }
+
+      return res.status(401).json({ message: "Invalid credentials. Contact your administrator for access." });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/logout", (req, res) => {
+    res.json({ message: "Logged out successfully" });
+  });
+  // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { username, password } = req.body;

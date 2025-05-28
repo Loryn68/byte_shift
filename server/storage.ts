@@ -498,4 +498,184 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  // Keep all other methods from MemStorage for now
+  async getPatient(id: number): Promise<Patient | undefined> {
+    return undefined;
+  }
+
+  async getPatientByPatientId(patientId: string): Promise<Patient | undefined> {
+    return undefined;
+  }
+
+  async createPatient(patient: InsertPatient): Promise<Patient> {
+    throw new Error("Not implemented");
+  }
+
+  async updatePatient(id: number, patient: Partial<InsertPatient>): Promise<Patient | undefined> {
+    return undefined;
+  }
+
+  async getAllPatients(): Promise<Patient[]> {
+    return [];
+  }
+
+  async getOutpatients(): Promise<Patient[]> {
+    return [];
+  }
+
+  async getInpatients(): Promise<Patient[]> {
+    return [];
+  }
+
+  async admitPatient(patientId: number, admissionData: { ward: string; bed: string; department: string }): Promise<Patient | undefined> {
+    return undefined;
+  }
+
+  async searchPatients(query: string): Promise<Patient[]> {
+    return [];
+  }
+
+  async getAppointment(id: number): Promise<Appointment | undefined> {
+    return undefined;
+  }
+
+  async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
+    throw new Error("Not implemented");
+  }
+
+  async updateAppointment(id: number, appointment: Partial<InsertAppointment>): Promise<Appointment | undefined> {
+    return undefined;
+  }
+
+  async getAppointmentsByPatient(patientId: number): Promise<Appointment[]> {
+    return [];
+  }
+
+  async getAppointmentsByDate(date: string): Promise<Appointment[]> {
+    return [];
+  }
+
+  async getAllAppointments(): Promise<Appointment[]> {
+    return [];
+  }
+
+  async getLabTest(id: number): Promise<LabTest | undefined> {
+    return undefined;
+  }
+
+  async createLabTest(labTest: InsertLabTest): Promise<LabTest> {
+    throw new Error("Not implemented");
+  }
+
+  async updateLabTest(id: number, labTest: Partial<InsertLabTest>): Promise<LabTest | undefined> {
+    return undefined;
+  }
+
+  async getLabTestsByPatient(patientId: number): Promise<LabTest[]> {
+    return [];
+  }
+
+  async getAllLabTests(): Promise<LabTest[]> {
+    return [];
+  }
+
+  async getMedication(id: number): Promise<Medication | undefined> {
+    return undefined;
+  }
+
+  async createMedication(medication: InsertMedication): Promise<Medication> {
+    throw new Error("Not implemented");
+  }
+
+  async updateMedication(id: number, medication: Partial<InsertMedication>): Promise<Medication | undefined> {
+    return undefined;
+  }
+
+  async getAllMedications(): Promise<Medication[]> {
+    return [];
+  }
+
+  async searchMedications(query: string): Promise<Medication[]> {
+    return [];
+  }
+
+  async getPrescription(id: number): Promise<Prescription | undefined> {
+    return undefined;
+  }
+
+  async createPrescription(prescription: InsertPrescription): Promise<Prescription> {
+    throw new Error("Not implemented");
+  }
+
+  async updatePrescription(id: number, prescription: Partial<InsertPrescription>): Promise<Prescription | undefined> {
+    return undefined;
+  }
+
+  async getPrescriptionsByPatient(patientId: number): Promise<Prescription[]> {
+    return [];
+  }
+
+  async getAllPrescriptions(): Promise<Prescription[]> {
+    return [];
+  }
+
+  async getBilling(id: number): Promise<Billing | undefined> {
+    return undefined;
+  }
+
+  async createBilling(billing: InsertBilling): Promise<Billing> {
+    throw new Error("Not implemented");
+  }
+
+  async updateBilling(id: number, billing: Partial<InsertBilling>): Promise<Billing | undefined> {
+    return undefined;
+  }
+
+  async getBillingByPatient(patientId: number): Promise<Billing[]> {
+    return [];
+  }
+
+  async getAllBilling(): Promise<Billing[]> {
+    return [];
+  }
+
+  async getDashboardStats(): Promise<{
+    totalPatients: number;
+    activeAppointments: number;
+    pendingLabTests: number;
+    todayRevenue: number;
+    bedOccupancy: number;
+  }> {
+    return {
+      totalPatients: 0,
+      activeAppointments: 0,
+      pendingLabTests: 0,
+      todayRevenue: 0,
+      bedOccupancy: 0,
+    };
+  }
+}
+
+export const storage = new DatabaseStorage();
