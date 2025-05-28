@@ -63,6 +63,64 @@ export default function TherapyPage() {
     patient.patientId.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Handle doctor referral mutation
+  const doctorReferralMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest("/api/billing", "POST", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Patient Referred Successfully",
+        description: "Patient has been sent to cashier for doctor consultation payment",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/billing"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Referral Failed",
+        description: error.message || "Failed to refer patient to doctor",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Check if patient has previous psychiatric visits
+  const checkPatientVisitHistory = (patientId: number) => {
+    if (!billingRecords) return false;
+    
+    const psychiatricVisits = (billingRecords as any[]).filter(
+      bill => bill.patientId === patientId && 
+      (bill.serviceType?.toLowerCase().includes('psychiatric') ||
+       bill.serviceDescription?.toLowerCase().includes('psychiatric'))
+    );
+    
+    return psychiatricVisits.length > 0;
+  };
+
+  // Handle doctor referral
+  const handleDoctorReferral = async (patient: Patient) => {
+    const hasVisitHistory = checkPatientVisitHistory(patient.id);
+    
+    const serviceType = hasVisitHistory ? "Psychiatric Review" : "Psychiatric Consultation";
+    const amount = hasVisitHistory ? "2500" : "3500"; // Review: KSh 2,500, First Visit: KSh 3,500
+    const serviceDescription = hasVisitHistory 
+      ? "Follow-up psychiatric review consultation" 
+      : "Initial psychiatric consultation - first visit";
+
+    const referralData = {
+      patientId: patient.id,
+      serviceType,
+      amount,
+      serviceDescription,
+      paymentStatus: "pending",
+      paymentMethod: "",
+      referredFrom: "Therapy Department",
+      notes: `Referred by therapist for ${serviceType.toLowerCase()}`
+    };
+
+    await doctorReferralMutation.mutateAsync(referralData);
+  };
+
   const TherapySessionForm = ({ patient }: { patient: Patient }) => {
     const [sessionData, setSessionData] = useState({
       sessionType: "individual",
@@ -266,17 +324,27 @@ export default function TherapyPage() {
           />
         </div>
 
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={() => setShowSessionModal(false)}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSubmit}
-            disabled={sessionMutation.isPending}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            {sessionMutation.isPending ? "Scheduling..." : "Schedule Session"}
-          </Button>
+        <div className="flex justify-between items-center">
+          <div className="flex space-x-2">
+            <Button 
+              onClick={() => handleDoctorReferral(patient)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Refer to Doctor
+            </Button>
+          </div>
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={() => setShowSessionModal(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmit}
+              disabled={sessionMutation.isPending}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {sessionMutation.isPending ? "Scheduling..." : "Schedule Session"}
+            </Button>
+          </div>
         </div>
       </div>
     );
