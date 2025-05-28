@@ -1001,45 +1001,96 @@ export default function PatientRegistration() {
           </div>
         </div>
 
-        {/* Right Sidebar - Earlier Visit Dates */}
-        <div className="bg-white rounded-lg shadow-sm border p-4">
-          <h4 className="font-medium text-center bg-blue-100 p-2 rounded mb-4">Earlier Visit Dates</h4>
-          <div className="max-h-96 overflow-y-auto">
-            {selectedPatient ? (
-              <div className="space-y-2">
-                {getPatientVisitHistory(selectedPatient.id).map((visit: any, index: number) => (
-                  <div key={index} className="p-3 border rounded-lg bg-gray-50 text-sm">
-                    <div className="font-semibold text-blue-700 mb-1">{visit.date}</div>
-                    <div className="text-gray-700 font-medium">{visit.type}</div>
-                    {visit.doctor && <div className="text-gray-600 text-xs mt-1">{visit.doctor}</div>}
-                    {visit.department && <div className="text-gray-500 text-xs">{visit.department}</div>}
-                    {visit.status && (
-                      <div className={`text-xs mt-1 px-2 py-1 rounded ${
-                        visit.status === 'completed' ? 'bg-green-100 text-green-700' :
-                        visit.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
-                        visit.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {visit.status.charAt(0).toUpperCase() + visit.status.slice(1)}
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {getPatientVisitHistory(selectedPatient.id).length === 0 && (
-                  <div className="text-center text-gray-500 text-sm p-4">
-                    <div className="text-gray-400 mb-2">📋</div>
-                    <div>No previous visits recorded</div>
-                    <div className="text-xs mt-1">This patient is new to the system</div>
-                  </div>
-                )}
+        {/* Right Sidebar - Patient Actions & Visit History */}
+        <div className="space-y-4">
+          {/* Patient Action Buttons */}
+          {selectedPatient && (
+            <div className="bg-white rounded-lg shadow-sm border p-4">
+              <h4 className="font-medium text-center bg-green-100 p-2 rounded mb-4">Patient Actions</h4>
+              <div className="space-y-3">
+                <Button 
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => window.location.href = '/cashier'}
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Proceed to Cashier
+                </Button>
+                
+                <Button 
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => window.location.href = '/triage'}
+                >
+                  <Stethoscope className="w-4 h-4 mr-2" />
+                  Proceed to Triage
+                </Button>
+                
+                <Button 
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  onClick={() => window.location.href = '/therapy'}
+                >
+                  <UserCheck className="w-4 h-4 mr-2" />
+                  Proceed to Therapy
+                </Button>
+                
+                <Button 
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                  onClick={() => window.location.href = '/outpatient'}
+                >
+                  <Stethoscope className="w-4 h-4 mr-2" />
+                  Proceed to Consultation
+                </Button>
+                
+                <Button 
+                  className="w-full bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => window.location.href = '/admission'}
+                >
+                  <Bed className="w-4 h-4 mr-2" />
+                  Admit Patient
+                </Button>
               </div>
-            ) : (
-              <div className="text-center text-gray-500 text-sm p-4">
-                <div className="text-gray-400 mb-2">👤</div>
-                <div>Select a patient to view visit history</div>
-                <div className="text-xs mt-1">Click on a patient from the list</div>
-              </div>
-            )}
+            </div>
+          )}
+          
+          {/* Earlier Visit Dates */}
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h4 className="font-medium text-center bg-blue-100 p-2 rounded mb-4">Earlier Visit Dates</h4>
+            <div className="max-h-96 overflow-y-auto">
+              {selectedPatient ? (
+                <div className="space-y-2">
+                  {getPatientVisitHistory(selectedPatient.id).map((visit: any, index: number) => (
+                    <div key={index} className="p-3 border rounded-lg bg-gray-50 text-sm">
+                      <div className="font-semibold text-blue-700 mb-1">{visit.date}</div>
+                      <div className="text-gray-700 font-medium">{visit.type}</div>
+                      {visit.doctor && <div className="text-gray-600 text-xs mt-1">{visit.doctor}</div>}
+                      {visit.department && <div className="text-gray-500 text-xs">{visit.department}</div>}
+                      {visit.status && (
+                        <div className={`text-xs mt-1 px-2 py-1 rounded ${
+                          visit.status === 'completed' ? 'bg-green-100 text-green-700' :
+                          visit.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
+                          visit.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                          'bg-gray-100 text-gray-700'
+                        }`}>
+                          {visit.status.charAt(0).toUpperCase() + visit.status.slice(1)}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {getPatientVisitHistory(selectedPatient.id).length === 0 && (
+                    <div className="text-center text-gray-500 text-sm p-4">
+                      <div className="text-gray-400 mb-2">📋</div>
+                      <div>No previous visits recorded</div>
+                      <div className="text-xs mt-1">This patient is new to the system</div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 text-sm p-4">
+                  <div className="text-gray-400 mb-2">👤</div>
+                  <div>Select a patient to view visit history</div>
+                  <div className="text-xs mt-1">Click on a patient from the list</div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
