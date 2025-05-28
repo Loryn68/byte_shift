@@ -1,123 +1,126 @@
 import { useQuery } from "@tanstack/react-query";
-import StatsGrid from "@/components/dashboard/stats-grid";
-import RecentPatients from "@/components/dashboard/recent-patients";
-import QuickActions from "@/components/dashboard/quick-actions";
 import { Button } from "@/components/ui/button";
-import { UserPlus, AlertTriangle } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { useState } from "react";
-import PatientRegistrationModal from "@/components/modals/patient-registration-modal";
+import { Calendar, Clock, HelpCircle, Settings } from "lucide-react";
 
 export default function Dashboard() {
-  const [showPatientModal, setShowPatientModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("Draft");
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
   });
 
-  const { data: patients = [], isLoading: patientsLoading } = useQuery({
-    queryKey: ["/api/patients"],
-  });
-
-  const handleQuickAdmission = () => {
-    setShowPatientModal(true);
-  };
-
-  const handleEmergencyAlert = () => {
-    alert("Emergency protocols activated. Redirecting to Emergency Management...");
-    // In production, this would redirect to emergency module
-  };
+  const tabs = ["Draft", "Submitted", "Closed"];
 
   return (
-    <div className="p-6">
-      {/* Dashboard Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-            <p className="text-gray-600">Welcome back, Dr. Johnson. Here's what's happening at ChildHaven today.</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Button 
-              onClick={handleQuickAdmission}
-              className="bg-primary text-white hover:bg-blue-700 flex items-center space-x-2"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>Quick Admission</span>
-            </Button>
-            <Button 
-              onClick={handleEmergencyAlert}
-              className="bg-red-600 text-white hover:bg-red-700 flex items-center space-x-2"
-            >
-              <AlertTriangle className="w-4 h-4" />
-              <span>Emergency</span>
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <StatsGrid stats={stats} loading={statsLoading} />
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-        {/* Recent Patients */}
-        <div className="lg:col-span-2">
-          <RecentPatients patients={patients.slice(0, 5)} loading={patientsLoading} />
-        </div>
-
-        {/* Quick Actions & System Status */}
-        <div>
-          <QuickActions onRegisterPatient={() => setShowPatientModal(true)} />
-          
-          {/* System Status */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mt-6">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">System Status</h3>
+    <div className="min-h-screen bg-gray-50">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">DASHBOARD</h1>
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-700">Database</span>
-                  </div>
-                  <span className="text-sm text-green-600">Online</span>
-                </div>
+            <div className="flex items-center space-x-4">
+              <Button 
+                size="sm" 
+                className="bg-green-600 hover:bg-green-700 text-white flex items-center space-x-1"
+              >
+                <HelpCircle className="w-4 h-4" />
+                <span>Help</span>
+              </Button>
+              <Button 
+                size="sm" 
+                className="bg-green-700 hover:bg-green-800 text-white flex items-center space-x-1"
+              >
+                <Settings className="w-4 h-4" />
+                <span>Patient Management Guide</span>
+              </Button>
+            </div>
+          </div>
+        </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-700">Lab Interface</span>
-                  </div>
-                  <span className="text-sm text-green-600">Connected</span>
-                </div>
+        {/* Tab Navigation */}
+        <div className="bg-white px-6">
+          <div className="flex space-x-0 border-b border-gray-200">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === tab
+                    ? "border-green-600 text-green-600 bg-green-50"
+                    : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-700">Backup System</span>
-                  </div>
-                  <span className="text-sm text-yellow-600">Syncing</span>
+        {/* Content Area */}
+        <div className="flex-1 p-6">
+          
+          {/* Patient Overview Section */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Patient Overview</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Patient Stats Cards */}
+              <Card className="p-6 bg-white border border-gray-200 hover:shadow-md transition-shadow">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Calendar className="w-5 h-5 text-gray-400" />
+                  <span className="text-sm text-gray-600">New Patients (7 days)</span>
                 </div>
+                <div className="text-3xl font-bold text-gray-900">0</div>
+              </Card>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-700">Pharmacy Interface</span>
-                  </div>
-                  <span className="text-sm text-green-600">Active</span>
+              <Card className="p-6 bg-white border border-gray-200 hover:shadow-md transition-shadow">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Calendar className="w-5 h-5 text-gray-400" />
+                  <span className="text-sm text-gray-600">Active Appointments</span>
+                </div>
+                <div className="text-3xl font-bold text-gray-900">0</div>
+              </Card>
+
+              <Card className="p-6 bg-white border border-gray-200 hover:shadow-md transition-shadow">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Clock className="w-5 h-5 text-gray-400" />
+                  <span className="text-sm text-gray-600">Pending Lab Tests</span>
+                </div>
+                <div className="text-3xl font-bold text-gray-900">0</div>
+              </Card>
+
+              <Card className="p-6 bg-white border border-gray-200 hover:shadow-md transition-shadow">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Calendar className="w-5 h-5 text-gray-400" />
+                  <span className="text-sm text-gray-600">Total Patients</span>
+                </div>
+                <div className="text-3xl font-bold text-gray-900">0</div>
+              </Card>
+            </div>
+          </div>
+
+          {/* Department Activity Section */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Department Activity</h2>
+            
+            <Card className="p-8 bg-white border border-gray-200">
+              <div className="flex items-center justify-center h-64 text-gray-400">
+                <div className="text-center">
+                  <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">No activity data available</p>
+                  <p className="text-sm">Patient activity will appear here as you use the system</p>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
       </div>
-
-      {/* Patient Registration Modal */}
-      <PatientRegistrationModal
-        open={showPatientModal}
-        onOpenChange={setShowPatientModal}
-      />
     </div>
   );
 }
