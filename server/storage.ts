@@ -189,15 +189,52 @@ export class MemStorage implements IStorage {
   }
 
   async createPatient(insertPatient: InsertPatient): Promise<Patient> {
-    const patient: Patient = {
-      ...insertPatient,
-      id: this.currentPatientId,
-      patientId: this.generatePatientId(insertPatient.firstName, insertPatient.middleName || '', insertPatient.lastName),
-      registrationDate: new Date(),
-      updatedAt: new Date(),
-    };
-    this.patients.set(this.currentPatientId++, patient);
-    return patient;
+    try {
+      console.log("Creating patient with data:", insertPatient);
+      
+      const patientId = this.generatePatientId(
+        insertPatient.firstName, 
+        insertPatient.middleName || '', 
+        insertPatient.lastName
+      );
+      
+      const patient: Patient = {
+        id: this.currentPatientId,
+        patientId: patientId,
+        firstName: insertPatient.firstName,
+        middleName: insertPatient.middleName || null,
+        lastName: insertPatient.lastName,
+        nationalId: insertPatient.nationalId || null,
+        dateOfBirth: insertPatient.dateOfBirth,
+        gender: insertPatient.gender,
+        phone: insertPatient.phone,
+        email: insertPatient.email || null,
+        address: insertPatient.address,
+        emergencyContactName: insertPatient.emergencyContactName,
+        emergencyContactPhone: insertPatient.emergencyContactPhone,
+        emergencyContactRelationship: insertPatient.emergencyContactRelationship || null,
+        occupation: insertPatient.occupation || null,
+        bloodType: insertPatient.bloodType || null,
+        insuranceProvider: insertPatient.insuranceProvider || null,
+        policyNumber: insertPatient.policyNumber || null,
+        medicalHistory: insertPatient.medicalHistory || null,
+        allergies: insertPatient.allergies || null,
+        patientType: insertPatient.patientType,
+        wardAssignment: insertPatient.wardAssignment || null,
+        bedNumber: insertPatient.bedNumber || null,
+        admissionDate: insertPatient.admissionDate || null,
+        isActive: insertPatient.isActive !== undefined ? insertPatient.isActive : true,
+        registrationDate: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      console.log("Created patient object:", patient);
+      this.patients.set(this.currentPatientId++, patient);
+      return patient;
+    } catch (error) {
+      console.error("Error in createPatient:", error);
+      throw error;
+    }
   }
 
   async updatePatient(id: number, updateData: Partial<InsertPatient>): Promise<Patient | undefined> {
