@@ -146,6 +146,11 @@ export default function TherapyPage() {
       }
 
       try {
+        console.log("Starting referral process for:", referralData);
+        
+        // First save the therapy session
+        await sessionMutation.mutateAsync(sessionData);
+        
         // Create billing record for the consultation
         const billingDataForReferral = {
           patientId: patient.id,
@@ -156,7 +161,9 @@ export default function TherapyPage() {
           paymentStatus: "pending"
         };
         
-        await apiRequest("POST", "/api/billing", billingDataForReferral);
+        console.log("Creating billing record:", billingDataForReferral);
+        const billingResponse = await apiRequest("POST", "/api/billing", billingDataForReferral);
+        console.log("Billing record created:", billingResponse);
 
         // Create appointment with therapy findings
         const appointmentData = {
@@ -167,27 +174,32 @@ export default function TherapyPage() {
           department: "Mental Health",
           status: "pending",
           consultationType: referralData.consultationType,
-          therapyFindings: sessionData.counselorFindings,
-          patientResponse: sessionData.patientResponse,
-          riskAssessment: sessionData.riskAssessment,
-          recommendedTreatment: sessionData.recommendedTreatment,
-          referralReason: sessionData.referralReason,
-          notes: `THERAPY REFERRAL:\n\nCounselor Findings: ${sessionData.counselorFindings}\n\nPatient Response: ${sessionData.patientResponse}\n\nRisk Assessment: ${sessionData.riskAssessment}\n\nRecommended Treatment: ${sessionData.recommendedTreatment}\n\nReferral Reason: ${sessionData.referralReason}\n\nReferred by: ${sessionData.therapistName}\nSession Date: ${sessionData.sessionDate}\n\nConsultation Type: ${referralData.consultationName}`
+          therapyFindings: sessionData.counselorFindings || "Therapy session completed",
+          patientResponse: sessionData.patientResponse || "Patient participated in session",
+          riskAssessment: sessionData.riskAssessment || "Assessment pending",
+          recommendedTreatment: sessionData.recommendedTreatment || "Follow-up recommended",
+          referralReason: sessionData.referralReason || "Therapy referral",
+          notes: `THERAPY REFERRAL:\n\nCounselor Findings: ${sessionData.counselorFindings || "Session completed"}\n\nPatient Response: ${sessionData.patientResponse || "Patient engaged"}\n\nRisk Assessment: ${sessionData.riskAssessment || "Standard assessment"}\n\nRecommended Treatment: ${sessionData.recommendedTreatment || "Medical consultation"}\n\nReferral Reason: ${sessionData.referralReason || "Therapy follow-up"}\n\nReferred by: ${sessionData.therapistName}\nSession Date: ${sessionData.sessionDate}\n\nConsultation Type: ${referralData.consultationName}`
         };
 
-        await apiRequest("POST", "/api/appointments", appointmentData);
+        console.log("Creating appointment:", appointmentData);
+        const appointmentResponse = await apiRequest("POST", "/api/appointments", appointmentData);
+        console.log("Appointment created:", appointmentResponse);
 
         toast({
           title: "Patient Referred Successfully",
           description: `Patient referred for ${referralData.consultationName}. They must visit cashier for payment (KShs ${referralData.consultationAmount}) before consultation.`,
         });
+        
         setShowSessionModal(false);
         queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
         queryClient.invalidateQueries({ queryKey: ["/api/billing"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       } catch (error) {
+        console.error("Referral error:", error);
         toast({
           title: "Referral Error",
-          description: "Unable to create doctor referral at this time.",
+          description: `Failed to create referral: ${error.message || "Unknown error"}`,
           variant: "destructive",
         });
       }
@@ -492,7 +504,7 @@ export default function TherapyPage() {
               <Button 
                 onClick={handleReferToDoctor}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
-                disabled={!referralData.consultationType || !sessionData.counselorFindings || !sessionData.referralReason}
+                disabled={!referralData.consultationType}
               >
                 <FileText className="h-4 w-4 mr-2" />
                 Refer to Doctor
