@@ -63,10 +63,12 @@ export default function TherapyPage() {
 
   // Filter therapy patients
   const therapyPatients = useMemo(() => {
-    return patients.filter((patient: Patient) => 
-      patient.serviceType === 'therapy' || 
-      patient.serviceType === 'counseling' ||
-      patient.status === 'therapy'
+    return patients.filter((patient: any) => 
+      patient.patientType === 'therapy' ||
+      (patient.patientType === 'outpatient' && 
+       (patient.serviceType === 'Counseling' || 
+        patient.serviceType === 'therapy' || 
+        patient.serviceType === 'counseling'))
     );
   }, [patients]);
 
@@ -494,7 +496,7 @@ export default function TherapyPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {therapyPatients.filter(p => p.serviceType?.includes('individual')).length}
+              {therapyPatients.filter((p: any) => p.serviceType?.includes('individual') || p.serviceType?.includes('Counseling')).length}
             </div>
             <p className="text-xs text-muted-foreground">Patients</p>
           </CardContent>
@@ -507,7 +509,7 @@ export default function TherapyPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {therapyPatients.filter(p => p.serviceType?.includes('family')).length}
+              {therapyPatients.filter((p: any) => p.serviceType?.includes('family') || p.serviceType?.includes('Counseling')).length}
             </div>
             <p className="text-xs text-muted-foreground">Families</p>
           </CardContent>
