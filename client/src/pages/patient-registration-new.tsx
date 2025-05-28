@@ -931,27 +931,27 @@ export default function PatientRegistration() {
                 </div>
 
                 {/* Essential Action Buttons */}
-                <div className="flex justify-center gap-4 pt-6 border-t">
+                <div className="flex flex-wrap justify-center gap-3 pt-6 border-t">
                   <Button 
                     type="submit" 
                     disabled={createPatientMutation.isPending} 
-                    className="bg-green-400 text-white hover:bg-green-500 px-6"
+                    className="bg-green-400 text-white hover:bg-green-500 px-4 py-2 text-sm flex-1 min-w-0"
                   >
-                    {editingPatient ? (updatePatientMutation.isPending ? "Updating..." : "Update Record") : (createPatientMutation.isPending ? "Registering..." : "Register Patient")}
+                    {editingPatient ? (updatePatientMutation.isPending ? "Updating..." : "Update") : (createPatientMutation.isPending ? "Registering..." : "Register")}
                   </Button>
                   <Button 
                     type="button" 
                     variant="outline" 
-                    className="bg-blue-400 text-white hover:bg-blue-500 px-6" 
+                    className="bg-blue-400 text-white hover:bg-blue-500 px-4 py-2 text-sm flex-1 min-w-0" 
                     onClick={resetForm}
                   >
                     <RotateCcw className="w-4 h-4 mr-1" />
-                    Reset Form
+                    Reset
                   </Button>
                   <Button 
                     type="button" 
                     variant="outline" 
-                    className="bg-green-500 text-white hover:bg-green-600 px-6"
+                    className="bg-green-500 text-white hover:bg-green-600 px-4 py-2 text-sm flex-1 min-w-0"
                     onClick={refreshData}
                   >
                     <RefreshCw className="w-4 h-4 mr-1" />
