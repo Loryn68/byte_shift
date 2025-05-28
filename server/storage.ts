@@ -189,52 +189,43 @@ export class MemStorage implements IStorage {
   }
 
   async createPatient(insertPatient: InsertPatient): Promise<Patient> {
-    try {
-      console.log("Creating patient with data:", insertPatient);
-      
-      const patientId = this.generatePatientId(
-        insertPatient.firstName, 
-        insertPatient.middleName || '', 
-        insertPatient.lastName
-      );
-      
-      const patient: Patient = {
-        id: this.currentPatientId,
-        patientId: patientId,
-        firstName: insertPatient.firstName,
-        middleName: insertPatient.middleName || null,
-        lastName: insertPatient.lastName,
-        nationalId: insertPatient.nationalId || null,
-        dateOfBirth: insertPatient.dateOfBirth,
-        gender: insertPatient.gender,
-        phone: insertPatient.phone,
-        email: insertPatient.email || null,
-        address: insertPatient.address,
-        emergencyContactName: insertPatient.emergencyContactName,
-        emergencyContactPhone: insertPatient.emergencyContactPhone,
-        emergencyContactRelationship: insertPatient.emergencyContactRelationship || null,
-        occupation: insertPatient.occupation || null,
-        bloodType: insertPatient.bloodType || null,
-        insuranceProvider: insertPatient.insuranceProvider || null,
-        policyNumber: insertPatient.policyNumber || null,
-        medicalHistory: insertPatient.medicalHistory || null,
-        allergies: insertPatient.allergies || null,
-        patientType: insertPatient.patientType,
-        wardAssignment: insertPatient.wardAssignment || null,
-        bedNumber: insertPatient.bedNumber || null,
-        admissionDate: insertPatient.admissionDate || null,
-        isActive: insertPatient.isActive !== undefined ? insertPatient.isActive : true,
-        registrationDate: new Date(),
-        updatedAt: new Date(),
-      };
-      
-      console.log("Created patient object:", patient);
-      this.patients.set(this.currentPatientId++, patient);
-      return patient;
-    } catch (error) {
-      console.error("Error in createPatient:", error);
-      throw error;
-    }
+    console.log("Creating patient with data:", insertPatient);
+    
+    const patientId = `CMH-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${insertPatient.firstName.charAt(0).toUpperCase()}${insertPatient.lastName.charAt(0).toUpperCase()}${String(this.currentPatientId).padStart(3, '0')}`;
+    
+    const patient: Patient = {
+      id: this.currentPatientId,
+      patientId: patientId,
+      firstName: insertPatient.firstName,
+      middleName: insertPatient.middleName || null,
+      lastName: insertPatient.lastName,
+      nationalId: insertPatient.nationalId || null,
+      dateOfBirth: insertPatient.dateOfBirth,
+      gender: insertPatient.gender,
+      phone: insertPatient.phone,
+      email: insertPatient.email || null,
+      address: insertPatient.address,
+      emergencyContactName: insertPatient.emergencyContactName,
+      emergencyContactPhone: insertPatient.emergencyContactPhone,
+      emergencyContactRelationship: insertPatient.emergencyContactRelationship || null,
+      occupation: insertPatient.occupation || null,
+      bloodType: insertPatient.bloodType || null,
+      insuranceProvider: insertPatient.insuranceProvider || null,
+      policyNumber: insertPatient.policyNumber || null,
+      medicalHistory: insertPatient.medicalHistory || null,
+      allergies: insertPatient.allergies || null,
+      patientType: insertPatient.patientType,
+      wardAssignment: insertPatient.wardAssignment || null,
+      bedNumber: insertPatient.bedNumber || null,
+      admissionDate: insertPatient.admissionDate || null,
+      isActive: insertPatient.isActive !== undefined ? insertPatient.isActive : true,
+      registrationDate: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    this.patients.set(this.currentPatientId++, patient);
+    console.log("Patient created successfully:", patient);
+    return patient;
   }
 
   async updatePatient(id: number, updateData: Partial<InsertPatient>): Promise<Patient | undefined> {

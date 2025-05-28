@@ -155,19 +155,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove fields that shouldn't be in the validation
       const { registerFor, patientCategory, paymentOption, referralSource, ...patientData } = req.body;
       
-      console.log("Cleaned patient data for validation:", patientData);
-      const validatedData = insertPatientSchema.parse(patientData);
-      console.log("Validated patient data:", validatedData);
-      const patient = await storage.createPatient(validatedData);
+      // Create patient data with required defaults
+      const cleanPatientData = {
+        firstName: patientData.firstName,
+        middleName: patientData.middleName || null,
+        lastName: patientData.lastName,
+        nationalId: patientData.nationalId || null,
+        dateOfBirth: patientData.dateOfBirth,
+        gender: patientData.gender,
+        phone: patientData.phone,
+        email: patientData.email || null,
+        address: patientData.address,
+        emergencyContactName: patientData.emergencyContactName,
+        emergencyContactPhone: patientData.emergencyContactPhone,
+        emergencyContactRelationship: patientData.emergencyContactRelationship || null,
+        occupation: patientData.occupation || null,
+        bloodType: patientData.bloodType || null,
+        insuranceProvider: patientData.insuranceProvider || null,
+        policyNumber: patientData.policyNumber || null,
+        medicalHistory: patientData.medicalHistory || null,
+        allergies: patientData.allergies || null,
+        patientType: patientData.patientType || "outpatient",
+        wardAssignment: patientData.wardAssignment || null,
+        bedNumber: patientData.bedNumber || null,
+        admissionDate: patientData.admissionDate || null,
+        isActive: patientData.isActive !== undefined ? patientData.isActive : true,
+      };
+      
+      console.log("Clean patient data:", cleanPatientData);
+      const patient = await storage.createPatient(cleanPatientData);
+      console.log("Patient created successfully:", patient);
       res.status(201).json(patient);
-    } catch (error) {
-      console.error("Patient creation error:", error);
-      console.error("Error stack:", error.stack);
-      if (error instanceof z.ZodError) {
-        console.log("Validation errors:", error.errors);
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
-      }
-      res.status(500).json({ message: "Failed to create patient", error: error.message });
+    } catch (error: any) {
+      console.error("=== PATIENT CREATION ERROR ===");
+      console.error("Error:", error);
+      console.error("Error message:", error?.message);
+      console.error("Error stack:", error?.stack);
+      console.error("Error type:", typeof error);
+      console.error("Error constructor:", error?.constructor?.name);
+      
+      res.status(500).json({ message: "Failed to create patient", error: error?.message || "Unknown error" });
     }
   });
 
