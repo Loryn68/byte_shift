@@ -162,14 +162,75 @@ export default function BillingPage() {
     calculateTotal();
   }, [watchedAmount, watchedDiscount]);
 
-  const filteredBillingRecords = billingRecords.filter((record: Billing) => {
-    const matchesSearch = !searchQuery || 
-      record.billId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      record.serviceDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patients.find((p: Patient) => p.id === record.patientId)?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patients.find((p: Patient) => p.id === record.patientId)?.lastName?.toLowerCase().includes(searchQuery.toLowerCase());
+  // Consolidate billing records by patient for professional billing
+  const consolidatedBillingRecords = (() => {
+    const consolidated = new Map();
     
-    const matchesStatus = statusFilter === "all" || record.paymentStatus === statusFilter;
+    billingRecords.forEach((record: Billing) => {
+      const patientKey = record.patientId;
+      
+      if (consolidated.has(patientKey)) {
+        const existing = consolidated.get(patientKey);
+        existing.services.push({
+          billId: record.billId,
+          serviceType: record.serviceType,
+          serviceDescription: record.serviceDescription,
+          amount: parseFloat(record.amount || "0"),
+          discount: parseFloat(record.discount || "0"),
+          totalAmount: parseFloat(record.totalAmount || "0"),
+          createdAt: record.createdAt,
+          paymentStatus: record.paymentStatus,
+          paymentMethod: record.paymentMethod,
+          id: record.id
+        });
+        existing.combinedTotal += parseFloat(record.totalAmount || "0");
+        existing.latestDate = new Date(Math.max(new Date(existing.latestDate), new Date(record.createdAt)));
+        
+        // Update overall payment status
+        if (record.paymentStatus === "pending") {
+          existing.overallPaymentStatus = existing.overallPaymentStatus === "paid" ? "partial" : "pending";
+        }
+      } else {
+        const patient = patients.find((p: Patient) => p.id === record.patientId);
+        consolidated.set(patientKey, {
+          id: record.id,
+          patientId: record.patientId,
+          patientName: patient ? `${patient.firstName} ${patient.lastName}` : "Unknown Patient",
+          patientIdCode: patient?.patientId || "Unknown",
+          services: [{
+            billId: record.billId,
+            serviceType: record.serviceType,
+            serviceDescription: record.serviceDescription,
+            amount: parseFloat(record.amount || "0"),
+            discount: parseFloat(record.discount || "0"),
+            totalAmount: parseFloat(record.totalAmount || "0"),
+            createdAt: record.createdAt,
+            paymentStatus: record.paymentStatus,
+            paymentMethod: record.paymentMethod,
+            id: record.id
+          }],
+          combinedTotal: parseFloat(record.totalAmount || "0"),
+          overallPaymentStatus: record.paymentStatus,
+          latestDate: new Date(record.createdAt),
+          earliestDate: new Date(record.createdAt)
+        });
+      }
+    });
+    
+    return Array.from(consolidated.values());
+  })();
+
+  const filteredBillingRecords = consolidatedBillingRecords.filter((consolidatedRecord: any) => {
+    const matchesSearch = !searchQuery || 
+      consolidatedRecord.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      consolidatedRecord.patientIdCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      consolidatedRecord.services.some((service: any) => 
+        service.billId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        service.serviceDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        service.serviceType.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    
+    const matchesStatus = statusFilter === "all" || consolidatedRecord.overallPaymentStatus === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
@@ -586,14 +647,11 @@ export default function BillingPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Bill ID</TableHead>
               <TableHead>Patient</TableHead>
-              <TableHead>Service</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Discount</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Services Provided</TableHead>
+              <TableHead>Combined Total</TableHead>
+              <TableHead>Payment Status</TableHead>
+              <TableHead>Latest Date</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -601,7 +659,7 @@ export default function BillingPage() {
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
-                  {Array.from({ length: 9 }).map((_, j) => (
+                  {Array.from({ length: 6 }).map((_, j) => (
                     <TableCell key={j}>
                       <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                     </TableCell>
@@ -610,7 +668,7 @@ export default function BillingPage() {
               ))
             ) : filteredBillingRecords.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8">
+                <TableCell colSpan={6} className="text-center py-8">
                   <div className="text-gray-500">
                     {searchQuery || statusFilter !== "all" 
                       ? "No billing records found matching your criteria" 
@@ -628,57 +686,130 @@ export default function BillingPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredBillingRecords.map((record: Billing) => (
-                <TableRow key={record.id}>
-                  <TableCell className="font-medium text-primary">
-                    {record.billId}
-                  </TableCell>
+              filteredBillingRecords.map((consolidatedRecord: any) => (
+                <TableRow key={`consolidated-${consolidatedRecord.patientId}`}>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{getPatientName(record.patientId)}</p>
+                      <p className="font-medium">{consolidatedRecord.patientName}</p>
                       <p className="text-sm text-gray-500">
-                        {patients.find((p: Patient) => p.id === record.patientId)?.patientId}
+                        {consolidatedRecord.patientIdCode}
                       </p>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div>
-                      <p className="font-medium">{record.serviceType}</p>
-                      <p className="text-sm text-gray-500 truncate max-w-32">
-                        {record.serviceDescription}
-                      </p>
+                    <div className="space-y-2 max-w-md">
+                      {consolidatedRecord.services.map((service: any, index: number) => (
+                        <div key={index} className="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-800">{service.serviceType}</p>
+                              <p className="text-sm text-gray-600 truncate max-w-48">
+                                {service.serviceDescription}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                Bill ID: {service.billId} • {formatDate(service.createdAt)}
+                              </p>
+                            </div>
+                            <div className="text-right ml-4">
+                              <p className="font-semibold text-blue-600">
+                                {formatCurrency(service.totalAmount)}
+                              </p>
+                              {service.discount > 0 && (
+                                <p className="text-xs text-gray-500">
+                                  -{formatCurrency(service.discount)} discount
+                                </p>
+                              )}
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs mt-1 ${
+                                  service.paymentStatus === "paid" 
+                                    ? "text-green-600 border-green-600" 
+                                    : "text-orange-600 border-orange-600"
+                                }`}
+                              >
+                                {service.paymentStatus}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {consolidatedRecord.services.length > 1 && (
+                        <div className="bg-blue-50 p-2 rounded border-t-2 border-blue-500">
+                          <p className="text-sm font-medium text-blue-800">
+                            📋 Professional Bill: {consolidatedRecord.services.length} services combined
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </TableCell>
-                  <TableCell>{formatCurrency(Number(record.amount))}</TableCell>
-                  <TableCell>{formatCurrency(Number(record.discount))}</TableCell>
-                  <TableCell className="font-medium">
-                    {formatCurrency(Number(record.totalAmount))}
-                  </TableCell>
-                  <TableCell>{formatDate(record.createdAt)}</TableCell>
                   <TableCell>
-                    <Badge className={getStatusColor(record.paymentStatus)}>
-                      {record.paymentStatus}
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-gray-900">
+                        {formatCurrency(consolidatedRecord.combinedTotal)}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Total for all services
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant="outline" 
+                      className={
+                        consolidatedRecord.overallPaymentStatus === "paid" 
+                          ? "text-green-600 border-green-600 bg-green-50" 
+                          : consolidatedRecord.overallPaymentStatus === "partial"
+                          ? "text-orange-600 border-orange-600 bg-orange-50"
+                          : "text-red-600 border-red-600 bg-red-50"
+                      }
+                    >
+                      {consolidatedRecord.overallPaymentStatus === "paid" ? "Fully Paid" : 
+                       consolidatedRecord.overallPaymentStatus === "partial" ? "Partially Paid" : "Pending Payment"}
                     </Badge>
                   </TableCell>
                   <TableCell>
+                    <div className="text-sm">
+                      <div className="font-medium">
+                        {formatDate(consolidatedRecord.latestDate)}
+                      </div>
+                      {consolidatedRecord.services.length > 1 && (
+                        <div className="text-xs text-gray-500">
+                          Latest service date
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
                     <div className="flex items-center space-x-2">
-                      {record.paymentStatus === "pending" && (
+                      {consolidatedRecord.overallPaymentStatus !== "paid" && (
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => handlePaymentUpdate(record.id, "paid", "cash")}
+                          onClick={() => {
+                            // Mark all pending services as paid
+                            consolidatedRecord.services
+                              .filter((service: any) => service.paymentStatus === "pending")
+                              .forEach((service: any) => {
+                                handlePaymentUpdate(service.id, "paid", "cash");
+                              });
+                          }}
                         >
-                          Mark Paid
+                          Mark All Paid
                         </Button>
                       )}
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        onClick={() => handlePrintInvoice(record)}
+                        onClick={() => {
+                          // For consolidated bills, we can print the first service as representative
+                          if (consolidatedRecord.services.length > 0) {
+                            handlePrintInvoice(consolidatedRecord.services[0]);
+                          }
+                        }}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         <Printer className="w-4 h-4 mr-1" />
-                        Print Invoice
+                        Print Combined Invoice
                       </Button>
                     </div>
                   </TableCell>
