@@ -7,6 +7,168 @@ import { useLocation } from "wouter";
 
 const TherapyForms = () => {
   const [, setLocation] = useLocation();
+  const [selectedCategory, setSelectedCategory] = useState("assessments");
+
+  // Define all form data first
+  const aceQuestionnaire = {
+    title: "ACE Questionnaire for Adults",
+    description: "Adverse Childhood Experience screening questionnaire",
+    category: "Assessment",
+    icon: <FileText className="h-5 w-5" />,
+    content: `ADVERSE CHILDHOOD EXPERIENCE QUESTIONNAIRE FOR ADULTS...`
+  };
+
+  const adhdScreening = {
+    title: "ADHD Self-Report Scale",
+    description: "Adult ADHD screening questionnaire",
+    category: "Assessment",
+    icon: <Brain className="h-5 w-5" />,
+    content: `ADHD SELF-REPORT SCALE...`
+  };
+
+  const addictionSeverityIndex = {
+    title: "Addiction Severity Index",
+    description: "Comprehensive addiction assessment tool",
+    category: "Assessment", 
+    icon: <Shield className="h-5 w-5" />,
+    content: `ADDICTION SEVERITY INDEX...`
+  };
+
+  const auditAlcoholScreening = {
+    title: "AUDIT Alcohol Screening",
+    description: "Alcohol Use Disorders Identification Test",
+    category: "Assessment",
+    icon: <Activity className="h-5 w-5" />,
+    content: `AUDIT ALCOHOL SCREENING TEST...`
+  };
+
+  const beckDepressionInventory = {
+    title: "Beck Depression Inventory",
+    description: "Depression assessment questionnaire",
+    category: "Assessment",
+    icon: <Heart className="h-5 w-5" />,
+    content: `BECK DEPRESSION INVENTORY...`
+  };
+
+  const pcl5PtsdChecklist = {
+    title: "PCL-5 PTSD Checklist",
+    description: "Post-traumatic stress disorder screening",
+    category: "Assessment",
+    icon: <Shield className="h-5 w-5" />,
+    content: `PCL-5 PTSD CHECKLIST...`
+  };
+
+  const bipolarDisorderScreening = {
+    title: "Bipolar Disorder Screening",
+    description: "Mood disorder assessment",
+    category: "Assessment",
+    icon: <Activity className="h-5 w-5" />,
+    content: `BIPOLAR DISORDER SCREENING...`
+  };
+
+  const defensesMechanisms = {
+    title: "Defense Mechanisms Worksheet",
+    description: "Understanding psychological defense mechanisms",
+    category: "Therapeutic",
+    icon: <Shield className="h-5 w-5" />,
+    content: `DEFENSE MECHANISMS WORKSHEET...`
+  };
+
+  const strengthBasedApproach = {
+    title: "Strength-Based Approach",
+    description: "Identifying personal strengths and resources",
+    category: "Therapeutic",
+    icon: <Heart className="h-5 w-5" />,
+    content: `STRENGTH-BASED APPROACH WORKSHEET...`
+  };
+
+  const triggerUnderstanding = {
+    title: "Understanding Triggers",
+    description: "Identifying and managing emotional triggers",
+    category: "Coping",
+    icon: <Brain className="h-5 w-5" />,
+    content: `UNDERSTANDING TRIGGERS WORKSHEET...`
+  };
+
+  const avoidanceConfrontation = {
+    title: "Avoidance vs Confrontation",
+    description: "Learning healthy coping strategies",
+    category: "Coping",
+    icon: <Activity className="h-5 w-5" />,
+    content: `AVOIDANCE VS CONFRONTATION WORKSHEET...`
+  };
+
+  const burnoutRecognition = {
+    title: "Burnout Recognition",
+    description: "Identifying and preventing burnout",
+    category: "Wellness",
+    icon: <Heart className="h-5 w-5" />,
+    content: `BURNOUT RECOGNITION WORKSHEET...`
+  };
+
+  const valuesExploration = {
+    title: "Values Exploration",
+    description: "Identifying core personal values",
+    category: "Growth",
+    icon: <BookOpen className="h-5 w-5" />,
+    content: `VALUES EXPLORATION WORKSHEET...`
+  };
+
+  const selfImageBuilding = {
+    title: "Self-Image Building",
+    description: "Developing positive self-perception",
+    category: "Growth",
+    icon: <Heart className="h-5 w-5" />,
+    content: `SELF-IMAGE BUILDING WORKSHEET...`
+  };
+
+  const positiveThinkingStrategies = {
+    title: "Positive Thinking Strategies",
+    description: "Techniques for cultivating optimism",
+    category: "Growth",
+    icon: <Brain className="h-5 w-5" />,
+    content: `POSITIVE THINKING STRATEGIES...`
+  };
+
+  const peaceAndStrength = {
+    title: "Finding Peace and Strength",
+    description: "Spiritual and emotional resilience",
+    category: "Spiritual",
+    icon: <Heart className="h-5 w-5" />,
+    content: `FINDING PEACE AND STRENGTH...`
+  };
+
+  const assertivenessTraining = {
+    title: "Assertiveness Training",
+    description: "Communication and boundary setting skills",
+    category: "Skills",
+    icon: <Users className="h-5 w-5" />,
+    content: `ASSERTIVENESS TRAINING WORKSHEET...`
+  };
+
+  const dbtSkills = {
+    title: "DBT Skills Training",
+    description: "Dialectical behavior therapy techniques",
+    category: "Skills",
+    icon: <Activity className="h-5 w-5" />,
+    content: `DBT SKILLS TRAINING WORKSHEET...`
+  };
+
+  const actTools = {
+    title: "ACT Tools and Techniques",
+    description: "Acceptance and commitment therapy resources",
+    category: "Skills",
+    icon: <Brain className="h-5 w-5" />,
+    content: `ACT TOOLS AND TECHNIQUES...`
+  };
+
+  const inspirationalStories = {
+    title: "Inspirational Stories",
+    description: "Motivational and recovery stories",
+    category: "Resources",
+    icon: <BookOpen className="h-5 w-5" />,
+    content: `INSPIRATIONAL STORIES COLLECTION...`
+  };
 
   // Assessment Forms
   const assessmentForms = [

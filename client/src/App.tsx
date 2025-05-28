@@ -13,7 +13,7 @@ import ConsultationInterface from "@/pages/consultation-interface-enhanced";
 import InpatientManagement from "@/pages/inpatient-management";
 import TriageVitals from "@/pages/triage-vitals";
 import TherapyPage from "@/pages/therapy";
-import TherapyForms from "@/pages/therapy-forms";
+import TherapyForms from "@/pages/therapy-forms-simple";
 import Appointments from "@/pages/appointments";
 import Laboratory from "@/pages/laboratory";
 import Pharmacy from "@/pages/pharmacy";
