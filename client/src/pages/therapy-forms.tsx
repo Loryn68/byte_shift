@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Download, FileText, Calendar, Users, Brain } from "lucide-react";
+import { ArrowLeft, Download, FileText, Calendar, Users, Brain, Shield, Activity, Heart, BookOpen, Printer } from "lucide-react";
 import { useLocation } from "wouter";
 
 const TherapyForms = () => {
@@ -117,55 +117,264 @@ HYPERACTIVITY AND IMPULSIVITY SYMPTOMS
       `
     },
     {
-      title: "Addiction Severity Index (ASI)",
-      description: "Comprehensive assessment tool for substance abuse evaluation",
+      title: "Addiction Severity Index (ASI) - 5th Edition",
+      description: "Clinical/Training Version - Comprehensive assessment tool for substance abuse evaluation",
       category: "Assessment",
       icon: <FileText className="h-5 w-5" />,
       content: `
-ADDICTION SEVERITY INDEX (ASI)
+ADDICTION SEVERITY INDEX - 5TH EDITION
+Clinical/Training Version
 
-The ASI addresses 7 main aspects of a person's behavior and environment:
+A. Thomas McLellan, Ph.D., Deni Carise, Ph.D., Thomas H. Coyne, MSW, T. Ron Jackson, MSW
 
-1. MEDICAL STATUS
-   - How many days have you experienced medical problems in the past 30 days?
-   - Are you taking any prescribed medication on a regular basis for a physical problem?
+Remember: This is an interview, not a test
 
-2. EMPLOYMENT/SUPPORT STATUS
-   - Level of education completed?
-   - How long was your longest full-time job?
-   - How many people depend on you for the majority of their food, shelter, etc.?
+INTRODUCING THE ASI: Introduce and explain the seven potential problem areas: Medical, Employment/Support Status, Alcohol, Drug, Legal, Family/Social, and Psychiatric. All clients receive this same standard interview. All information gathered is confidential.
 
-3. ALCOHOL USE
-   - How many times in your life have you been treated for alcohol abuse?
-   - How many days have you been treated in an outpatient setting for alcohol in the past 30 days?
+There are two time periods we will discuss:
+1. The past 30 days
+2. Lifetime
 
-4. DRUG USE
-   - How much money would you say you spent during the past 30 days on drugs?
-   - How many days have you been treated in an outpatient setting for drugs in the past 30 days?
+Patient Rating Scale: Patient input is important. For each area, I will ask you to use this scale to let me know how bothered you have been by any problems in each section.
 
-5. LEGAL STATUS
-   - How many times in your life have you been arrested and charged with shoplifting or vandalism?
-   - How many times in your life have you been charged with driving while intoxicated?
-   - Are you presently awaiting charges, trial, or sentencing?
-
-6. FAMILY/SOCIAL RELATIONSHIPS
-   - Do you live with anyone who uses non-prescribed drugs?
-   - How many close friends do you have?
-   - Has anyone ever abused you?
-
-7. PSYCHIATRIC STATUS
-   - How many times have you been treated for any psychological or emotional problems?
-   - Have you had a significant period of time (that was not a direct result of drug/alcohol use) in which you have experienced serious anxiety or tension?
-
-Patient Rating Scale (0-4):
+The scale is:
 0 - Not at all
-1 - Slightly
+1 - Slightly  
 2 - Moderately
 3 - Considerably
 4 - Extremely
 
-How bothered have you been by these problems in the past 30 days?
-How important to you now is treatment for these problems?
+HOLLINGSHEAD CATEGORIES:
+1. Higher execs, major professionals, owners of large businesses
+2. Business managers, lesser professions (nurses, teachers, social workers)
+3. Administrative personnel, managers, minor professionals, small business owners
+4. Clerical and sales, technicians, small businesses
+5. Skilled manual - usually having had training (electrician, mechanic, police, plumber)
+6. Semi-skilled (hospital aide, bartender, bus driver, cook, machine operator)
+7. Unskilled (attendant, janitor, construction helper, porter, unemployed)
+
+LIST OF COMMONLY USED DRUGS:
+Alcohol: Beer, wine, liquor
+Methadone: Dolophine, LAAM
+Opiates: Pain killers (Morphine, Percocet, Codeine, Fentanyl)
+Barbiturates: Nembutal, Seconal, Phenobarbital
+Sedatives/Hypnotics/Tranquilizers: Valium, Librium, Ativan, Xanax
+Cocaine: Cocaine Crystal, Free-Base Cocaine or "Crack"
+Cannabis: Marijuana, hashish
+Hallucinogens: LSD, mescaline, PCP, ecstasy
+Inhalants: Glue, paint thinner, gasoline
+      `
+    },
+    {
+      title: "Beck Depression Inventory (BDI)",
+      description: "Self-scored depression assessment questionnaire",
+      category: "Assessment", 
+      icon: <Brain className="h-5 w-5" />,
+      content: `
+BECK'S DEPRESSION INVENTORY
+
+This depression inventory can be self-scored. The scoring scale is at the end of the questionnaire.
+
+Instructions: For each group of statements, pick the one that best describes how you have been feeling during the past two weeks, including today.
+
+1. Sadness
+   0 I do not feel sad.
+   1 I feel sad
+   2 I am sad all the time and I can't snap out of it.
+   3 I am so sad and unhappy that I can't stand it.
+
+2. Pessimism
+   0 I am not particularly discouraged about the future.
+   1 I feel discouraged about the future.
+   2 I feel I have nothing to look forward to.
+   3 I feel the future is hopeless and that things cannot improve.
+
+3. Past Failure
+   0 I do not feel like a failure.
+   1 I feel I have failed more than the average person.
+   2 As I look back on my life, all I can see is a lot of failures.
+   3 I feel I am a complete failure as a person.
+
+4. Loss of Pleasure
+   0 I get as much satisfaction out of things as I used to.
+   1 I don't enjoy things the way I used to.
+   2 I don't get real satisfaction out of anything anymore.
+   3 I am dissatisfied or bored with everything.
+
+5. Guilty Feelings
+   0 I don't feel particularly guilty
+   1 I feel guilty a good part of the time.
+   2 I feel quite guilty most of the time.
+   3 I feel guilty all of the time.
+
+[Continue through all 21 items...]
+
+INTERPRETING THE BECK DEPRESSION INVENTORY:
+Add up the score for each question. Highest possible total: 63. Lowest possible: 0.
+
+Scoring:
+0-13: Minimal depression
+14-19: Mild depression  
+20-28: Moderate depression
+29-63: Severe depression
+      `
+    },
+    {
+      title: "AUDIT Alcohol Screening Tool",
+      description: "Alcohol Use Disorders Identification Test for detecting risky drinking patterns",
+      category: "Assessment",
+      icon: <FileText className="h-5 w-5" />,
+      content: `
+AUDIT ALCOHOL SCREENING TOOL
+
+The AUDIT (Alcohol Use Disorders Identification Test) is an effective and reliable screening tool for detecting risky and harmful drinking patterns.
+
+INSTRUCTIONS:
+1. Answer the following questions about your alcohol use during the past 12 months.
+2. Circle one box that best describes your answer to each question.
+3. When completed, SCORE them and put your total score in the box.
+
+1. How often do you have a drink containing alcohol?
+   0 Never   1 Monthly or less   2 2-4 times a month   3 2-3 times a week   4 4+ times a week
+
+2. How many drinks containing alcohol do you have on a typical day when you are drinking?
+   0 1 or 2   1 3 or 4   2 5 or 6   3 7 to 9   4 10 or more
+
+3. How often do you have six or more standard drinks on one occasion?
+   0 Never   1 Less than monthly   2 Monthly   3 Weekly   4 Daily or almost daily
+
+4. How often during the last year have you found that you were not able to stop drinking once you had started?
+   0 Never   1 Less than monthly   2 Monthly   3 Weekly   4 Daily or almost daily
+
+5. How often during the last year have you failed to do what was normally expected of you because of drinking?
+   0 Never   1 Less than monthly   2 Monthly   3 Weekly   4 Daily or almost daily
+
+6. How often during the last year have you needed a drink first thing in the morning to get yourself going after a heavy drinking session?
+   0 Never   1 Less than monthly   2 Monthly   3 Weekly   4 Daily or almost daily
+
+7. How often during the last year have you had a feeling of guilt or remorse after drinking?
+   0 Never   1 Less than monthly   2 Monthly   3 Weekly   4 Daily or almost daily
+
+8. How often during the last year have you been unable to remember what happened the night before because you had been drinking?
+   0 Never   1 Less than monthly   2 Monthly   3 Weekly   4 Daily or almost daily
+
+9. Have you or someone else been injured as a result of your drinking?
+   0 No   2 Yes, but not in the last year   4 Yes, during the last year
+
+10. Has a relative or friend or a doctor or another health worker been concerned about your drinking or suggested you cut down?
+    0 No   2 Yes, but not in the last year   4 Yes, during the last year
+
+SCORING:
+0-7: Lower risk
+8-15: Hazardous drinking
+16-19: Harmful drinking  
+20+: Possible alcohol dependence
+      `
+    },
+    {
+      title: "PCL-5 PTSD Checklist",
+      description: "Standard PTSD assessment tool for detecting trauma symptoms",
+      category: "Assessment",
+      icon: <Shield className="h-5 w-5" />,
+      content: `
+PCL-5 PTSD CHECKLIST
+
+The PCL-5 is a 20-item self-report measure that assesses the 20 DSM-5 symptoms of PTSD.
+
+Instructions: Below is a list of problems and complaints that people sometimes have in response to stressful life experiences. Please read each problem carefully and then circle one of the numbers to the right to indicate how much you have been bothered by that problem in the past month.
+
+Response Options:
+0 = Not at all
+1 = A little bit  
+2 = Moderately
+3 = Quite a bit
+4 = Extremely
+
+In the past month, how much were you bothered by:
+
+1. Repeated, disturbing, and unwanted memories of the stressful experience?
+2. Repeated, disturbing dreams of the stressful experience?
+3. Suddenly feeling or acting as if the stressful experience were actually happening again?
+4. Feeling very upset when something reminded you of the stressful experience?
+5. Having strong physical reactions when something reminded you of the stressful experience?
+6. Avoiding memories, thoughts, or feelings related to the stressful experience?
+7. Avoiding external reminders of the stressful experience?
+8. Trouble remembering important parts of the stressful experience?
+9. Having strong negative beliefs about yourself, other people, or the world?
+10. Blaming yourself or someone else for the stressful experience or what happened after it?
+11. Having strong negative feelings such as fear, horror, anger, guilt, or shame?
+12. Loss of interest in activities that you used to enjoy?
+13. Feeling distant or cut off from other people?
+14. Trouble experiencing positive feelings?
+15. Irritable behavior, angry outbursts, or acting aggressively?
+16. Taking too many risks or doing things that could cause you harm?
+17. Being "super alert" or watchful or on guard?
+18. Feeling jumpy or easily startled?
+19. Having difficulty concentrating?
+20. Trouble falling or staying asleep?
+
+SCORING:
+A provisional PTSD diagnosis can be made by treating each item rated as 2 = "Moderately" or higher as a symptom endorsed, then following the DSM-5 diagnostic rule which requires at least: 1 B item (questions 1-5), 1 C item (questions 6-7), 2 D items (questions 8-14), and 2 E items (questions 15-20).
+
+Total Score: _____ (Sum of all items; range 0-80)
+      `
+    },
+    {
+      title: "Bipolar Disorder Assessment", 
+      description: "Screening tool for identifying bipolar disorder symptoms",
+      category: "Assessment",
+      icon: <Activity className="h-5 w-5" />,
+      content: `
+BIPOLAR DISORDER SCREENING
+
+Bipolar disorder is a mental health condition characterized by extreme mood swings that include emotional highs (mania or hypomania) and lows (depression).
+
+MANIC EPISODE SYMPTOMS:
+During a manic episode, you may experience:
+
+□ Abnormally upbeat, jumpy or wired
+□ Increased activity, energy or agitation
+□ Exaggerated sense of well-being and self-confidence (euphoria)
+□ Decreased need for sleep
+□ Unusual talkativeness
+□ Racing thoughts
+□ Distractibility
+□ Poor decision-making — for example, going on buying sprees, taking sexual risks or making foolish investments
+
+HYPOMANIC EPISODE SYMPTOMS:
+A hypomanic episode includes the same symptoms as a manic episode, but they are less severe and don't cause significant problems in social or work functioning.
+
+MAJOR DEPRESSIVE EPISODE SYMPTOMS:
+During a major depressive episode, symptoms may include:
+
+□ Depressed mood, such as feeling sad, empty, hopeless or tearful
+□ Marked loss of interest or feeling no pleasure in all — or almost all — activities
+□ Significant weight loss when not dieting, weight gain, or decrease or increase in appetite
+□ Either insomnia or sleeping too much
+□ Either restlessness or slowed behavior
+□ Fatigue or loss of energy
+□ Feelings of worthlessness or excessive or inappropriate guilt
+□ Diminished ability to think or concentrate, or indecisiveness
+□ Thinking about, planning or attempting suicide
+
+SCREENING QUESTIONS:
+
+1. Have you ever had a period of time when you were not your usual self and...
+   □ You felt so good or so hyper that other people thought you were not your normal self?
+   □ You were so irritable that you shouted at people or started fights or arguments?
+   □ You felt much more self-confident than usual?
+   □ You got much less sleep than usual and found you didn't really miss it?
+   □ You were much more talkative or spoke much faster than usual?
+
+2. If you checked YES to more than one of the above, have several of these ever happened during the same period of time?
+
+3. How much of a problem did any of these cause you?
+   □ No problem
+   □ Minor problem  
+   □ Moderate problem
+   □ Serious problem
+
+Note: This is a screening tool only. Professional diagnosis requires comprehensive clinical evaluation.
       `
     }
   ];
@@ -290,6 +499,141 @@ Break larger goals into smaller, achievable steps to build confidence and moment
 
 10. CELEBRATE SMALL WINS
 Acknowledge and celebrate your progress, no matter how small the achievement.
+      `
+    },
+    {
+      title: "Confronting Avoidance - ACT Skill",
+      description: "ACT skill worksheet for addressing avoidance behaviors",
+      category: "Coping Skills",
+      icon: <Brain className="h-5 w-5" />,
+      content: `
+CONFRONTING AVOIDANCE - ACT SKILL
+
+It's normal to avoid or push away whatever feels intense or uncomfortable, but this only works for a while. Over time, resisting difficult thoughts and emotions makes them worse and drains your vitality.
+
+COMMONLY AVOIDED EXPERIENCES:
+
+THOUGHTS: Thoughts that evoke strong emotions, have disturbing content, or trigger anxiety
+EMOTIONS: Any intense feelings, especially heavier states such as guilt, anger, or grief  
+SENSATIONS: Physical discomfort or actual pain, particularly when part of a chronic condition
+
+TYPICAL AVOIDANCE STRATEGIES:
+
+DISTRACTION: While useful in small doses, distraction quickly becomes a way of resisting what you're experiencing. Examples include excessively watching TV, checking your phone, or overworking.
+
+DENIAL: This involves pushing away difficult internal states so you don't have to acknowledge or deal with them. Denial can work short term, but soon traps you in a fantasy world.
+
+PROJECTION: When you don't like what you're feeling, you may externalize it onto others. This allows you to avoid taking ownership of your feelings.
+
+OPTING OUT: If you're unwilling to confront tough emotions, you may avoid people, places, and situations that are likely to bring up uncomfortable feelings.
+
+EXERCISES:
+
+1. Name what you are avoiding.
+What do you push away most (e.g., anger, physical pain, difficult thought, etc.)?
+
+What's the cost of avoiding this and how could you benefit from confronting it?
+
+2. Examine your limiting beliefs.
+Write down two beliefs related to what you listed, such as the belief that certain emotions are dangerous, wrong, or proof of weakness.
+
+Are these beliefs 100% true? If not, what would be a more balanced view?
+
+3. Welcome your difficult experiences.
+Identify a situation that often brings up the undesired thought, emotion, or sensation.
+
+Describe two ways you can welcome this experience the next time it arises.
+
+© 2023 Therapist Aid LLC
+      `
+    },
+    {
+      title: "Being Assertive and Vocal",
+      description: "Techniques for developing assertiveness and confident communication",
+      category: "Self-Care",
+      icon: <Users className="h-5 w-5" />,
+      content: `
+BEING ASSERTIVE AND VOCAL
+
+Assertiveness is a communication style. It is the ability to honestly and appropriately express your feelings, thoughts, beliefs, opinions, attitudes and rights, in an open manner without undue anxiety, in a way that doesn't infringe on the rights of others.
+
+TOP 10 TIPS FOR ASSERTIVENESS:
+
+1. USE EMPOWERED VERBAL AND BODY LANGUAGE
+Replace 'but' with 'and,' 'I should' with 'I will' and 'I'll try to' with 'I'll aim to.' Project confidence with good posture and eye contact.
+
+2. GET OUT OF YOUR COMFORT ZONE
+Nothing changes if nothing changes. Practice makes perfect and like a muscle, assertiveness needs limbering up to work at its strongest.
+
+3. FOCUS ON CLEAR AND CALM COMMUNICATION
+Stay calm, clear-headed and collected. Keep emotion out of it, keep it professional. Stick to the facts to support your opinions – don't exaggerate.
+
+4. BE TRUE TO YOURSELF
+Staying true to your values allows you to be more confident. People can sense authenticity from miles away.
+
+5. DON'T BE AFRAID TO SPEAK UP AND SHARE YOUR THOUGHTS. BE DIRECT.
+If you've struck the balance between assertiveness and arrogance, you needn't worry about offending anyone by expressing your opinion, provided you can back up your points.
+
+6. UNDERSTAND THE DIFFERENCE BETWEEN ASSERTIVENESS AND ARROGANCE
+Assertive: Open to other opinions, listens to others, acts constructively and inclusively, states opinion decisively
+Arrogant: Believes only their opinion matters, ignores everyone else, dictates, shouts and argues
+
+7. OBSERVE ASSERTIVE ROLE MODELS
+Study the body language and expression of people who exude the confidence you wish you could have.
+
+8. PRACTICE SAYING NO
+Learn to decline requests that don't align with your priorities or values. Always offer an alternative when possible.
+
+BENEFITS OF BEING ASSERTIVE:
+- Gain self-confidence and self-esteem
+- Understand and recognize your feelings
+- Earn respect from others
+- Improve communication
+- Create win-win situations
+- Improve decision-making skills
+- Create honest relationships
+      `
+    },
+    {
+      title: "Being at Peace with Self",
+      description: "Strategies for finding inner peace and self-acceptance",
+      category: "Mindset",
+      icon: <Brain className="h-5 w-5" />,
+      content: `
+BEING AT PEACE WITH SELF
+
+"He who lives in harmony with himself lives in harmony with the world." ~Marcus Aurelius
+
+How can I find peace of mind? The answer lies in what you do. You create your state of mind by the things you do, and you cement that by the things you tell yourself.
+
+As long as I behave with integrity every day, I can feel at peace with myself.
+
+Things will always change. Life will sometimes be tough. People will say and do things that upset you. That's just the nature of things. As long as you hang onto your integrity, no matter what is happening in your world, you can go to bed with a clear conscience.
+
+TIPS TO HELP YOU CULTIVATE A SENSE OF PEACE:
+
+1. KNOW YOUR IDEAL SELF
+Make a list of all the good qualities you intend to cultivate. Are you going to be kinder, fairer, more tolerant, more patient, more dignified? What principles do you wish to uphold?
+
+2. DO THE NEXT RIGHT THING
+If you've been struggling emotionally or mentally, it may be difficult to act with integrity all the time. Practice doing the "next right thing" all the time to build up this habit.
+
+3. LET GO OF PERFECTIONISM
+Validate the attempts you're making to do the right thing even when things are a struggle. Allow yourself to be imperfect, and yet still make progress.
+
+4. MAKE AMENDS IMMEDIATELY
+When you do something that goes against your values, make it right as soon as possible. Apologize, make amends, and commit to doing better.
+
+5. PRACTICE SELF-COMPASSION
+Treat yourself with the same kindness you would show a good friend. Acknowledge your mistakes without harsh self-judgment.
+
+6. LIVE BY YOUR VALUES
+Identify what matters most to you and make decisions that align with those values, even when it's difficult.
+
+7. CULTIVATE GRATITUDE
+Regularly acknowledge the good things in your life, no matter how small they may seem.
+
+Remember: Peace of mind comes from acting with integrity and treating yourself with compassion, not from external circumstances or achievements.
       `
     }
   ];
