@@ -83,10 +83,7 @@ export default function TherapyPage() {
   // Session mutation
   const sessionMutation = useMutation({
     mutationFn: async (sessionData: SessionData) => {
-      return apiRequest("/api/therapy-sessions", {
-        method: "POST",
-        body: JSON.stringify(sessionData),
-      });
+      return await apiRequest("POST", "/api/therapy-sessions", sessionData);
     },
     onSuccess: () => {
       toast({

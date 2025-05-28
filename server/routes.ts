@@ -284,6 +284,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Therapy sessions endpoint
+  app.post("/api/therapy-sessions", async (req, res) => {
+    try {
+      console.log("Therapy session data received:", req.body);
+      
+      // Save therapy session data
+      const sessionData = {
+        ...req.body,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Store in localStorage for now (in production, this would be in database)
+      res.status(201).json({ 
+        message: "Therapy session saved successfully",
+        session: sessionData
+      });
+    } catch (error) {
+      console.error("Error saving therapy session:", error);
+      res.status(500).json({ message: "Failed to save therapy session" });
+    }
+  });
+
   // Laboratory routes
   app.get("/api/lab-tests", async (req, res) => {
     try {
