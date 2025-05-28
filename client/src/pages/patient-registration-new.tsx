@@ -169,6 +169,18 @@ export default function PatientRegistration() {
         console.log("Created billing record:", billingRecord);
       }
 
+      // Set patient type based on service
+      let updatedPatientType = "outpatient";
+      if (data.registerFor === "counseling-3000" || data.registerFor === "family-counseling-3000") {
+        updatedPatientType = "therapy";
+      }
+
+      // Update patient with correct type
+      await apiRequest("PUT", `/api/patients/${createdPatient.id}`, {
+        patientType: updatedPatientType,
+        serviceType: getServiceDetails(data.registerFor || "").name
+      });
+
       // Set patient department based on registration type
       const department = data.registerFor === "laboratory-only" ? "laboratory" :
                         data.registerFor === "pharmacy-only" ? "pharmacy" : "outpatient";

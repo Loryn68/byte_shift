@@ -65,10 +65,10 @@ export default function TherapyPage() {
   const therapyPatients = useMemo(() => {
     return patients.filter((patient: any) => 
       patient.patientType === 'therapy' ||
-      (patient.patientType === 'outpatient' && 
-       (patient.serviceType === 'Counseling' || 
-        patient.serviceType === 'therapy' || 
-        patient.serviceType === 'counseling'))
+      patient.serviceType === 'Counseling' ||
+      patient.serviceType === 'Family Counseling' ||
+      patient.serviceType === 'therapy' ||
+      patient.serviceType === 'counseling'
     );
   }, [patients]);
 

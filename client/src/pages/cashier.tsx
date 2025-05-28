@@ -81,12 +81,36 @@ export default function Cashier() {
       
       return await apiRequest("PUT", `/api/billing/${id}`, updateData);
     },
-    onSuccess: () => {
-      toast({
-        title: "Payment Processed",
-        description: "Payment has been processed successfully.",
-      });
+    onSuccess: async (response, variables) => {
+      // Find the billing record to check service type
+      const currentBill = billingRecords.find((bill: any) => bill.id === variables.id);
+      
+      if (currentBill) {
+        // If it's a therapy/counseling service, update patient status for therapy workflow
+        if (currentBill.serviceType === 'Counseling' || 
+            currentBill.serviceType === 'Family Counseling' ||
+            currentBill.serviceType === 'therapy') {
+          
+          // Update patient to be ready for therapy (bypass triage)
+          await apiRequest("PUT", `/api/patients/${currentBill.patientId}`, {
+            patientType: "therapy",
+            status: "paid-ready-for-therapy"
+          });
+          
+          toast({
+            title: "Payment Processed - Therapy Patient",
+            description: "Patient can now proceed directly to therapy services (no triage required).",
+          });
+        } else {
+          toast({
+            title: "Payment Processed",
+            description: "Payment has been processed successfully.",
+          });
+        }
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["/api/billing"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
       setPaymentDialog({ isOpen: false, bill: null, method: null });
       setPaymentData({ amountReceived: '', transactionNumber: '' });
     },
