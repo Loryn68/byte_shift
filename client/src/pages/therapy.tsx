@@ -480,6 +480,17 @@ export default function TherapyPage() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedPatient(patient);
+                        setShowSessionModal(true);
+                      }}
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Start Therapy
+                    </Button>
+                    <Button
                       variant="outline"
                       size="sm"
                       onClick={() => {
@@ -504,9 +515,14 @@ export default function TherapyPage() {
 
       {/* Session Scheduling Modal */}
       <Dialog open={showSessionModal} onOpenChange={setShowSessionModal}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Schedule Therapy Session</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-green-700">
+              Start Therapy Session - {selectedPatient?.firstName} {selectedPatient?.lastName}
+            </DialogTitle>
+            <div className="text-sm text-gray-600">
+              Patient ID: {selectedPatient?.patientId} | Age: {selectedPatient?.dateOfBirth ? new Date().getFullYear() - new Date(selectedPatient.dateOfBirth).getFullYear() : 'N/A'} years
+            </div>
           </DialogHeader>
           {selectedPatient && <TherapySessionForm patient={selectedPatient} />}
         </DialogContent>
