@@ -289,9 +289,9 @@ export default function PatientRegistration() {
           <div className="mt-2">
             <Button 
               onClick={() => setShowPatientList(!showPatientList)}
-              className="w-full mb-3 bg-green-400 hover:bg-green-500 text-white font-medium text-xs sm:text-sm px-1 sm:px-2 py-2 h-auto leading-tight"
+              className="w-full mb-3 bg-green-400 hover:bg-green-500 text-white font-medium text-xs px-2 py-2 h-auto leading-tight"
             >
-              <span className="break-words text-center">Load List of Registered Patients</span>
+              <span className="text-center">Patient Registry</span>
             </Button>
             
             {showPatientList && (
