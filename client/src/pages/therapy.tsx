@@ -123,6 +123,12 @@ export default function TherapyPage() {
       notes: "",
     });
 
+    const [referralData, setReferralData] = useState({
+      consultationType: "",
+      consultationAmount: 0,
+      consultationName: ""
+    });
+
     const [activeTab, setActiveTab] = useState("session");
 
     const handleSubmit = () => {
@@ -130,33 +136,54 @@ export default function TherapyPage() {
     };
 
     const handleReferToDoctor = async () => {
+      if (!referralData.consultationType) {
+        toast({
+          title: "Consultation Type Required",
+          description: "Please select a consultation type before referring to doctor.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       try {
-        const referralData = {
+        // Create billing record for the consultation
+        const billingDataForReferral = {
           patientId: patient.id,
-          type: "Psychiatric Consultation",
+          serviceType: referralData.consultationName,
+          serviceDescription: referralData.consultationName,
+          amount: referralData.consultationAmount.toFixed(2),
+          totalAmount: referralData.consultationAmount.toFixed(2),
+          paymentStatus: "pending"
+        };
+        
+        await apiRequest("POST", "/api/billing", billingDataForReferral);
+
+        // Create appointment with therapy findings
+        const appointmentData = {
+          patientId: patient.id,
+          type: "therapy-referral",
           doctorId: 1,
           appointmentDate: new Date().toISOString().split('T')[0],
           department: "Mental Health",
           status: "pending",
+          consultationType: referralData.consultationType,
           therapyFindings: sessionData.counselorFindings,
           patientResponse: sessionData.patientResponse,
           riskAssessment: sessionData.riskAssessment,
           recommendedTreatment: sessionData.recommendedTreatment,
           referralReason: sessionData.referralReason,
-          notes: `THERAPY REFERRAL:\n\nCounselor Findings: ${sessionData.counselorFindings}\n\nPatient Response: ${sessionData.patientResponse}\n\nRisk Assessment: ${sessionData.riskAssessment}\n\nRecommended Treatment: ${sessionData.recommendedTreatment}\n\nReferral Reason: ${sessionData.referralReason}\n\nReferred by: ${sessionData.therapistName}\nSession Date: ${sessionData.sessionDate}`
+          notes: `THERAPY REFERRAL:\n\nCounselor Findings: ${sessionData.counselorFindings}\n\nPatient Response: ${sessionData.patientResponse}\n\nRisk Assessment: ${sessionData.riskAssessment}\n\nRecommended Treatment: ${sessionData.recommendedTreatment}\n\nReferral Reason: ${sessionData.referralReason}\n\nReferred by: ${sessionData.therapistName}\nSession Date: ${sessionData.sessionDate}\n\nConsultation Type: ${referralData.consultationName}`
         };
 
-        await apiRequest('/api/appointments', {
-          method: 'POST',
-          body: JSON.stringify(referralData)
-        });
+        await apiRequest("POST", "/api/appointments", appointmentData);
 
         toast({
           title: "Patient Referred Successfully",
-          description: "Patient has been referred to doctor with therapy findings. They will need to visit the cashier for payment before consultation.",
+          description: `Patient referred for ${referralData.consultationName}. They must visit cashier for payment (KShs ${referralData.consultationAmount}) before consultation.`,
         });
         setShowSessionModal(false);
         queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/billing"] });
       } catch (error) {
         toast({
           title: "Referral Error",
@@ -372,6 +399,47 @@ export default function TherapyPage() {
               </p>
               
               <div className="space-y-4">
+                <div>
+                  <Label htmlFor="consultationType">Select Consultation Type</Label>
+                  <select 
+                    id="consultationType"
+                    value={referralData.consultationType}
+                    onChange={(e) => {
+                      const selectedValue = e.target.value;
+                      const serviceMap: Record<string, { name: string; amount: number }> = {
+                        "child-consultation": { name: "Child Consultation", amount: 200 },
+                        "psychiatric-consultation-5000": { name: "Psychiatric Consultation", amount: 5000 },
+                        "psychiatric-consultation-3000": { name: "Psychiatric Consultation", amount: 3000 },
+                        "psychiatric-review-5000": { name: "Psychiatric Review", amount: 5000 },
+                        "psychiatric-review-3000": { name: "Psychiatric Review", amount: 3000 },
+                        "medical-consultation-300": { name: "Medical Consultation", amount: 300 },
+                        "medical-review-300": { name: "Medical Review", amount: 300 }
+                      };
+                      const serviceDetails = serviceMap[selectedValue] || { name: "", amount: 0 };
+                      setReferralData({
+                        consultationType: selectedValue,
+                        consultationAmount: serviceDetails.amount,
+                        consultationName: serviceDetails.name
+                      });
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">-- Select Consultation Type --</option>
+                    <option value="child-consultation">Child Consultation (KShs 200)</option>
+                    <option value="psychiatric-consultation-5000">Psychiatric Consultation (KShs 5,000)</option>
+                    <option value="psychiatric-consultation-3000">Psychiatric Consultation (KShs 3,000)</option>
+                    <option value="psychiatric-review-5000">Psychiatric Review (KShs 5,000)</option>
+                    <option value="psychiatric-review-3000">Psychiatric Review (KShs 3,000)</option>
+                    <option value="medical-consultation-300">Medical Consultation (KShs 300)</option>
+                    <option value="medical-review-300">Medical Review (KShs 300)</option>
+                  </select>
+                  {referralData.consultationType && (
+                    <p className="text-sm text-blue-600 mt-2">
+                      Selected: {referralData.consultationName} - KShs {referralData.consultationAmount}
+                    </p>
+                  )}
+                </div>
+
                 <div>
                   <Label htmlFor="recommendedTreatment">Recommended Medical Treatment</Label>
                   <Textarea
