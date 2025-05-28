@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 import { 
   Users, 
   Calendar, 
@@ -29,6 +30,7 @@ export default function TherapyPage() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -500,10 +502,7 @@ export default function TherapyPage() {
                     <Button
                       className="bg-green-600 hover:bg-green-700 text-white"
                       size="sm"
-                      onClick={() => {
-                        setSelectedPatient(patient);
-                        setShowSessionModal(true);
-                      }}
+                      onClick={() => setLocation("/therapy-forms")}
                     >
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Start Therapy

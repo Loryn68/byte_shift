@@ -13,6 +13,7 @@ import ConsultationInterface from "@/pages/consultation-interface-enhanced";
 import InpatientManagement from "@/pages/inpatient-management";
 import TriageVitals from "@/pages/triage-vitals";
 import TherapyPage from "@/pages/therapy";
+import TherapyForms from "@/pages/therapy-forms";
 import Appointments from "@/pages/appointments";
 import Laboratory from "@/pages/laboratory";
 import Pharmacy from "@/pages/pharmacy";
@@ -46,6 +47,7 @@ function Router() {
             <Route path="/cashier" component={Cashier} />
             <Route path="/triage" component={TriageVitals} />
             <Route path="/therapy" component={TherapyPage} />
+            <Route path="/therapy-forms" component={TherapyForms} />
             <Route path="/outpatient" component={OutpatientConsultation} />
             <Route path="/consultation/:patientId" component={ConsultationInterface} />
             <Route path="/inpatient" component={InpatientManagement} />
