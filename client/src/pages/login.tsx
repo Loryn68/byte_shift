@@ -49,8 +49,8 @@ export default function LoginPage() {
                 Healthcare Management System
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                Comprehensive pediatric mental health platform providing compassionate, 
-                technology-driven care management for young patients through intuitive 
+                Comprehensive mental health platform providing compassionate, 
+                technology-driven care management for young and adult patients through intuitive 
                 and supportive digital interfaces.
               </p>
             </div>
