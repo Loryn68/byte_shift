@@ -61,16 +61,37 @@ export default function TherapyPage() {
     queryKey: ["/api/patients"],
   });
 
-  // Filter therapy patients
+  // Fetch therapy sessions to track completed sessions
+  const { data: therapySessions = [] } = useQuery({
+    queryKey: ["/api/therapy-sessions"],
+  });
+
+  // Filter therapy patients (exclude those who have completed sessions today)
   const therapyPatients = useMemo(() => {
-    return patients.filter((patient: any) => 
-      patient.patientType === 'therapy' ||
-      patient.serviceType === 'Counseling' ||
-      patient.serviceType === 'Family Counseling' ||
-      patient.serviceType === 'therapy' ||
-      patient.serviceType === 'counseling'
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Get patients who have completed therapy sessions today
+    const completedToday = new Set(
+      therapySessions
+        .filter((session: any) => 
+          session.sessionDate === today && 
+          session.status === 'completed'
+        )
+        .map((session: any) => session.patientId)
     );
-  }, [patients]);
+
+    return patients.filter((patient: any) => {
+      const isTherapyPatient = 
+        patient.patientType === 'therapy' ||
+        patient.serviceType === 'Counseling' ||
+        patient.serviceType === 'Family Counseling' ||
+        patient.serviceType === 'therapy' ||
+        patient.serviceType === 'counseling';
+      
+      // Only show therapy patients who haven't completed a session today
+      return isTherapyPatient && !completedToday.has(patient.id);
+    });
+  }, [patients, therapySessions]);
 
   // Filter patients based on search
   const filteredPatients = useMemo(() => {
@@ -83,15 +104,22 @@ export default function TherapyPage() {
   // Session mutation
   const sessionMutation = useMutation({
     mutationFn: async (sessionData: SessionData) => {
-      return await apiRequest("POST", "/api/therapy-sessions", sessionData);
+      // Automatically mark session as completed when saved
+      const completedSessionData = {
+        ...sessionData,
+        status: "completed"
+      };
+      return await apiRequest("POST", "/api/therapy-sessions", completedSessionData);
     },
     onSuccess: () => {
       toast({
-        title: "Session Saved",
-        description: "Therapy session has been saved successfully.",
+        title: "Session Completed",
+        description: "Therapy session has been completed and patient removed from waiting area.",
       });
       setShowSessionModal(false);
+      // Invalidate both patients and therapy sessions to refresh the waiting list
       queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/therapy-sessions"] });
     },
     onError: () => {
       toast({

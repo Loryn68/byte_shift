@@ -84,6 +84,7 @@ export class MemStorage implements IStorage {
   private medications: Map<number, Medication> = new Map();
   private prescriptions: Map<number, Prescription> = new Map();
   private billing: Map<number, Billing> = new Map();
+  private therapySessions: Map<number, TherapySession> = new Map();
   
   private currentUserId = 1;
   private currentPatientId = 1;
@@ -92,6 +93,7 @@ export class MemStorage implements IStorage {
   private currentMedicationId = 1;
   private currentPrescriptionId = 1;
   private currentBillingId = 1;
+  private currentTherapySessionId = 1;
 
   constructor() {
     this.seedInitialData();
@@ -530,6 +532,45 @@ export class MemStorage implements IStorage {
       todayRevenue,
       bedOccupancy: 89, // Mock bed occupancy percentage
     };
+  }
+
+  // Therapy session management
+  async getTherapySession(id: number): Promise<TherapySession | undefined> {
+    return this.therapySessions.get(id);
+  }
+
+  async createTherapySession(session: InsertTherapySession): Promise<TherapySession> {
+    const newSession: TherapySession = {
+      id: this.currentTherapySessionId++,
+      ...session,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    this.therapySessions.set(newSession.id, newSession);
+    return newSession;
+  }
+
+  async updateTherapySession(id: number, sessionUpdate: Partial<InsertTherapySession>): Promise<TherapySession | undefined> {
+    const session = this.therapySessions.get(id);
+    if (!session) return undefined;
+
+    const updatedSession: TherapySession = {
+      ...session,
+      ...sessionUpdate,
+      updatedAt: new Date(),
+    };
+
+    this.therapySessions.set(id, updatedSession);
+    return updatedSession;
+  }
+
+  async getTherapySessionsByPatient(patientId: number): Promise<TherapySession[]> {
+    return Array.from(this.therapySessions.values()).filter(session => session.patientId === patientId);
+  }
+
+  async getAllTherapySessions(): Promise<TherapySession[]> {
+    return Array.from(this.therapySessions.values());
   }
 }
 
