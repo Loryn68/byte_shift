@@ -1,9 +1,9 @@
 import { 
-  users, patients, appointments, labTests, medications, prescriptions, billing,
+  users, patients, appointments, labTests, medications, prescriptions, billing, therapySessions,
   type User, type InsertUser, type Patient, type InsertPatient,
   type Appointment, type InsertAppointment, type LabTest, type InsertLabTest,
   type Medication, type InsertMedication, type Prescription, type InsertPrescription,
-  type Billing, type InsertBilling
+  type Billing, type InsertBilling, type TherapySession, type InsertTherapySession
 } from "@shared/schema";
 
 export interface IStorage {
@@ -58,6 +58,13 @@ export interface IStorage {
   updateBilling(id: number, billing: Partial<InsertBilling>): Promise<Billing | undefined>;
   getBillingByPatient(patientId: number): Promise<Billing[]>;
   getAllBilling(): Promise<Billing[]>;
+  
+  // Therapy session management
+  getTherapySession(id: number): Promise<TherapySession | undefined>;
+  createTherapySession(session: InsertTherapySession): Promise<TherapySession>;
+  updateTherapySession(id: number, session: Partial<InsertTherapySession>): Promise<TherapySession | undefined>;
+  getTherapySessionsByPatient(patientId: number): Promise<TherapySession[]>;
+  getAllTherapySessions(): Promise<TherapySession[]>;
   
   // Dashboard statistics
   getDashboardStats(): Promise<{

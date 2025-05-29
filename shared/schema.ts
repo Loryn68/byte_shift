@@ -218,3 +218,36 @@ export type InsertPrescription = z.infer<typeof insertPrescriptionSchema>;
 
 export type Billing = typeof billing.$inferSelect;
 export type InsertBilling = z.infer<typeof insertBillingSchema>;
+
+// Therapy Sessions table - track completed therapy sessions
+export const therapySessions = pgTable("therapy_sessions", {
+  id: serial("id").primaryKey(),
+  patientId: integer("patient_id").notNull(),
+  therapistName: text("therapist_name").notNull(),
+  sessionDate: date("session_date").notNull(),
+  sessionTime: text("session_time").notNull(),
+  sessionType: text("session_type").notNull(), // individual, group, family
+  duration: text("duration").notNull(),
+  status: text("status").notNull().default("completed"), // completed, cancelled, no-show
+  goals: text("goals"),
+  counselorFindings: text("counselor_findings"),
+  patientResponse: text("patient_response"),
+  riskAssessment: text("risk_assessment"),
+  interventions: text("interventions"),
+  homework: text("homework"),
+  nextSession: text("next_session"),
+  recommendedTreatment: text("recommended_treatment"),
+  referralReason: text("referral_reason"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertTherapySessionSchema = createInsertSchema(therapySessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type TherapySession = typeof therapySessions.$inferSelect;
+export type InsertTherapySession = z.infer<typeof insertTherapySessionSchema>;

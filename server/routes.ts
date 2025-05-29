@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPatientSchema, insertAppointmentSchema, insertLabTestSchema, insertMedicationSchema, insertPrescriptionSchema, insertBillingSchema } from "@shared/schema";
+import { insertPatientSchema, insertAppointmentSchema, insertLabTestSchema, insertMedicationSchema, insertPrescriptionSchema, insertBillingSchema, insertTherapySessionSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -284,27 +284,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Therapy sessions endpoint
+  // Therapy sessions endpoints
   app.post("/api/therapy-sessions", async (req, res) => {
     try {
-      console.log("Therapy session data received:", req.body);
-      
-      // Save therapy session data
-      const sessionData = {
-        ...req.body,
-        id: Date.now(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      
-      // Store in localStorage for now (in production, this would be in database)
-      res.status(201).json({ 
-        message: "Therapy session saved successfully",
-        session: sessionData
-      });
+      const validatedData = insertTherapySessionSchema.parse(req.body);
+      const session = await storage.createTherapySession(validatedData);
+      console.log("Therapy session saved:", session);
+      res.status(201).json(session);
     } catch (error) {
-      console.error("Error saving therapy session:", error);
-      res.status(500).json({ message: "Failed to save therapy session" });
+      console.error("Error creating therapy session:", error);
+      res.status(400).json({ message: "Invalid therapy session data" });
+    }
+  });
+
+  app.get("/api/therapy-sessions", async (req, res) => {
+    try {
+      const sessions = await storage.getAllTherapySessions();
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching therapy sessions:", error);
+      res.status(500).json({ message: "Failed to fetch therapy sessions" });
+    }
+  });
+
+  app.get("/api/therapy-sessions/patient/:patientId", async (req, res) => {
+    try {
+      const patientId = parseInt(req.params.patientId);
+      if (isNaN(patientId)) {
+        return res.status(400).json({ message: "Invalid patient ID" });
+      }
+      const sessions = await storage.getTherapySessionsByPatient(patientId);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching patient therapy sessions:", error);
+      res.status(500).json({ message: "Failed to fetch patient therapy sessions" });
     }
   });
 
