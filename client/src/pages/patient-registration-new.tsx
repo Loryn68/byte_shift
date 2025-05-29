@@ -1141,6 +1141,35 @@ export default function PatientRegistration() {
         </div>
       </div>
 
+      {/* Comprehensive Patient History Search Modal */}
+      {showPatientSearch && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-gray-800">Patient History Search</h2>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowPatientSearch(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </Button>
+              </div>
+              <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                <p className="text-blue-800 text-sm">
+                  <strong>Search for existing patients:</strong> Find patients like "Lorine Lorine Khanira" to access their complete medical history including:
+                  billing records, therapy sessions, appointments, prescriptions, and medical notes across all departments.
+                </p>
+              </div>
+              <PatientSearch 
+                onPatientSelect={handlePatientSelect}
+                selectedPatient={selectedPatient}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
