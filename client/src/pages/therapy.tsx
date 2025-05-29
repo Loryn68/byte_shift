@@ -101,24 +101,23 @@ export default function TherapyPage() {
     );
   }, [therapyPatients, searchTerm]);
 
-  // Session mutation
+  // Session mutation - saves notes but keeps session open for referrals/scheduling
   const sessionMutation = useMutation({
     mutationFn: async (sessionData: SessionData) => {
-      // Automatically mark session as completed when saved
-      const completedSessionData = {
+      // Keep session in progress to allow for referrals or scheduling
+      const sessionDataWithStatus = {
         ...sessionData,
-        status: "completed"
+        status: sessionData.status || "in-progress"
       };
-      return await apiRequest("POST", "/api/therapy-sessions", completedSessionData);
+      return await apiRequest("POST", "/api/therapy-sessions", sessionDataWithStatus);
     },
     onSuccess: () => {
       toast({
-        title: "Session Completed",
-        description: "Therapy session has been completed and patient removed from waiting area.",
+        title: "Session Notes Saved",
+        description: "Therapy notes have been saved. You can now refer patient or schedule next session.",
       });
-      setShowSessionModal(false);
-      // Invalidate both patients and therapy sessions to refresh the waiting list
-      queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+      // Don't close modal - keep it open for additional actions
+      // Refresh therapy sessions to show updated notes
       queryClient.invalidateQueries({ queryKey: ["/api/therapy-sessions"] });
     },
     onError: () => {
@@ -161,6 +160,77 @@ export default function TherapyPage() {
 
     const handleSubmit = () => {
       sessionMutation.mutate(sessionData);
+    };
+
+    const handleCompleteSession = async () => {
+      try {
+        // Mark session as completed and remove from waiting area
+        const completedSessionData = {
+          ...sessionData,
+          status: "completed"
+        };
+        
+        await sessionMutation.mutateAsync(completedSessionData);
+        
+        toast({
+          title: "Session Completed",
+          description: "Therapy session has been completed and patient removed from waiting area.",
+        });
+        
+        setShowSessionModal(false);
+        queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/therapy-sessions"] });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to complete therapy session.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    const handleScheduleNext = async () => {
+      if (!sessionData.nextSession) {
+        toast({
+          title: "Next Session Required",
+          description: "Please specify the next session date and time.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        // Save current session with next session details
+        await sessionMutation.mutateAsync(sessionData);
+        
+        // Create next appointment
+        const nextAppointmentData = {
+          patientId: patient.id,
+          doctorId: 1,
+          appointmentDate: new Date(sessionData.nextSession).toISOString(),
+          department: "Therapy",
+          type: "therapy-follow-up",
+          status: "scheduled",
+          notes: `Follow-up therapy session scheduled by ${sessionData.therapistName}`
+        };
+
+        await apiRequest("POST", "/api/appointments", nextAppointmentData);
+        
+        toast({
+          title: "Next Session Scheduled",
+          description: `Next therapy session scheduled for ${sessionData.nextSession}`,
+        });
+        
+        setShowSessionModal(false);
+        queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to schedule next session.",
+          variant: "destructive",
+        });
+      }
     };
 
     const handleReferToDoctor = async () => {
@@ -520,42 +590,124 @@ export default function TherapyPage() {
         )}
 
         {/* Action Buttons */}
-        <div className="flex justify-between items-center pt-6 border-t">
-          <div className="flex space-x-2">
-            {activeTab === "referral" && (
+        <div className="space-y-4 pt-6 border-t">
+          {/* Primary Actions Row */}
+          <div className="flex justify-between items-center">
+            <div className="flex space-x-2">
               <Button 
-                onClick={handleReferToDoctor}
+                onClick={() => setLocation("/therapy-forms")}
+                variant="outline"
+                className="border-green-200 text-green-700 hover:bg-green-50"
+              >
+                <Brain className="h-4 w-4 mr-2" />
+                Assessment Forms
+              </Button>
+            </div>
+            <div className="flex space-x-2">
+              <Button 
+                onClick={handleSubmit}
+                disabled={sessionMutation.isPending}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {sessionMutation.isPending ? "Saving..." : "Save Notes"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Session Workflow Actions */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-medium text-gray-800 mb-3">Session Actions</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* Complete Session */}
+              <Button 
+                onClick={handleCompleteSession}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Complete Session
+              </Button>
+
+              {/* Refer to Doctor */}
+              <Button 
+                onClick={() => setActiveTab("referral")}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
-                disabled={!referralData.consultationType}
               >
                 <FileText className="h-4 w-4 mr-2" />
                 Refer to Doctor
-                {referralData.consultationType && (
-                  <span className="ml-2 text-xs bg-blue-500 px-2 py-1 rounded">
-                    {referralData.consultationName}
-                  </span>
-                )}
               </Button>
+
+              {/* Schedule Next Session */}
+              <Button 
+                onClick={handleScheduleNext}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+                disabled={!sessionData.nextSession}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Schedule Next
+              </Button>
+            </div>
+
+            {/* Referral Section */}
+            {activeTab === "referral" && (
+              <div className="mt-4 p-4 bg-white rounded border">
+                <h5 className="font-medium text-gray-800 mb-3">Refer Patient to Doctor</h5>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium">Consultation Type:</Label>
+                    <Select 
+                      value={referralData.consultationType} 
+                      onValueChange={(value) => {
+                        const consultationTypes = {
+                          "general": { name: "General Consultation", amount: 2000 },
+                          "specialist": { name: "Specialist Consultation", amount: 3500 },
+                          "psychiatric": { name: "Psychiatric Evaluation", amount: 4000 },
+                          "emergency": { name: "Emergency Consultation", amount: 5000 }
+                        };
+                        const selected = consultationTypes[value as keyof typeof consultationTypes];
+                        setReferralData({
+                          consultationType: value,
+                          consultationAmount: selected?.amount || 0,
+                          consultationName: selected?.name || ""
+                        });
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select consultation type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">General Consultation - KShs 2,000</SelectItem>
+                        <SelectItem value="specialist">Specialist Consultation - KShs 3,500</SelectItem>
+                        <SelectItem value="psychiatric">Psychiatric Evaluation - KShs 4,000</SelectItem>
+                        <SelectItem value="emergency">Emergency Consultation - KShs 5,000</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button 
+                    onClick={handleReferToDoctor}
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                    disabled={!referralData.consultationType}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Confirm Referral
+                    {referralData.consultationType && (
+                      <span className="ml-2 text-xs bg-blue-500 px-2 py-1 rounded">
+                        KShs {referralData.consultationAmount}
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              </div>
             )}
-            <Button 
-              onClick={() => setLocation("/therapy-forms")}
-              variant="outline"
-              className="border-green-200 text-green-700 hover:bg-green-50"
-            >
-              <Brain className="h-4 w-4 mr-2" />
-              Assessment Forms
-            </Button>
+
+            <div className="mt-3 text-xs text-gray-600">
+              <strong>Workflow:</strong> Save notes first, then choose to complete session, refer patient, or schedule next appointment.
+            </div>
           </div>
-          <div className="flex space-x-2">
+
+          {/* Close Button */}
+          <div className="flex justify-center">
             <Button variant="outline" onClick={() => setShowSessionModal(false)}>
-              Close Session
-            </Button>
-            <Button 
-              onClick={handleSubmit}
-              disabled={sessionMutation.isPending}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {sessionMutation.isPending ? "Saving..." : "Save Session"}
+              Close Without Saving
             </Button>
           </div>
         </div>
