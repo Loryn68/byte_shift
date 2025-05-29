@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { workflowManager } from "@/lib/workflow-system";
 import logoPath from "@assets/image_1748235729903.png";
 import type { Patient } from "@shared/schema";
+import { PatientSearch } from "@/components/patient-search";
 
 const registrationSchema = z.object({
   firstName: z.string().min(1, "Baptismal name is required"),
@@ -44,6 +45,7 @@ export default function PatientRegistration() {
   const [showPatientList, setShowPatientList] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [showPatientSearch, setShowPatientSearch] = useState(false);
   const [referralFacility, setReferralFacility] = useState("");
   const [communityUnit, setCommunityUnit] = useState("");
   const [labRequestFile, setLabRequestFile] = useState<File | null>(null);
@@ -276,11 +278,25 @@ export default function PatientRegistration() {
     });
   };
 
+  // Handle patient selection from comprehensive search
+  const handlePatientSelect = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setShowPatientSearch(false);
+    loadPatientForEdit(patient);
+    
+    toast({
+      title: "Patient Found",
+      description: `${patient.firstName} ${patient.lastName} (${patient.patientId}) loaded. Complete history available. Select new service type to proceed.`,
+    });
+  };
+
   // Reset form
   const resetForm = () => {
     form.reset();
     setEditingPatient(null);
+    setSelectedPatient(null);
     setSearchQuery("");
+    setShowPatientSearch(false);
   };
 
   // Refresh data
@@ -362,6 +378,15 @@ export default function PatientRegistration() {
               >
                 <Search className="w-4 h-4 mr-1" />
                 Search
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowPatientSearch(true)}
+                className="bg-green-600 text-white hover:bg-green-700 border-green-600"
+              >
+                <Search className="w-4 h-4 mr-1" />
+                Full History
               </Button>
             </div>
           </div>
