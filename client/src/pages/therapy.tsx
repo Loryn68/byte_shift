@@ -799,7 +799,26 @@ export default function TherapyPage() {
             <div className="text-2xl font-bold">
               {therapyPatients.filter((p: any) => p.serviceType?.includes('individual') || p.serviceType?.includes('Counseling')).length}
             </div>
-            <p className="text-xs text-muted-foreground">Patients</p>
+            <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+              {therapyPatients
+                .filter((p: any) => p.serviceType?.includes('individual') || p.serviceType?.includes('Counseling'))
+                .slice(0, 3)
+                .map((patient: any) => (
+                <div key={patient.id} className="flex justify-between items-center text-xs">
+                  <span className="font-medium text-gray-700">
+                    {patient.firstName} {patient.lastName}
+                  </span>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="h-6 px-2 text-xs"
+                    onClick={() => handleViewSession(patient)}
+                  >
+                    View
+                  </Button>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -810,9 +829,28 @@ export default function TherapyPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {therapyPatients.filter((p: any) => p.serviceType?.includes('family') || p.serviceType?.includes('Counseling')).length}
+              {therapyPatients.filter((p: any) => p.serviceType?.includes('family')).length}
             </div>
-            <p className="text-xs text-muted-foreground">Families</p>
+            <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+              {therapyPatients
+                .filter((p: any) => p.serviceType?.includes('family'))
+                .slice(0, 3)
+                .map((patient: any) => (
+                <div key={patient.id} className="flex justify-between items-center text-xs">
+                  <span className="font-medium text-gray-700">
+                    {patient.firstName} {patient.lastName}
+                  </span>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="h-6 px-2 text-xs"
+                    onClick={() => handleViewSession(patient)}
+                  >
+                    View
+                  </Button>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -822,8 +860,34 @@ export default function TherapyPage() {
             <Calendar className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">Scheduled today</p>
+            <div className="text-2xl font-bold">
+              {therapySessions.filter((s: any) => {
+                return s.sessionDate === new Date().toISOString().split('T')[0];
+              }).length}
+            </div>
+            <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+              {therapySessions
+                .filter((s: any) => s.sessionDate === new Date().toISOString().split('T')[0])
+                .slice(0, 3)
+                .map((session: any) => {
+                  const patient = therapyPatients.find((p: any) => p.id === session.patientId);
+                  return (
+                    <div key={session.id} className="flex justify-between items-center text-xs">
+                      <span className="font-medium text-gray-700">
+                        {patient?.firstName} {patient?.lastName}
+                      </span>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="h-6 px-2 text-xs"
+                        onClick={() => handleViewSessionDetails(session)}
+                      >
+                        View
+                      </Button>
+                    </div>
+                  );
+                })}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -930,6 +994,147 @@ export default function TherapyPage() {
             </div>
           </DialogHeader>
           {selectedPatient && <TherapySessionForm patient={selectedPatient} />}
+        </DialogContent>
+      </Dialog>
+
+      {/* Session Details View Modal */}
+      <Dialog open={showSessionDetails} onOpenChange={setShowSessionDetails}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-800">
+              Session Details - {selectedPatient?.firstName} {selectedPatient?.lastName}
+            </DialogTitle>
+            <div className="text-sm text-gray-600">
+              Patient ID: {selectedPatient?.patientId} | Session Date: {selectedSession?.sessionDate}
+            </div>
+          </DialogHeader>
+          {selectedSession && (
+            <div className="space-y-6">
+              {/* Session Overview */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-800 mb-3">Session Overview</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label className="text-xs font-medium text-gray-600">Therapist</Label>
+                    <p className="text-sm font-medium">{selectedSession.therapistName}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-600">Date & Time</Label>
+                    <p className="text-sm font-medium">{selectedSession.sessionDate} at {selectedSession.sessionTime}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-600">Duration</Label>
+                    <p className="text-sm font-medium">{selectedSession.duration} minutes</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-600">Status</Label>
+                    <Badge variant={selectedSession.status === 'completed' ? 'default' : 'secondary'}>
+                      {selectedSession.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Session Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Counselor Findings */}
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Session Goals</Label>
+                    <div className="mt-1 p-3 bg-gray-50 rounded border">
+                      <p className="text-sm text-gray-800">{selectedSession.goals || "No goals specified"}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Counselor Findings</Label>
+                    <div className="mt-1 p-3 bg-blue-50 rounded border">
+                      <p className="text-sm text-gray-800">{selectedSession.counselorFindings || "No findings recorded"}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Interventions</Label>
+                    <div className="mt-1 p-3 bg-green-50 rounded border">
+                      <p className="text-sm text-gray-800">{selectedSession.interventions || "No interventions recorded"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Patient Response & Assessment */}
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Patient Response</Label>
+                    <div className="mt-1 p-3 bg-purple-50 rounded border">
+                      <p className="text-sm text-gray-800">{selectedSession.patientResponse || "No patient response recorded"}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Risk Assessment</Label>
+                    <div className="mt-1 p-3 bg-yellow-50 rounded border">
+                      <p className="text-sm text-gray-800">{selectedSession.riskAssessment || "No risk assessment completed"}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Homework/Activities</Label>
+                    <div className="mt-1 p-3 bg-orange-50 rounded border">
+                      <p className="text-sm text-gray-800">{selectedSession.homework || "No homework assigned"}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Treatment Plans */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Recommended Treatment</Label>
+                  <div className="mt-1 p-3 bg-indigo-50 rounded border">
+                    <p className="text-sm text-gray-800">{selectedSession.recommendedTreatment || "No treatment recommendations"}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Next Session</Label>
+                  <div className="mt-1 p-3 bg-teal-50 rounded border">
+                    <p className="text-sm text-gray-800">{selectedSession.nextSession || "No next session scheduled"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Notes */}
+              {(selectedSession.notes || selectedSession.referralReason) && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Additional Notes</Label>
+                  <div className="mt-1 p-3 bg-gray-100 rounded border">
+                    {selectedSession.notes && (
+                      <p className="text-sm text-gray-800 mb-2">{selectedSession.notes}</p>
+                    )}
+                    {selectedSession.referralReason && (
+                      <p className="text-sm text-gray-800"><strong>Referral Reason:</strong> {selectedSession.referralReason}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-2 pt-4 border-t">
+                <Button variant="outline" onClick={() => setShowSessionDetails(false)}>
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowSessionDetails(false);
+                    setShowSessionModal(true);
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Edit Session
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
