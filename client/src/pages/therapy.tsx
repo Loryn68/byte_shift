@@ -55,6 +55,8 @@ export default function TherapyPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [showSessionModal, setShowSessionModal] = useState(false);
+  const [showSessionDetails, setShowSessionDetails] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<any>(null);
 
   // Fetch patients
   const { data: patients = [], isLoading: patientsLoading } = useQuery({
@@ -100,6 +102,30 @@ export default function TherapyPage() {
       patient.patientId.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [therapyPatients, searchTerm]);
+
+  // Handler for viewing session details
+  const handleViewSession = (patient: any) => {
+    const patientSessions = therapySessions.filter((s: any) => s.patientId === patient.id);
+    if (patientSessions.length > 0) {
+      setSelectedSession(patientSessions[0]); // Show most recent session
+      setSelectedPatient(patient);
+      setShowSessionDetails(true);
+    } else {
+      toast({
+        title: "No Session Found",
+        description: `No therapy sessions found for ${patient.firstName} ${patient.lastName}`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handler for viewing specific session details
+  const handleViewSessionDetails = (session: any) => {
+    const patient = therapyPatients.find((p: any) => p.id === session.patientId);
+    setSelectedSession(session);
+    setSelectedPatient(patient);
+    setShowSessionDetails(true);
+  };
 
   // Session mutation - saves notes but keeps session open for referrals/scheduling
   const sessionMutation = useMutation({
@@ -741,7 +767,26 @@ export default function TherapyPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{therapyPatients.length}</div>
-            <p className="text-xs text-muted-foreground">In therapy services</p>
+            <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+              {therapyPatients.slice(0, 3).map((patient: any) => (
+                <div key={patient.id} className="flex justify-between items-center text-xs">
+                  <span className="font-medium text-gray-700">
+                    {patient.firstName} {patient.lastName}
+                  </span>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="h-6 px-2 text-xs"
+                    onClick={() => handleViewSession(patient)}
+                  >
+                    View
+                  </Button>
+                </div>
+              ))}
+              {therapyPatients.length > 3 && (
+                <p className="text-xs text-gray-500">+{therapyPatients.length - 3} more</p>
+              )}
+            </div>
           </CardContent>
         </Card>
 
