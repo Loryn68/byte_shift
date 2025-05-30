@@ -130,7 +130,7 @@ const navigationItems = [
       {
         title: "Business Intelligence",
         href: "/reports-analytics",
-        icon: TrendingUp
+        icon: BarChart3
       }
     ]
   },
@@ -146,7 +146,7 @@ const navigationItems = [
       {
         title: "Financial Management",
         href: "/financial-management",
-        icon: DollarSign
+        icon: CreditCard
       },
       {
         title: "System Settings",
