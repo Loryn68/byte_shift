@@ -169,6 +169,11 @@ const navigationItems = [
         icon: BarChart3
       },
       {
+        title: "Prescription Billing",
+        href: "/cashier-prescriptions",
+        icon: DollarSign
+      },
+      {
         title: "Insurance Billing",
         href: "/financial-management/insurance",
         icon: Shield
