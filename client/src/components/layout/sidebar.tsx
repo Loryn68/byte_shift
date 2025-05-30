@@ -18,7 +18,9 @@ import {
   UserCheck,
   CreditCard,
   Menu,
-  ChevronRight
+  ChevronRight,
+  TrendingUp,
+  DollarSign
 } from "lucide-react";
 
 const navigationItems = [
