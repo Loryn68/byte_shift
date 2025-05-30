@@ -18,6 +18,7 @@ import {
   UserCheck,
   CreditCard,
   Menu,
+  Upload,
   ChevronRight,
   TrendingUp,
   DollarSign
@@ -109,6 +110,11 @@ const navigationItems = [
         title: "Pharmacy",
         href: "/pharmacy",
         icon: Pill
+      },
+      {
+        title: "External Prescriptions",
+        href: "/registry-prescription",
+        icon: FileText
       }
     ]
   },

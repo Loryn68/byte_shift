@@ -23,6 +23,8 @@ import Pharmacy from "@/pages/pharmacy";
 import PharmacyInventory from "@/pages/pharmacy-inventory";
 import PharmacyPrescriptions from "@/pages/pharmacy-prescriptions";
 import PharmacyMain from "@/pages/pharmacy-main";
+import RegistryPrescription from "@/pages/registry-prescription";
+import ConsultationPrescription from "@/pages/consultation-prescription";
 import Billing from "@/pages/billing";
 import ProfessionalBilling from "@/pages/professional-billing";
 import Cashier from "@/pages/cashier";
@@ -70,6 +72,7 @@ function Router() {
             <Route path="/pharmacy" component={PharmacyMain} />
             <Route path="/pharmacy-inventory" component={PharmacyInventory} />
             <Route path="/pharmacy-original" component={Pharmacy} />
+            <Route path="/registry-prescription" component={RegistryPrescription} />
             <Route path="/radiology" component={Laboratory} />
             <Route path="/billing" component={Billing} />
             <Route path="/professional-billing" component={ProfessionalBilling} />
