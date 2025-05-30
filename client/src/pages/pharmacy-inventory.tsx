@@ -181,8 +181,12 @@ export default function PharmacyInventory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showStockModal, setShowStockModal] = useState(false);
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [showPriceModal, setShowPriceModal] = useState(false);
   const [selectedMedication, setSelectedMedication] = useState<any>(null);
   const [stockAdjustment, setStockAdjustment] = useState({ quantity: 0, type: "add", reason: "" });
+  const [supplierEdit, setSupplierEdit] = useState({ supplier: "", notes: "" });
+  const [priceEdit, setPriceEdit] = useState({ price: 0, reason: "" });
 
   // Filter medications
   const filteredMedications = useMemo(() => {
@@ -215,9 +219,51 @@ export default function PharmacyInventory() {
     },
   });
 
+  // Supplier update mutation
+  const updateSupplierMutation = useMutation({
+    mutationFn: async (supplierData: any) => {
+      return await apiRequest("PUT", `/api/medications/${supplierData.medicationId}/supplier`, supplierData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Supplier Updated",
+        description: "Medication supplier has been updated successfully.",
+      });
+      setShowSupplierModal(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/medications"] });
+    },
+  });
+
+  // Price update mutation
+  const updatePriceMutation = useMutation({
+    mutationFn: async (priceData: any) => {
+      return await apiRequest("PUT", `/api/medications/${priceData.medicationId}/price`, priceData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Price Updated",
+        description: "Medication price has been updated successfully.",
+      });
+      setShowPriceModal(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/medications"] });
+    },
+  });
+
   const handleStockAdjustment = (medication: any) => {
     setSelectedMedication(medication);
     setShowStockModal(true);
+  };
+
+  const handleSupplierEdit = (medication: any) => {
+    setSelectedMedication(medication);
+    setSupplierEdit({ supplier: medication.supplier, notes: "" });
+    setShowSupplierModal(true);
+  };
+
+  const handlePriceEdit = (medication: any) => {
+    setSelectedMedication(medication);
+    setPriceEdit({ price: medication.price, reason: "" });
+    setShowPriceModal(true);
   };
 
   const submitStockAdjustment = () => {
@@ -225,6 +271,22 @@ export default function PharmacyInventory() {
     adjustStockMutation.mutate({
       medicationId: selectedMedication.id,
       ...stockAdjustment
+    });
+  };
+
+  const submitSupplierUpdate = () => {
+    if (!selectedMedication) return;
+    updateSupplierMutation.mutate({
+      medicationId: selectedMedication.id,
+      ...supplierEdit
+    });
+  };
+
+  const submitPriceUpdate = () => {
+    if (!selectedMedication) return;
+    updatePriceMutation.mutate({
+      medicationId: selectedMedication.id,
+      ...priceEdit
     });
   };
 
@@ -377,7 +439,12 @@ export default function PharmacyInventory() {
                         Reorder at: {medication.reorderLevel}
                       </div>
                     </TableCell>
-                    <TableCell>{medication.price.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <div className="cursor-pointer hover:text-blue-600" onClick={() => handlePriceEdit(medication)}>
+                        KShs {medication.price.toFixed(2)}
+                        <Edit className="h-3 w-3 inline ml-1" />
+                      </div>
+                    </TableCell>
                     <TableCell>{(medication.stock * medication.price).toFixed(2)}</TableCell>
                     <TableCell>
                       <Badge variant={getStockBadgeColor(stockStatus)}>
@@ -385,17 +452,30 @@ export default function PharmacyInventory() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">{medication.supplier}</div>
+                      <div className="text-sm cursor-pointer hover:text-blue-600" onClick={() => handleSupplierEdit(medication)}>
+                        {medication.supplier}
+                        <Edit className="h-3 w-3 inline ml-1" />
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleStockAdjustment(medication)}
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Adjust Stock
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleStockAdjustment(medication)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Stock
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleSupplierEdit(medication)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Supplier
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
@@ -475,6 +555,44 @@ export default function PharmacyInventory() {
               </Button>
               <Button onClick={submitStockAdjustment} disabled={adjustStockMutation.isPending}>
                 {adjustStockMutation.isPending ? "Updating..." : "Update Stock"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Supplier Edit Modal */}
+      <Dialog open={showSupplierModal} onOpenChange={setShowSupplierModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Supplier - {selectedMedication?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Current Supplier: {selectedMedication?.supplier}</Label>
+            </div>
+            <div>
+              <Label>New Supplier Name</Label>
+              <Input
+                value={supplierEdit.supplier}
+                onChange={(e) => setSupplierEdit({...supplierEdit, supplier: e.target.value})}
+                placeholder="Enter new supplier name"
+              />
+            </div>
+            <div>
+              <Label>Notes/Reason for Change</Label>
+              <Input
+                value={supplierEdit.notes}
+                onChange={(e) => setSupplierEdit({...supplierEdit, notes: e.target.value})}
+                placeholder="Reason for supplier change"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowSupplierModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={submitSupplierUpdate} disabled={updateSupplierMutation.isPending}>
+                {updateSupplierMutation.isPending ? "Updating..." : "Update Supplier"}
               </Button>
             </div>
           </div>
