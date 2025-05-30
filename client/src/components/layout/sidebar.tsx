@@ -114,49 +114,186 @@ const navigationItems = [
     ]
   },
   {
-    title: "Reports & Analytics",
-    section: "reports",
-    items: [
-      {
-        title: "Reports",
-        href: "/reports",
-        icon: BarChart3
-      },
-      {
-        title: "Analytics",
-        href: "/analytics",
-        icon: Activity
-      },
-      {
-        title: "Business Intelligence",
-        href: "/reports-analytics",
-        icon: BarChart3
-      }
-    ]
-  },
-  {
     title: "Administrator",
     section: "administrator",
     items: [
       {
-        title: "Administrator Dashboard",
+        title: "Registered Users",
         href: "/administrator",
         icon: Users
       },
       {
-        title: "Financial Management",
+        title: "Assign User Rights",
+        href: "/administrator",
+        icon: Shield
+      },
+      {
+        title: "Remove/Delete",
+        href: "/administrator",
+        icon: UserCheck
+      },
+      {
+        title: "Change Password",
+        href: "/administrator",
+        icon: Shield
+      },
+      {
+        title: "Users Activeness",
+        href: "/administrator",
+        icon: Activity
+      }
+    ]
+  },
+  {
+    title: "Patient Administrator",
+    section: "patient-admin",
+    items: [
+      {
+        title: "Registry",
+        href: "/patient-registration",
+        icon: UserCheck
+      },
+      {
+        title: "Cashier",
+        href: "/cashier",
+        icon: CreditCard
+      },
+      {
+        title: "Triage",
+        href: "/triage",
+        icon: Activity
+      },
+      {
+        title: "Therapy",
+        href: "/therapy",
+        icon: Shield
+      },
+      {
+        title: "Outpatient",
+        href: "/outpatient",
+        icon: Users
+      },
+      {
+        title: "Inpatient",
+        href: "/inpatient",
+        icon: Bed
+      },
+      {
+        title: "Laboratory",
+        href: "/laboratory",
+        icon: FlaskRound
+      },
+      {
+        title: "Pharmacy",
+        href: "/pharmacy",
+        icon: Pill
+      }
+    ]
+  },
+  {
+    title: "Financial Management",
+    section: "financial",
+    items: [
+      {
+        title: "Inpatient Billing",
+        href: "/financial-management",
+        icon: FileText
+      },
+      {
+        title: "Outpatient Billing",
+        href: "/financial-management",
+        icon: FileText
+      },
+      {
+        title: "Salaries",
         href: "/financial-management",
         icon: CreditCard
       },
       {
-        title: "System Settings",
-        href: "/system-settings",
-        icon: Shield
+        title: "Unpaid Bills",
+        href: "/financial-management",
+        icon: FileText
       },
       {
-        title: "Audit Logs",
-        href: "/audit-logs",
+        title: "Paid Bills",
+        href: "/financial-management",
         icon: FileText
+      },
+      {
+        title: "Petty Cash Book",
+        href: "/financial-management",
+        icon: CreditCard
+      },
+      {
+        title: "Inventory",
+        href: "/financial-management",
+        icon: FileText
+      },
+      {
+        title: "Income Generated",
+        href: "/financial-management",
+        icon: BarChart3
+      },
+      {
+        title: "Insurance Billing",
+        href: "/financial-management",
+        icon: Shield
+      }
+    ]
+  },
+  {
+    title: "Reports and Analytics",
+    section: "reports",
+    items: [
+      {
+        title: "Monthly Admission Reports",
+        href: "/reports-analytics",
+        icon: BarChart3
+      },
+      {
+        title: "Monthly Outpatient Reports",
+        href: "/reports-analytics",
+        icon: BarChart3
+      },
+      {
+        title: "Growth Graph Per Month",
+        href: "/reports-analytics",
+        icon: Activity
+      },
+      {
+        title: "Monthly Therapy Reports",
+        href: "/reports-analytics",
+        icon: BarChart3
+      },
+      {
+        title: "Monthly Income Reports",
+        href: "/reports-analytics",
+        icon: BarChart3
+      },
+      {
+        title: "Monthly Pharmacy Reports",
+        href: "/reports-analytics",
+        icon: BarChart3
+      },
+      {
+        title: "Monthly Insurance Reports",
+        href: "/reports-analytics",
+        icon: BarChart3
+      },
+      {
+        title: "Monthly Laboratory Reports",
+        href: "/reports-analytics",
+        icon: BarChart3
+      },
+      {
+        title: "Monthly Expenditure Report",
+        href: "/reports-analytics",
+        icon: BarChart3
+      },
+      {
+        title: "Cumulative Report Per Year",
+        href: "/reports-analytics",
+        icon: Activity
       }
     ]
   }
