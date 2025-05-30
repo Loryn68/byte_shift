@@ -21,6 +21,8 @@ import Appointments from "@/pages/appointments";
 import Laboratory from "@/pages/laboratory";
 import Pharmacy from "@/pages/pharmacy";
 import PharmacyInventory from "@/pages/pharmacy-inventory";
+import PharmacyPrescriptions from "@/pages/pharmacy-prescriptions";
+import PharmacyMain from "@/pages/pharmacy-main";
 import Billing from "@/pages/billing";
 import ProfessionalBilling from "@/pages/professional-billing";
 import Cashier from "@/pages/cashier";
@@ -65,7 +67,8 @@ function Router() {
             <Route path="/patient-flow" component={PatientFlowDashboard} />
             <Route path="/appointments" component={Appointments} />
             <Route path="/laboratory" component={Laboratory} />
-            <Route path="/pharmacy" component={PharmacyInventory} />
+            <Route path="/pharmacy" component={PharmacyMain} />
+            <Route path="/pharmacy-inventory" component={PharmacyInventory} />
             <Route path="/pharmacy-original" component={Pharmacy} />
             <Route path="/radiology" component={Laboratory} />
             <Route path="/billing" component={Billing} />
