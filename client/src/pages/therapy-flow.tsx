@@ -335,53 +335,16 @@ export default function TherapyFlow() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header with Flow Chart Reference */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Heart className="h-8 w-8 text-purple-600" />
-            Therapy Flow Management
+            Therapy Management
           </h1>
-          <p className="text-gray-600">Following Patient Administration Flow Chart for Therapy</p>
+          <p className="text-gray-600">Mental health counseling and therapy sessions</p>
         </div>
       </div>
-
-      {/* Flow Chart Visual */}
-      <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
-        <CardHeader>
-          <CardTitle className="text-purple-800">Therapy Patient Flow</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 px-3 py-2 bg-blue-100 rounded-lg">
-              <User className="h-4 w-4 text-blue-600" />
-              <span className="font-medium text-blue-800">Patient Registry</span>
-            </div>
-            <ArrowRight className="h-4 w-4 text-gray-400" />
-            <div className="flex items-center gap-2 px-3 py-2 bg-green-100 rounded-lg">
-              <FileText className="h-4 w-4 text-green-600" />
-              <span className="font-medium text-green-800">Cashier</span>
-            </div>
-            <ArrowRight className="h-4 w-4 text-gray-400" />
-            <div className="flex items-center gap-2 px-3 py-2 bg-purple-100 rounded-lg">
-              <Heart className="h-4 w-4 text-purple-600" />
-              <span className="font-medium text-purple-800">Therapy</span>
-            </div>
-          </div>
-          <div className="mt-4 flex justify-center gap-8">
-            <div className="flex items-center gap-2 px-3 py-2 bg-blue-100 rounded-lg text-sm">
-              <span className="font-medium text-blue-800">Refer to Doctor → Cashier → Outpatient</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-2 bg-green-100 rounded-lg text-sm">
-              <span className="font-medium text-green-800">End Session</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-2 bg-orange-100 rounded-lg text-sm">
-              <Phone className="h-4 w-4 text-orange-600" />
-              <span className="font-medium text-orange-800">Schedule Next → SMS → Appointments</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Search and Filter Controls */}
       <div className="flex gap-4 items-center">
