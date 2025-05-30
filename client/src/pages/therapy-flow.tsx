@@ -63,15 +63,19 @@ export default function TherapyFlow() {
   const [activeSession, setActiveSession] = useState<TherapySession | null>(null);
   const [activePatient, setActivePatient] = useState<Patient | null>(null);
 
-  // Fetch therapy patients (family counselling and counselling only)
+  // Fetch therapy patients (strict flow enforcement)
   const { data: therapyPatients = [] } = useQuery({
     queryKey: ["/api/patients/therapy"],
     queryFn: async () => {
       const response = await fetch("/api/patients");
       const allPatients = await response.json();
+      // STRICT FLOW: Only patients who completed registry → cashier → therapy path
       return allPatients.filter((patient: Patient) => 
-        patient.serviceType?.toLowerCase().includes('counselling') ||
-        patient.serviceType?.toLowerCase().includes('therapy')
+        // Must be family counselling or counselling service
+        (patient.serviceType?.toLowerCase().includes('family counselling') || 
+         patient.serviceType?.toLowerCase().includes('counselling')) &&
+        // Must have completed payment at cashier (flow enforcement)
+        patient.paymentStatus === 'paid'
       );
     }
   });
@@ -214,33 +218,42 @@ export default function TherapyFlow() {
     },
   });
 
-  // Refer to doctor
+  // Refer to doctor (strict flow: therapy → cashier → triage → outpatient)
   const referToDoctorMutation = useMutation({
     mutationFn: async ({ patientId, sessionId, referralData }: { patientId: number; sessionId: number; referralData: any }) => {
-      // Update session status
+      // FLOW ENFORCEMENT: Update session status to referred
       await apiRequest("PUT", `/api/therapy-sessions/${sessionId}`, {
         status: "referred_to_doctor",
         referralReason: referralData.referralReason
       });
       
-      // Create appointment referral (they need to pay again at cashier)
-      return await apiRequest("POST", "/api/appointments", {
+      // FLOW ENFORCEMENT: Reset patient status to require cashier payment
+      await apiRequest("PUT", `/api/patients/${patientId}`, {
+        currentStatus: "referred_from_therapy",
+        flowStep: "cashier_required", // Must go to cashier first
+        paymentStatus: "pending", // Requires new payment for doctor consultation
+        serviceType: `${referralData.referralType} (Referred from Therapy)`
+      });
+      
+      // Create billing requirement for doctor consultation
+      return await apiRequest("POST", "/api/billing", {
         patientId,
-        appointmentType: referralData.referralType,
-        appointmentDate: new Date().toISOString().split('T')[0],
-        status: "referred_from_therapy",
-        notes: `Referred from therapy: ${referralData.referralReason}`,
-        paymentRequired: true
+        serviceType: referralData.referralType,
+        totalAmount: referralData.referralType === "psychiatrist" ? 3000 : 2500,
+        paymentStatus: "pending",
+        billType: "consultation",
+        notes: `Therapy referral: ${referralData.referralReason}`
       });
     },
     onSuccess: () => {
       toast({
         title: "Patient Referred to Doctor",
-        description: "Patient must visit cashier for payment before seeing doctor.",
+        description: "Patient must complete: Cashier → Triage → Outpatient consultation",
       });
       setShowReferralModal(false);
       queryClient.invalidateQueries({ queryKey: ["/api/therapy-sessions"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/patients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/billing"] });
     },
   });
 
