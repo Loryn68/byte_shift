@@ -24,44 +24,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-// Mock approved prescriptions - in real app this would come from API
-const mockApprovedPrescriptions = [
-  {
-    id: "RX001",
-    patientId: "CMH-202501JDM001",
-    patientName: "John Doe Mwangi",
-    patientPhone: "0722123456",
-    doctorName: "Dr. Sarah Johnson",
-    prescriptionType: "doctor",
-    diagnosis: "Anxiety disorder with mild depression",
-    dateIssued: "2025-05-30",
-    timeIssued: "14:30",
-    status: "approved",
-    pharmacistName: "Dr. Alice Pharmacist",
-    approvalDate: "2025-05-30",
-    approvalTime: "15:15",
-    medications: [
-      {
-        medicationId: 6,
-        medicationName: "Sertraline 50mg",
-        quantity: 30,
-        instructions: "Take 1 tablet once daily in the morning",
-        unitPrice: 75,
-        total: 2250
-      },
-      {
-        medicationId: 11,
-        medicationName: "Diazepam 5mg",
-        quantity: 20,
-        instructions: "Take 1 tablet as needed for anxiety (max 2 per day)",
-        unitPrice: 10,
-        total: 200
-      }
-    ],
-    totalAmount: 2450,
-    pharmacistNotes: "Verified dosage and drug interactions. Approved for dispensing."
-  }
-];
+// Cleared approved prescriptions for fresh demo
+const mockApprovedPrescriptions = [];
 
 export default function CashierPrescriptionBilling() {
   const { toast } = useToast();

@@ -26,74 +26,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
-// Mock prescription data - in real app this would come from API
-const mockPrescriptions = [
-  {
-    id: "RX001",
-    patientId: "CMH-202501JDM001",
-    patientName: "John Doe Mwangi",
-    doctorName: "Dr. Sarah Johnson",
-    prescriptionType: "doctor",
-    diagnosis: "Anxiety disorder with mild depression",
-    dateIssued: "2025-05-30",
-    timeIssued: "14:30",
-    status: "pending",
-    medications: [
-      {
-        medicationId: 6,
-        medicationName: "Sertraline 50mg",
-        quantity: 30,
-        instructions: "Take 1 tablet once daily in the morning",
-        unitPrice: 75,
-        total: 2250
-      },
-      {
-        medicationId: 11,
-        medicationName: "Diazepam 5mg",
-        quantity: 20,
-        instructions: "Take 1 tablet as needed for anxiety (max 2 per day)",
-        unitPrice: 10,
-        total: 200
-      }
-    ],
-    totalAmount: 2450,
-    prescriptionNotes: "Start with half dose for first week, then increase to full dose",
-    followUpInstructions: "Review in 2 weeks"
-  },
-  {
-    id: "RX002",
-    patientId: "EXT-1748619001",
-    patientName: "Mary Wanjiku",
-    doctorName: "Dr. Peter Kamau",
-    prescriptionType: "registry",
-    clinicName: "Nairobi Medical Center",
-    prescriptionDate: "2025-05-29",
-    dateIssued: "2025-05-30",
-    timeIssued: "15:45",
-    status: "pending",
-    medications: [
-      {
-        medicationId: 3,
-        medicationName: "Risperidone 2mg",
-        quantity: 60,
-        instructions: "Take 1 tablet twice daily with meals",
-        unitPrice: 80,
-        total: 4800
-      },
-      {
-        medicationId: 12,
-        medicationName: "Omeprazole 20mg",
-        quantity: 30,
-        instructions: "Take 1 tablet before breakfast",
-        unitPrice: 15,
-        total: 450
-      }
-    ],
-    totalAmount: 5250,
-    prescriptionNotes: "External prescription from psychiatric consultation",
-    registryNotes: "Patient has been on this medication for 3 months"
-  }
-];
+// Mock prescription data - cleared for fresh demo
+const mockPrescriptions = [];
 
 export default function PharmacyApproval() {
   const { toast } = useToast();
