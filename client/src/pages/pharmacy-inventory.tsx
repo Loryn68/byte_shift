@@ -458,7 +458,7 @@ export default function PharmacyInventory() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1">
                         <Button
                           size="sm"
                           variant="outline"
@@ -466,6 +466,14 @@ export default function PharmacyInventory() {
                         >
                           <Edit className="h-4 w-4 mr-1" />
                           Stock
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handlePriceEdit(medication)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Price
                         </Button>
                         <Button
                           size="sm"
@@ -593,6 +601,46 @@ export default function PharmacyInventory() {
               </Button>
               <Button onClick={submitSupplierUpdate} disabled={updateSupplierMutation.isPending}>
                 {updateSupplierMutation.isPending ? "Updating..." : "Update Supplier"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Price Edit Modal */}
+      <Dialog open={showPriceModal} onOpenChange={setShowPriceModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Price - {selectedMedication?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Current Price: KShs {selectedMedication?.price?.toFixed(2)}</Label>
+            </div>
+            <div>
+              <Label>New Unit Price (KShs)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={priceEdit.price}
+                onChange={(e) => setPriceEdit({...priceEdit, price: parseFloat(e.target.value) || 0})}
+                placeholder="Enter new price"
+              />
+            </div>
+            <div>
+              <Label>Reason for Price Change</Label>
+              <Input
+                value={priceEdit.reason}
+                onChange={(e) => setPriceEdit({...priceEdit, reason: e.target.value})}
+                placeholder="Reason for price adjustment"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowPriceModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={submitPriceUpdate} disabled={updatePriceMutation.isPending}>
+                {updatePriceMutation.isPending ? "Updating..." : "Update Price"}
               </Button>
             </div>
           </div>
