@@ -26,6 +26,8 @@ import PharmacyMain from "@/pages/pharmacy-main";
 import RegistryPrescription from "@/pages/registry-prescription";
 import ConsultationPrescription from "@/pages/consultation-prescription";
 import ConsultationWithPrescription from "@/pages/consultation-with-prescription";
+import PharmacyApproval from "@/pages/pharmacy-approval";
+import CashierPrescriptionBilling from "@/pages/cashier-prescription-billing";
 import Billing from "@/pages/billing";
 import ProfessionalBilling from "@/pages/professional-billing";
 import Cashier from "@/pages/cashier";
@@ -75,6 +77,8 @@ function Router() {
             <Route path="/pharmacy-original" component={Pharmacy} />
             <Route path="/registry-prescription" component={RegistryPrescription} />
             <Route path="/consultation/:patientId" component={ConsultationWithPrescription} />
+            <Route path="/pharmacy-approval" component={PharmacyApproval} />
+            <Route path="/cashier-prescriptions" component={CashierPrescriptionBilling} />
             <Route path="/radiology" component={Laboratory} />
             <Route path="/billing" component={Billing} />
             <Route path="/professional-billing" component={ProfessionalBilling} />

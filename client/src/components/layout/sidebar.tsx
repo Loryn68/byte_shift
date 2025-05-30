@@ -21,7 +21,8 @@ import {
   Upload,
   ChevronRight,
   TrendingUp,
-  DollarSign
+  DollarSign,
+  CheckCircle
 } from "lucide-react";
 
 const navigationItems = [
@@ -110,6 +111,11 @@ const navigationItems = [
         title: "Pharmacy",
         href: "/pharmacy",
         icon: Pill
+      },
+      {
+        title: "Prescription Approval",
+        href: "/pharmacy-approval",
+        icon: UserCheck
       },
       {
         title: "External Prescriptions",
