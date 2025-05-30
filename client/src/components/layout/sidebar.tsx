@@ -35,28 +35,33 @@ const navigationItems = [
     section: "administrator",
     items: [
       {
+        title: "Register User",
+        href: "/administrator/register",
+        icon: UserPlus
+      },
+      {
         title: "Registered Users",
-        href: "/administrator",
+        href: "/administrator/users",
         icon: Users
       },
       {
         title: "Assign User Rights",
-        href: "/administrator",
+        href: "/administrator/rights",
         icon: Shield
       },
       {
         title: "Remove/Delete",
-        href: "/administrator",
+        href: "/administrator/remove",
         icon: UserCheck
       },
       {
         title: "Change Password",
-        href: "/administrator",
+        href: "/administrator/passwords",
         icon: Shield
       },
       {
         title: "Users Activeness",
-        href: "/administrator",
+        href: "/administrator/activity",
         icon: Activity
       }
     ]
@@ -113,47 +118,47 @@ const navigationItems = [
     items: [
       {
         title: "Inpatient Billing",
-        href: "/financial-management",
+        href: "/financial-management/inpatient",
         icon: FileText
       },
       {
         title: "Outpatient Billing",
-        href: "/financial-management",
+        href: "/financial-management/outpatient",
         icon: FileText
       },
       {
         title: "Salaries",
-        href: "/financial-management",
+        href: "/financial-management/salaries",
         icon: CreditCard
       },
       {
         title: "Unpaid Bills",
-        href: "/financial-management",
+        href: "/financial-management/unpaid",
         icon: FileText
       },
       {
         title: "Paid Bills",
-        href: "/financial-management",
+        href: "/financial-management/paid",
         icon: FileText
       },
       {
         title: "Petty Cash Book",
-        href: "/financial-management",
+        href: "/financial-management/petty-cash",
         icon: CreditCard
       },
       {
         title: "Inventory",
-        href: "/financial-management",
+        href: "/financial-management/inventory",
         icon: FileText
       },
       {
         title: "Income Generated",
-        href: "/financial-management",
+        href: "/financial-management/income",
         icon: BarChart3
       },
       {
         title: "Insurance Billing",
-        href: "/financial-management",
+        href: "/financial-management/insurance",
         icon: Shield
       }
     ]
@@ -164,52 +169,52 @@ const navigationItems = [
     items: [
       {
         title: "Monthly Admission Reports",
-        href: "/reports-analytics",
+        href: "/reports-analytics/admissions",
         icon: BarChart3
       },
       {
         title: "Monthly Outpatient Reports",
-        href: "/reports-analytics",
+        href: "/reports-analytics/outpatient",
         icon: BarChart3
       },
       {
         title: "Growth Graph Per Month",
-        href: "/reports-analytics",
+        href: "/reports-analytics/growth",
         icon: Activity
       },
       {
         title: "Monthly Therapy Reports",
-        href: "/reports-analytics",
+        href: "/reports-analytics/therapy",
         icon: BarChart3
       },
       {
         title: "Monthly Income Reports",
-        href: "/reports-analytics",
+        href: "/reports-analytics/income",
         icon: BarChart3
       },
       {
         title: "Monthly Pharmacy Reports",
-        href: "/reports-analytics",
+        href: "/reports-analytics/pharmacy",
         icon: BarChart3
       },
       {
         title: "Monthly Insurance Reports",
-        href: "/reports-analytics",
+        href: "/reports-analytics/insurance",
         icon: BarChart3
       },
       {
         title: "Monthly Laboratory Reports",
-        href: "/reports-analytics",
+        href: "/reports-analytics/laboratory",
         icon: BarChart3
       },
       {
         title: "Monthly Expenditure Report",
-        href: "/reports-analytics",
+        href: "/reports-analytics/expenditure",
         icon: BarChart3
       },
       {
         title: "Cumulative Report Per Year",
-        href: "/reports-analytics",
+        href: "/reports-analytics/annual",
         icon: Activity
       }
     ]

@@ -23,6 +23,7 @@ import ProfessionalBilling from "@/pages/professional-billing";
 import Cashier from "@/pages/cashier";
 import Reports from "@/pages/reports";
 import AdministratorDashboard from "@/pages/administrator-dashboard";
+import RegisterUser from "@/pages/register-user";
 import FinancialManagement from "@/pages/financial-management";
 import ReportsAnalytics from "@/pages/reports-analytics";
 import NotFound from "@/pages/not-found";
@@ -67,6 +68,7 @@ function Router() {
             <Route path="/reports" component={Reports} />
             <Route path="/analytics" component={Reports} />
             <Route path="/administrator" component={AdministratorDashboard} />
+            <Route path="/administrator/register" component={RegisterUser} />
             <Route path="/financial-management" component={FinancialManagement} />
             <Route path="/reports-analytics" component={ReportsAnalytics} />
             <Route component={NotFound} />
