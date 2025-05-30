@@ -22,6 +22,9 @@ import Billing from "@/pages/billing";
 import ProfessionalBilling from "@/pages/professional-billing";
 import Cashier from "@/pages/cashier";
 import Reports from "@/pages/reports";
+import AdministratorDashboard from "@/pages/administrator-dashboard";
+import FinancialManagement from "@/pages/financial-management";
+import ReportsAnalytics from "@/pages/reports-analytics";
 import NotFound from "@/pages/not-found";
 import LoginPage from "@/pages/login";
 import { useAuth } from "@/lib/auth";
@@ -63,6 +66,9 @@ function Router() {
             <Route path="/insurance" component={Billing} />
             <Route path="/reports" component={Reports} />
             <Route path="/analytics" component={Reports} />
+            <Route path="/administrator" component={AdministratorDashboard} />
+            <Route path="/financial-management" component={FinancialManagement} />
+            <Route path="/reports-analytics" component={ReportsAnalytics} />
             <Route component={NotFound} />
           </Switch>
         </main>

@@ -124,6 +124,11 @@ const navigationItems = [
         title: "Analytics",
         href: "/analytics",
         icon: Activity
+      },
+      {
+        title: "Business Intelligence",
+        href: "/reports-analytics",
+        icon: TrendingUp
       }
     ]
   },
@@ -132,9 +137,14 @@ const navigationItems = [
     section: "administrator",
     items: [
       {
-        title: "User Management",
-        href: "/user-management",
+        title: "Administrator Dashboard",
+        href: "/administrator",
         icon: Users
+      },
+      {
+        title: "Financial Management",
+        href: "/financial-management",
+        icon: DollarSign
       },
       {
         title: "System Settings",
