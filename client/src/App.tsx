@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import PatientRegistration from "@/pages/patient-registration-new";
 import PatientFlowDashboard from "@/pages/patient-flow-dashboard";
 import OutpatientConsultation from "@/pages/outpatient-consultation-clean";
+import OutpatientFlow from "@/pages/outpatient-flow";
 import ConsultationInterface from "@/pages/consultation-interface-enhanced";
 import InpatientManagement from "@/pages/inpatient-management";
 import TriageVitals from "@/pages/triage-vitals";
@@ -56,7 +57,8 @@ function Router() {
             <Route path="/therapy-original" component={TherapyPage} />
           <Route path="/therapy-professional" component={TherapyProfessionalPage} />
             <Route path="/therapy-forms" component={TherapyForms} />
-            <Route path="/outpatient" component={OutpatientConsultation} />
+            <Route path="/outpatient" component={OutpatientFlow} />
+            <Route path="/outpatient-original" component={OutpatientConsultation} />
             <Route path="/consultation/:patientId" component={ConsultationInterface} />
             <Route path="/inpatient" component={InpatientManagement} />
             <Route path="/patient-flow" component={PatientFlowDashboard} />
