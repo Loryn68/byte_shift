@@ -13,6 +13,7 @@ import ConsultationInterface from "@/pages/consultation-interface-enhanced";
 import InpatientManagement from "@/pages/inpatient-management";
 import TriageVitals from "@/pages/triage-vitals";
 import TherapyPage from "@/pages/therapy";
+import TherapyFlow from "@/pages/therapy-flow";
 import TherapyProfessionalPage from "@/pages/therapy-professional";
 import TherapyForms from "@/pages/therapy-forms-simple";
 import Appointments from "@/pages/appointments";
@@ -51,7 +52,8 @@ function Router() {
             <Route path="/patient-registration" component={PatientRegistration} />
             <Route path="/cashier" component={Cashier} />
             <Route path="/triage" component={TriageVitals} />
-            <Route path="/therapy" component={TherapyPage} />
+            <Route path="/therapy" component={TherapyFlow} />
+            <Route path="/therapy-original" component={TherapyPage} />
           <Route path="/therapy-professional" component={TherapyProfessionalPage} />
             <Route path="/therapy-forms" component={TherapyForms} />
             <Route path="/outpatient" component={OutpatientConsultation} />
