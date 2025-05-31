@@ -108,7 +108,7 @@ const navigationItems = [
         icon: FlaskRound
       },
       {
-        title: "Pharmacy",
+        title: "Pharmacy Management",
         href: "/pharmacy",
         icon: Pill
       },
