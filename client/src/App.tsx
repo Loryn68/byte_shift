@@ -89,6 +89,7 @@ function App() {
                 <Route path="/financial/cashier" component={CashierCollections} />
                 <Route path="/financial/expenditure" component={ExpenditureManagement} />
                 <Route path="/financial/income" component={IncomeManagement} />
+                <Route path="/financial/income-kenya" component={IncomeManagementKenya} />
                 <Route path="/financial/ledger" component={GeneralLedger} />
                 
                 {/* Staff & Payroll */}
