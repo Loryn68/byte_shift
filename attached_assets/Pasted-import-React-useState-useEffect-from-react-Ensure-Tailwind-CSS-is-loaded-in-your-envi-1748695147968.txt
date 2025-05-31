@@ -1,0 +1,344 @@
+import React, { useState, useEffect } from 'react';
+
+// Ensure Tailwind CSS is loaded in your environment for styling
+// <script src="https://cdn.tailwindcss.com"></script>
+
+function App() {
+  const [employee, setEmployee] = useState({
+    name: 'John Doe',
+    employeeId: 'H001',
+    grossSalary: 85000, // Example gross salary
+    benefits: 0, // Other taxable benefits
+    providentFund: 0, // Approved pension contributions, capped at 30,000 KES/month for tax relief
+    loanRepayment: 5000, // Example loan repayment
+    saccoContribution: 3000, // Example SACCO contribution
+    otherDeductions: 0, // Any other custom deductions
+  });
+
+  const [payslip, setPayslip] = useState(null);
+  const [error, setError] = useState('');
+
+  // Function to calculate payroll
+  const calculatePayroll = () => {
+    const { grossSalary, benefits, providentFund, loanRepayment, saccoContribution, otherDeductions } = employee;
+
+    // 1. Calculate Total Taxable Earnings (before statutory deductions that are tax-deductible)
+    // In Kenya, SHIF and Housing Levy are deductible before PAYE calculation.
+    let totalGrossTaxableIncome = grossSalary + benefits;
+
+    // 2. Calculate Statutory Deductions
+    let nssfContribution = 0;
+    const nssfLowerLimit = 8000; // Effective Feb 2025
+    const nssfUpperLimit = 72000; // Effective Feb 2025
+    const nssfRate = 0.06;
+
+    if (totalGrossTaxableIncome <= nssfLowerLimit) {
+      nssfContribution = totalGrossTaxableIncome * nssfRate;
+    } else if (totalGrossTaxableIncome <= nssfUpperLimit) {
+      nssfContribution = totalGrossTaxableIncome * nssfRate;
+    } else {
+      nssfContribution = nssfUpperLimit * nssfRate; // Capped at upper limit
+    }
+    // NSSF contribution is capped at KES 4,320 for employee (6% of 72,000)
+    nssfContribution = Math.min(nssfContribution, 4320);
+
+
+    const shifRate = 0.0275; // Effective Oct 2024
+    let shifContribution = totalGrossTaxableIncome * shifRate;
+
+    const housingLevyRate = 0.015; // Effective March 2024
+    let housingLevyContribution = totalGrossTaxableIncome * housingLevyRate;
+
+    // Approved pension contributions (provident fund) are tax-deductible up to KES 30,000/month
+    const maxProvidentFundRelief = 30000;
+    const taxDeductibleProvidentFund = Math.min(providentFund, maxProvidentFundRelief);
+
+    // 3. Calculate Taxable Income for PAYE
+    // SHIF, Housing Levy, and approved Provident Fund are deductible before PAYE calculation
+    let taxableIncome = totalGrossTaxableIncome - nssfContribution - shifContribution - housingLevyContribution - taxDeductibleProvidentFund;
+    taxableIncome = Math.max(0, taxableIncome); // Ensure taxable income is not negative
+
+    // 4. Calculate PAYE (Pay As You Earn)
+    let paye = 0;
+    const personalRelief = 2400; // KES 2,400 per month
+
+    // PAYE Tax Bands (Monthly) - as per Finance Act 2023/2024
+    const bands = [
+      { limit: 24000, rate: 0.10 },
+      { limit: 8333, rate: 0.25 }, // Next 8,333 (24,001 - 32,333)
+      { limit: 467667, rate: 0.30 }, // Next 467,667 (32,334 - 500,000)
+      { limit: 300000, rate: 0.325 }, // Next 300,000 (500,001 - 800,000)
+      { limit: Infinity, rate: 0.35 } // Above 800,000
+    ];
+
+    let remainingTaxable = taxableIncome;
+    let cumulativeBandLimit = 0;
+
+    for (const band of bands) {
+      if (remainingTaxable <= 0) break;
+
+      const currentBandUpper = cumulativeBandLimit + band.limit;
+      const amountInBand = Math.min(remainingTaxable, band.limit);
+      paye += amountInBand * band.rate;
+      remainingTaxable -= amountInBand;
+      cumulativeBandLimit = currentBandUpper;
+    }
+
+    // Apply Personal Relief
+    paye = Math.max(0, paye - personalRelief);
+
+    // 5. Calculate Total Deductions (Statutory + Other)
+    let totalDeductions = nssfContribution + shifContribution + housingLevyContribution + loanRepayment + saccoContribution + otherDeductions + paye;
+
+    // 6. Calculate Net Pay
+    let netPay = totalGrossTaxableIncome - totalDeductions;
+
+    // 7. Apply the "One-Third Rule" for voluntary deductions (Loans, SACCO, Other)
+    // The rule states that total deductions (including statutory) should not exceed two-thirds of gross salary,
+    // ensuring at least one-third of gross salary remains as net pay.
+    const minimumNetPayRequired = totalGrossTaxableIncome / 3;
+
+    let adjustedLoanRepayment = loanRepayment;
+    let adjustedSaccoContribution = saccoContribution;
+    let adjustedOtherDeductions = otherDeductions;
+
+    if (netPay < minimumNetPayRequired) {
+      setError(`Warning: Net pay (KES ${netPay.toFixed(2)}) is less than 1/3 of gross salary (KES ${minimumNetPayRequired.toFixed(2)}). Adjusting voluntary deductions.`);
+
+      // Calculate the amount by which voluntary deductions need to be reduced
+      const reductionNeeded = minimumNetPayRequired - netPay;
+
+      // Prioritize reduction from 'otherDeductions', then 'saccoContribution', then 'loanRepayment'
+      let tempReduction = reductionNeeded;
+
+      if (adjustedOtherDeductions >= tempReduction) {
+        adjustedOtherDeductions -= tempReduction;
+        tempReduction = 0;
+      } else {
+        tempReduction -= adjustedOtherDeductions;
+        adjustedOtherDeductions = 0;
+      }
+
+      if (tempReduction > 0) {
+        if (adjustedSaccoContribution >= tempReduction) {
+          adjustedSaccoContribution -= tempReduction;
+          tempReduction = 0;
+        } else {
+          tempReduction -= adjustedSaccoContribution;
+          adjustedSaccoContribution = 0;
+        }
+      }
+
+      if (tempReduction > 0) {
+        if (adjustedLoanRepayment >= tempReduction) {
+          adjustedLoanRepayment -= tempReduction;
+          tempReduction = 0;
+        } else {
+          adjustedLoanRepayment = 0;
+          setError(prev => prev + ` Further reduction needed, but all voluntary deductions exhausted. Net pay still below 1/3.`);
+        }
+      }
+
+      // Recalculate total deductions and net pay with adjusted voluntary deductions
+      totalDeductions = nssfContribution + shifContribution + housingLevyContribution + adjustedLoanRepayment + adjustedSaccoContribution + adjustedOtherDeductions + paye;
+      netPay = totalGrossTaxableIncome - totalDeductions;
+
+    } else {
+      setError(''); // Clear any previous errors
+    }
+
+
+    setPayslip({
+      totalGrossTaxableIncome: totalGrossTaxableIncome,
+      nssfContribution: nssfContribution,
+      shifContribution: shifContribution,
+      housingLevyContribution: housingLevyContribution,
+      taxDeductibleProvidentFund: taxDeductibleProvidentFund,
+      taxableIncome: taxableIncome,
+      paye: paye,
+      loanRepayment: adjustedLoanRepayment, // Use adjusted values
+      saccoContribution: adjustedSaccoContribution, // Use adjusted values
+      otherDeductions: adjustedOtherDeductions, // Use adjusted values
+      totalDeductions: totalDeductions,
+      netPay: netPay,
+    });
+  };
+
+  // Recalculate payroll whenever employee data changes
+  useEffect(() => {
+    calculatePayroll();
+  }, [employee]);
+
+  const handleChange = (e) => {
+    const { name, value, type } = e.target;
+    setEmployee(prev => ({
+      ...prev,
+      [name]: type === 'number' ? parseFloat(value) || 0 : value
+    }));
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 sm:p-6 lg:p-8 font-inter antialiased">
+      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-8 lg:p-10 border border-blue-200">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-center text-blue-800 mb-8">
+          Hospital Payroll System (Kenya)
+        </h1>
+
+        {/* Employee Input Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-blue-50 p-5 rounded-lg shadow-sm border border-blue-100">
+            <h2 className="text-xl font-semibold text-blue-700 mb-4">Employee Details</h2>
+            <div className="mb-4">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Employee Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={employee.name}
+                onChange={handleChange}
+                className="w-full p-2 border border-blue-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="employeeId" className="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
+              <input
+                type="text"
+                id="employeeId"
+                name="employeeId"
+                value={employee.employeeId}
+                onChange={handleChange}
+                className="w-full p-2 border border-blue-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="bg-green-50 p-5 rounded-lg shadow-sm border border-green-100">
+            <h2 className="text-xl font-semibold text-green-700 mb-4">Earnings</h2>
+            <div className="mb-4">
+              <label htmlFor="grossSalary" className="block text-sm font-medium text-gray-700 mb-1">Gross Salary (KES)</label>
+              <input
+                type="number"
+                id="grossSalary"
+                name="grossSalary"
+                value={employee.grossSalary}
+                onChange={handleChange}
+                className="w-full p-2 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="benefits" className="block text-sm font-medium text-gray-700 mb-1">Other Taxable Benefits (KES)</label>
+              <input
+                type="number"
+                id="benefits"
+                name="benefits"
+                value={employee.benefits}
+                onChange={handleChange}
+                className="w-full p-2 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="providentFund" className="block text-sm font-medium text-gray-700 mb-1">Approved Pension Fund (KES)</label>
+              <input
+                type="number"
+                id="providentFund"
+                name="providentFund"
+                value={employee.providentFund}
+                onChange={handleChange}
+                className="w-full p-2 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">Tax-deductible up to KES 30,000/month.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-red-50 p-5 rounded-lg shadow-sm border border-red-100 mb-8">
+          <h2 className="text-xl font-semibold text-red-700 mb-4">Other Deductions</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="mb-4 sm:mb-0">
+              <label htmlFor="loanRepayment" className="block text-sm font-medium text-gray-700 mb-1">Loan Repayment (KES)</label>
+              <input
+                type="number"
+                id="loanRepayment"
+                name="loanRepayment"
+                value={employee.loanRepayment}
+                onChange={handleChange}
+                className="w-full p-2 border border-red-300 rounded-md focus:ring-red-500 focus:border-red-500"
+              />
+            </div>
+            <div className="mb-4 sm:mb-0">
+              <label htmlFor="saccoContribution" className="block text-sm font-medium text-gray-700 mb-1">SACCO Contribution (KES)</label>
+              <input
+                type="number"
+                id="saccoContribution"
+                name="saccoContribution"
+                value={employee.saccoContribution}
+                onChange={handleChange}
+                className="w-full p-2 border border-red-300 rounded-md focus:ring-red-500 focus:border-red-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="otherDeductions" className="block text-sm font-medium text-gray-700 mb-1">Other Custom Deductions (KES)</label>
+              <input
+                type="number"
+                id="otherDeductions"
+                name="otherDeductions"
+                value={employee.otherDeductions}
+                onChange={handleChange}
+                className="w-full p-2 border border-red-300 rounded-md focus:ring-red-500 focus:border-red-500"
+              />
+            </div>
+          </div>
+          {error && (
+            <p className="text-red-600 text-sm mt-4 p-2 bg-red-100 rounded-md border border-red-200">
+              {error}
+            </p>
+          )}
+        </div>
+
+        {/* Payslip Display Section */}
+        {payslip && (
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Payslip for {employee.name}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
+              <div className="space-y-2">
+                <h3 className="font-semibold text-lg text-blue-700 border-b pb-1 mb-2">Earnings</h3>
+                <p className="flex justify-between"><span>Gross Salary:</span> <span className="font-medium">KES {employee.grossSalary.toFixed(2)}</span></p>
+                <p className="flex justify-between"><span>Other Taxable Benefits:</span> <span className="font-medium">KES {employee.benefits.toFixed(2)}</span></p>
+                <p className="flex justify-between"><span>Approved Pension Fund:</span> <span className="font-medium">KES {employee.providentFund.toFixed(2)}</span></p>
+                <p className="flex justify-between font-bold text-blue-800 border-t pt-2 mt-2">
+                  <span>Total Gross Taxable Income:</span> <span>KES {payslip.totalGrossTaxableIncome.toFixed(2)}</span>
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-lg text-red-700 border-b pb-1 mb-2">Deductions</h3>
+                <p className="flex justify-between"><span>PAYE (Tax):</span> <span className="font-medium text-red-600">KES {payslip.paye.toFixed(2)}</span></p>
+                <p className="flex justify-between"><span>NSSF Contribution:</span> <span className="font-medium text-red-600">KES {payslip.nssfContribution.toFixed(2)}</span></p>
+                <p className="flex justify-between"><span>SHIF Contribution:</span> <span className="font-medium text-red-600">KES {payslip.shifContribution.toFixed(2)}</span></p>
+                <p className="flex justify-between"><span>Housing Levy:</span> <span className="font-medium text-red-600">KES {payslip.housingLevyContribution.toFixed(2)}</span></p>
+                <p className="flex justify-between"><span>Loan Repayment:</span> <span className="font-medium text-red-600">KES {payslip.loanRepayment.toFixed(2)}</span></p>
+                <p className="flex justify-between"><span>SACCO Contribution:</span> <span className="font-medium text-red-600">KES {payslip.saccoContribution.toFixed(2)}</span></p>
+                <p className="flex justify-between"><span>Other Deductions:</span> <span className="font-medium text-red-600">KES {payslip.otherDeductions.toFixed(2)}</span></p>
+                <p className="flex justify-between font-bold text-red-800 border-t pt-2 mt-2">
+                  <span>Total Deductions:</span> <span>KES {payslip.totalDeductions.toFixed(2)}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-3xl font-extrabold text-green-700 p-4 bg-green-50 rounded-lg shadow-inner">
+                Net Pay: KES {payslip.netPay.toFixed(2)}
+              </p>
+            </div>
+            <div className="mt-4 text-sm text-gray-600 text-center">
+                <p>Employee ID: {employee.employeeId}</p>
+                <p>Date: {new Date().toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
