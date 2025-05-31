@@ -1,18 +1,16 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  TrendingUp, TrendingDown, DollarSign, Calendar, FileText, Download,
-  Plus, Edit3, Trash2, Eye, Search, Filter, PieChart, BarChart3
+  TrendingUp, Calendar, FileText, Download, Plus, Edit3, Trash2, 
+  PieChart, BarChart3, AlertCircle, DollarSign
 } from "lucide-react";
 
 interface IncomeRecord {
@@ -22,377 +20,476 @@ interface IncomeRecord {
   amount: number;
   source: string;
   notes: string;
-  category: string;
-  paymentMethod: string;
-  patientId?: string;
-  invoiceNumber?: string;
 }
 
-export default function IncomeManagementKenya() {
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [selectedRecord, setSelectedRecord] = useState<IncomeRecord | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
-  const [dateRange, setDateRange] = useState("current_month");
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<IncomeRecord | null>(null);
+function DashboardCard({ title, value, icon, color }: { title: string; value: string; icon: string; color: string }) {
+  return (
+    <div className={`p-5 rounded-lg shadow-md flex items-center space-x-4 ${color}`}>
+      <span className="text-4xl">{icon}</span>
+      <div>
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <p className="text-3xl font-bold">{value}</p>
+      </div>
+    </div>
+  );
+}
 
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+function IncomeDashboard({ incomeRecords }: { incomeRecords: IncomeRecord[] }) {
+  const [totalIncomeAllTime, setTotalIncomeAllTime] = useState(0);
+  const [totalIncomeThisMonth, setTotalIncomeThisMonth] = useState(0);
+  const [incomeByMonth, setIncomeByMonth] = useState<{ [key: string]: number }>({});
+  const [loading, setLoading] = useState(false);
 
-  // Mock data for demonstration - replace with actual API calls
-  const incomeRecords: IncomeRecord[] = [
-    {
-      id: "1",
-      date: "2024-01-30",
-      incomeType: "Patient Fees",
-      amount: 15000,
-      source: "Outpatient Consultation",
-      notes: "Mental health consultation",
-      category: "Medical Services",
-      paymentMethod: "M-Pesa",
-      patientId: "PAT001",
-      invoiceNumber: "INV-2024-001"
-    },
-    {
-      id: "2",
-      date: "2024-01-30",
-      incomeType: "Insurance Claims",
-      amount: 45000,
-      source: "NHIF Reimbursement",
-      notes: "Monthly insurance claims processing",
-      category: "Insurance",
-      paymentMethod: "Bank Transfer",
-      invoiceNumber: "CLM-2024-015"
-    },
-    {
-      id: "3",
-      date: "2024-01-29",
-      incomeType: "Laboratory Services",
-      amount: 8500,
-      source: "Blood Tests & Diagnostics",
-      notes: "Various lab tests performed",
-      category: "Diagnostics",
-      paymentMethod: "Cash",
-      patientId: "PAT002",
-      invoiceNumber: "LAB-2024-089"
-    },
-    {
-      id: "4",
-      date: "2024-01-29",
-      incomeType: "Pharmacy Sales",
-      amount: 12000,
-      source: "Medication Dispensing",
-      notes: "Prescription medications sold",
-      category: "Pharmacy",
-      paymentMethod: "M-Pesa",
-      patientId: "PAT003",
-      invoiceNumber: "PHM-2024-156"
-    },
-    {
-      id: "5",
-      date: "2024-01-28",
-      incomeType: "Therapy Sessions",
-      amount: 25000,
-      source: "Individual & Group Therapy",
-      notes: "Mental health therapy sessions",
-      category: "Therapy",
-      paymentMethod: "Bank Transfer",
-      patientId: "PAT004",
-      invoiceNumber: "THR-2024-078"
-    }
-  ];
-
-  // Calculate dashboard statistics
-  const currentMonth = new Date().toISOString().slice(0, 7);
-  const currentMonthRecords = incomeRecords.filter(record => record.date.startsWith(currentMonth));
-  
-  const dashboardStats = {
-    totalIncomeAllTime: incomeRecords.reduce((sum, record) => sum + record.amount, 0),
-    totalIncomeThisMonth: currentMonthRecords.reduce((sum, record) => sum + record.amount, 0),
-    recordsCount: incomeRecords.length,
-    averagePerRecord: incomeRecords.length > 0 ? incomeRecords.reduce((sum, record) => sum + record.amount, 0) / incomeRecords.length : 0,
-    topCategory: getTopCategory(incomeRecords),
-    monthlyGrowth: calculateMonthlyGrowth(incomeRecords)
-  };
-
-  function getTopCategory(records: IncomeRecord[]) {
-    const categoryTotals: { [key: string]: number } = {};
-    records.forEach(record => {
-      categoryTotals[record.category] = (categoryTotals[record.category] || 0) + record.amount;
-    });
-    return Object.keys(categoryTotals).reduce((a, b) => categoryTotals[a] > categoryTotals[b] ? a : b, '');
-  }
-
-  function calculateMonthlyGrowth(records: IncomeRecord[]) {
-    const currentMonth = new Date();
-    const lastMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1);
+  useEffect(() => {
+    setLoading(true);
     
-    const currentMonthTotal = records
-      .filter(record => record.date.startsWith(currentMonth.toISOString().slice(0, 7)))
-      .reduce((sum, record) => sum + record.amount, 0);
-    
-    const lastMonthTotal = records
-      .filter(record => record.date.startsWith(lastMonth.toISOString().slice(0, 7)))
-      .reduce((sum, record) => sum + record.amount, 0);
-    
-    if (lastMonthTotal === 0) return 0;
-    return ((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
-  }
+    let allTime = 0;
+    let thisMonth = 0;
+    const monthlyData: { [key: string]: number } = {};
+    const currentMonthYear = new Date().toISOString().slice(0, 7); // YYYY-MM
 
-  const categories = [...new Set(incomeRecords.map(record => record.category))];
-  const paymentMethods = [...new Set(incomeRecords.map(record => record.paymentMethod))];
-
-  const filteredRecords = incomeRecords.filter(record => {
-    const matchesSearch = record.source.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         record.incomeType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         record.invoiceNumber?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = filterCategory === "all" || record.category === filterCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const handleAddRecord = () => {
-    setShowAddForm(true);
-    setEditingRecord(null);
-  };
-
-  const handleEditRecord = (record: IncomeRecord) => {
-    setEditingRecord(record);
-    setShowAddForm(true);
-  };
-
-  const handleDeleteRecord = (recordId: string) => {
-    if (confirm("Are you sure you want to delete this income record?")) {
-      toast({
-        title: "Record Deleted",
-        description: "Income record has been successfully deleted.",
-      });
-    }
-  };
-
-  const getCategoryBreakdown = () => {
-    const breakdown: { [key: string]: number } = {};
     incomeRecords.forEach(record => {
-      breakdown[record.category] = (breakdown[record.category] || 0) + record.amount;
+      const amount = parseFloat(record.amount.toString()) || 0;
+      allTime += amount;
+
+      if (record.date && record.date.startsWith(currentMonthYear)) {
+        thisMonth += amount;
+      }
+
+      if (record.date) {
+        const monthYear = record.date.slice(0, 7);
+        monthlyData[monthYear] = (monthlyData[monthYear] || 0) + amount;
+      }
     });
-    return Object.entries(breakdown).map(([category, amount]) => ({ category, amount }));
+
+    setTotalIncomeAllTime(allTime);
+    setTotalIncomeThisMonth(thisMonth);
+    setIncomeByMonth(monthlyData);
+    setLoading(false);
+  }, [incomeRecords]);
+
+  const sortedMonths = Object.keys(incomeByMonth).sort().reverse();
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold text-purple-700 mb-6">Income Dashboard</h2>
+      {loading ? (
+        <p className="text-gray-600">Loading income data...</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <DashboardCard 
+            title="Total Income (All Time)" 
+            value={`KSH ${totalIncomeAllTime.toFixed(2)}`} 
+            icon="📈" 
+            color="bg-green-100 text-green-700" 
+          />
+          <DashboardCard 
+            title="Total Income (This Month)" 
+            value={`KSH ${totalIncomeThisMonth.toFixed(2)}`} 
+            icon="🗓️" 
+            color="bg-blue-100 text-blue-700" 
+          />
+        </div>
+      )}
+
+      <h3 className="text-xl font-semibold text-purple-800 mb-4">Monthly Income Breakdown</h3>
+      {sortedMonths.length === 0 ? (
+        <p className="text-gray-600">No monthly income data available.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sortedMonths.map(month => (
+            <div key={month} className="p-4 rounded-lg shadow-sm bg-gray-50 border border-gray-200">
+              <h4 className="text-md font-semibold text-gray-800">{month}</h4>
+              <p className="text-xl font-bold text-gray-900">KSH {incomeByMonth[month].toFixed(2)}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function IncomeManagement({ 
+  incomeRecords, 
+  onAddRecord, 
+  onUpdateRecord, 
+  onDeleteRecord 
+}: { 
+  incomeRecords: IncomeRecord[]; 
+  onAddRecord: (record: Omit<IncomeRecord, 'id'>) => void;
+  onUpdateRecord: (record: IncomeRecord) => void;
+  onDeleteRecord: (id: string) => void;
+}) {
+  const [newIncome, setNewIncome] = useState({ 
+    date: '', 
+    incomeType: 'Patient Fees', 
+    amount: '', 
+    source: '', 
+    notes: '' 
+  });
+  const [editingIncome, setEditingIncome] = useState<IncomeRecord | null>(null);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const { toast } = useToast();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const val = type === 'number' ? parseFloat(value) || '' : value;
+
+    if (editingIncome) {
+      setEditingIncome(prev => prev ? { ...prev, [name]: val } : null);
+    } else {
+      setNewIncome(prev => ({ ...prev, [name]: val }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage('');
+    setError('');
+
+    try {
+      const incomeData = editingIncome || { ...newIncome, amount: parseFloat(newIncome.amount.toString()) || 0 };
+      
+      if (!incomeData.date || !incomeData.incomeType || !incomeData.amount || !incomeData.source) {
+        setError("Date, Income Type, Amount, and Source are required.");
+        return;
+      }
+      
+      if (isNaN(Number(incomeData.amount)) || Number(incomeData.amount) <= 0) {
+        setError("Amount must be a positive number.");
+        return;
+      }
+
+      if (editingIncome) {
+        onUpdateRecord(editingIncome);
+        setMessage("Income record updated successfully!");
+        setEditingIncome(null);
+        toast({
+          title: "Success",
+          description: "Income record updated successfully!",
+        });
+      } else {
+        onAddRecord({
+          date: incomeData.date,
+          incomeType: incomeData.incomeType,
+          amount: Number(incomeData.amount),
+          source: incomeData.source,
+          notes: incomeData.notes
+        });
+        setMessage("Income record added successfully!");
+        setNewIncome({ date: '', incomeType: 'Patient Fees', amount: '', source: '', notes: '' });
+        toast({
+          title: "Success", 
+          description: "Income record added successfully!",
+        });
+      }
+    } catch (err) {
+      console.error("Error saving income record:", err);
+      setError("Failed to save income record.");
+    }
+  };
+
+  const handleEdit = (record: IncomeRecord) => {
+    setEditingIncome({ ...record });
+    setMessage('');
+    setError('');
+  };
+
+  const handleDelete = async (id: string) => {
+    setMessage('');
+    setError('');
+    if (window.confirm("Are you sure you want to delete this income record?")) {
+      try {
+        onDeleteRecord(id);
+        setMessage("Income record deleted successfully!");
+        toast({
+          title: "Success",
+          description: "Income record deleted successfully!",
+        });
+      } catch (err) {
+        console.error("Error deleting income record:", err);
+        setError("Failed to delete income record.");
+      }
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIncome(null);
+    setError('');
+    setMessage('');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <TrendingUp className="h-8 w-8 text-purple-600" />
-                Hospital Income Management (Kenya)
-              </h1>
-              <p className="text-gray-600 mt-1">Track and manage all hospital revenue streams in KSH</p>
-            </div>
-            <Badge variant="secondary" className="px-3 py-1">
-              <Calendar className="h-4 w-4 mr-1" />
-              KSH {dashboardStats.totalIncomeThisMonth.toLocaleString()} This Month
-            </Badge>
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold text-purple-700 mb-6">Manage Income Records</h2>
+
+      {/* Add/Edit Income Form */}
+      <form onSubmit={handleSubmit} className="mb-8 p-6 bg-yellow-50 rounded-lg shadow-inner border border-yellow-100">
+        <h3 className="text-xl font-semibold text-yellow-800 mb-4">
+          {editingIncome ? 'Edit Income Record' : 'Add New Income Record'}
+        </h3>
+        
+        {error && <p className="text-red-600 mb-4">{error}</p>}
+        {message && <p className="text-green-600 mb-4">{message}</p>}
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div>
+            <Label htmlFor="date">Date</Label>
+            <Input
+              type="date"
+              id="date"
+              name="date"
+              value={editingIncome ? editingIncome.date : newIncome.date}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="incomeType">Income Type</Label>
+            <Select 
+              name="incomeType" 
+              value={editingIncome ? editingIncome.incomeType : newIncome.incomeType} 
+              onValueChange={(value) => {
+                if (editingIncome) {
+                  setEditingIncome(prev => prev ? { ...prev, incomeType: value } : null);
+                } else {
+                  setNewIncome(prev => ({ ...prev, incomeType: value }));
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Patient Fees">Patient Fees</SelectItem>
+                <SelectItem value="Insurance Claims">Insurance Claims</SelectItem>
+                <SelectItem value="Laboratory Services">Laboratory Services</SelectItem>
+                <SelectItem value="Pharmacy Sales">Pharmacy Sales</SelectItem>
+                <SelectItem value="Therapy Sessions">Therapy Sessions</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="amount">Amount (KSH)</Label>
+            <Input
+              type="number"
+              id="amount"
+              name="amount"
+              step="0.01"
+              min="0"
+              value={editingIncome ? editingIncome.amount : newIncome.amount}
+              onChange={handleChange}
+              required
+            />
           </div>
         </div>
-      </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <Label htmlFor="source">Source</Label>
+            <Input
+              type="text"
+              id="source"
+              name="source"
+              value={editingIncome ? editingIncome.source : newIncome.source}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              name="notes"
+              value={editingIncome ? editingIncome.notes : newIncome.notes}
+              onChange={handleChange}
+              rows={3}
+            />
+          </div>
+        </div>
+        
+        <div className="flex gap-4">
+          <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
+            {editingIncome ? 'Update Record' : 'Add Record'}
+          </Button>
+          {editingIncome && (
+            <Button type="button" variant="outline" onClick={handleCancelEdit}>
+              Cancel Edit
+            </Button>
+          )}
+        </div>
+      </form>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <PieChart className="h-4 w-4" />
-              Income Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="records" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Income Records
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Dashboard Tab */}
-          <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Income (All Time)</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">KSH {dashboardStats.totalIncomeAllTime.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Since hospital inception
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">This Month Income</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">KSH {dashboardStats.totalIncomeThisMonth.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {dashboardStats.monthlyGrowth > 0 ? '+' : ''}{dashboardStats.monthlyGrowth.toFixed(1)}% from last month
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Average Per Transaction</CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">KSH {dashboardStats.averagePerRecord.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Across {dashboardStats.recordsCount} transactions
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Top Revenue Category</CardTitle>
-                  <PieChart className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{dashboardStats.topCategory}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Highest earning category
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Category Breakdown */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Income by Category</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {getCategoryBreakdown().map(({ category, amount }) => {
-                    const percentage = (amount / dashboardStats.totalIncomeAllTime) * 100;
-                    return (
-                      <div key={category} className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{category}</span>
-                        <div className="flex items-center gap-3">
-                          <div className="w-24 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-purple-600 h-2 rounded-full" 
-                              style={{ width: `${percentage}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-sm font-bold min-w-[100px] text-right">
-                            KSH {amount.toLocaleString()}
-                          </span>
-                        </div>
+      {/* Income Records Table */}
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Income Records</h3>
+        {incomeRecords.length === 0 ? (
+          <p className="text-gray-600">No income records found. Add your first income record above.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Income Type</TableHead>
+                  <TableHead>Source</TableHead>
+                  <TableHead>Amount (KSH)</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {incomeRecords.map((record) => (
+                  <TableRow key={record.id}>
+                    <TableCell>{record.date}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{record.incomeType}</Badge>
+                    </TableCell>
+                    <TableCell>{record.source}</TableCell>
+                    <TableCell className="font-bold">KSH {record.amount.toFixed(2)}</TableCell>
+                    <TableCell>{record.notes}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => handleEdit(record)}>
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleDelete(record.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Records Tab */}
-          <TabsContent value="records" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Income Records Management</CardTitle>
-                  <Button onClick={handleAddRecord} className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add Income Record
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Search and Filter */}
-                <div className="flex gap-4 mb-6">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <Input
-                        placeholder="Search by source, type, or invoice number..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                  <Select value={filterCategory} onValueChange={setFilterCategory}>
-                    <SelectTrigger className="w-48">
-                      <SelectValue placeholder="Filter by category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category}>{category}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    Export
-                  </Button>
-                </div>
-
-                {/* Income Records Table */}
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Income Type</TableHead>
-                      <TableHead>Source</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Amount (KSH)</TableHead>
-                      <TableHead>Payment Method</TableHead>
-                      <TableHead>Invoice #</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredRecords.map((record) => (
-                      <TableRow key={record.id}>
-                        <TableCell>{record.date}</TableCell>
-                        <TableCell className="font-medium">{record.incomeType}</TableCell>
-                        <TableCell>{record.source}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{record.category}</Badge>
-                        </TableCell>
-                        <TableCell className="font-bold">
-                          KSH {record.amount.toLocaleString()}
-                        </TableCell>
-                        <TableCell>{record.paymentMethod}</TableCell>
-                        <TableCell className="font-mono text-sm">{record.invoiceNumber}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button size="sm" variant="outline" onClick={() => handleEditRecord(record)}>
-                              <Edit3 className="h-4 w-4" />
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={() => setSelectedRecord(record)}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={() => handleDeleteRecord(record.id)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+export default function IncomeManagementKenya() {
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [incomeRecords, setIncomeRecords] = useState<IncomeRecord[]>([]);
+  const [userId] = useState('hospital_admin');
+
+  // Initialize with sample data
+  useEffect(() => {
+    const sampleData: IncomeRecord[] = [
+      {
+        id: "1",
+        date: "2024-01-30",
+        incomeType: "Patient Fees",
+        amount: 15000,
+        source: "Outpatient Consultation",
+        notes: "Mental health consultation"
+      },
+      {
+        id: "2", 
+        date: "2024-01-30",
+        incomeType: "Insurance Claims",
+        amount: 45000,
+        source: "NHIF Reimbursement",
+        notes: "Monthly insurance claims processing"
+      },
+      {
+        id: "3",
+        date: "2024-01-29", 
+        incomeType: "Laboratory Services",
+        amount: 8500,
+        source: "Blood Tests & Diagnostics",
+        notes: "Various lab tests performed"
+      },
+      {
+        id: "4",
+        date: "2024-01-29",
+        incomeType: "Pharmacy Sales", 
+        amount: 12000,
+        source: "Medication Dispensing",
+        notes: "Prescription medications sold"
+      },
+      {
+        id: "5",
+        date: "2024-01-28",
+        incomeType: "Therapy Sessions",
+        amount: 25000,
+        source: "Individual & Group Therapy", 
+        notes: "Mental health therapy sessions"
+      }
+    ];
+    setIncomeRecords(sampleData);
+  }, []);
+
+  const handleAddRecord = (record: Omit<IncomeRecord, 'id'>) => {
+    const newRecord = {
+      ...record,
+      id: Date.now().toString()
+    };
+    setIncomeRecords(prev => [...prev, newRecord]);
+  };
+
+  const handleUpdateRecord = (updatedRecord: IncomeRecord) => {
+    setIncomeRecords(prev => 
+      prev.map(record => 
+        record.id === updatedRecord.id ? updatedRecord : record
+      )
+    );
+  };
+
+  const handleDeleteRecord = (id: string) => {
+    setIncomeRecords(prev => prev.filter(record => record.id !== id));
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 font-inter antialiased">
+      {/* Header and Navigation */}
+      <header className="bg-white shadow-md p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center">
+        <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-4 sm:mb-0">
+          Child Mental Haven - Income Management (Kenya)
+        </h1>
+        <nav className="flex flex-wrap gap-2 sm:gap-4">
+          <Button
+            onClick={() => setCurrentView('dashboard')}
+            variant={currentView === 'dashboard' ? 'default' : 'outline'}
+            className={currentView === 'dashboard' ? 'bg-purple-600 text-white' : ''}
+          >
+            <PieChart className="h-4 w-4 mr-2" />
+            Dashboard
+          </Button>
+          <Button
+            onClick={() => setCurrentView('income_records')}
+            variant={currentView === 'income_records' ? 'default' : 'outline'}
+            className={currentView === 'income_records' ? 'bg-purple-600 text-white' : ''}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Income Records
+          </Button>
+        </nav>
+      </header>
+
+      {/* User ID Display */}
+      <div className="p-4 bg-purple-50 text-purple-700 text-center text-sm font-medium">
+        User ID: <span className="font-mono text-purple-900">{userId}</span> | Income data stored securely with KSH currency
+      </div>
+
+      {/* Main Content Area */}
+      <main className="p-4 sm:p-6 lg:p-8">
+        {currentView === 'dashboard' && <IncomeDashboard incomeRecords={incomeRecords} />}
+        {currentView === 'income_records' && (
+          <IncomeManagement 
+            incomeRecords={incomeRecords}
+            onAddRecord={handleAddRecord}
+            onUpdateRecord={handleUpdateRecord}
+            onDeleteRecord={handleDeleteRecord}
+          />
+        )}
+      </main>
     </div>
   );
 }
