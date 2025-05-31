@@ -6,26 +6,26 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Printer, Save, Plus, Edit3 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, Printer, Save, Plus, Edit3, Search, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function InpatientManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedPatient, setSelectedPatient] = useState<any>({
-    name: "LESLEY NDAMBUKI MUASYA",
-    opNo: "2024050024",
-    gender: "Male",
-    age: "21 Years, 3 Months, 23 Days (0.0 M)"
-  });
-  
+  const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [admissionNotes, setAdmissionNotes] = useState([]);
   const [newNote, setNewNote] = useState({
     date: new Date().toISOString().split('T')[0],
     description: "",
     enteredBy: ""
+  });
+
+  const { data: patients = [] } = useQuery({
+    queryKey: ["/api/patients"],
   });
 
   const { data: inpatients = [] } = useQuery({
@@ -50,7 +50,39 @@ export default function InpatientManagement() {
     },
   });
 
+  const handlePatientSearch = () => {
+    if (searchQuery.length > 0) {
+      const foundPatient = patients.find((p: any) => 
+        p.patientId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.surname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.baptismalName?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      if (foundPatient) {
+        setSelectedPatient(foundPatient);
+        toast({
+          title: "Patient Found",
+          description: `${foundPatient.surname}, ${foundPatient.baptismalName} selected for inpatient care.`,
+        });
+      } else {
+        toast({
+          title: "Not Found",
+          description: "No patient found with that criteria.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
   const handleAddNote = () => {
+    if (!selectedPatient) {
+      toast({
+        title: "No Patient Selected",
+        description: "Please search and select a patient first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!newNote.description.trim()) {
       toast({
         title: "Missing Information",
@@ -63,8 +95,8 @@ export default function InpatientManagement() {
     const noteData = {
       ...newNote,
       patientId: selectedPatient.id,
-      patientName: selectedPatient.name,
-      opNo: selectedPatient.opNo
+      patientName: `${selectedPatient.surname}, ${selectedPatient.baptismalName}`,
+      opNo: selectedPatient.patientId
     };
 
     addNoteMutation.mutate(noteData);
@@ -73,24 +105,56 @@ export default function InpatientManagement() {
   return (
     <div className="h-screen bg-green-50 p-6">
       <div className="bg-white rounded-lg shadow-sm h-full">
-        {/* Patient Information Header */}
+        {/* Patient Search and Information Header */}
         <div className="p-6 border-b border-gray-200">
-          <div className="grid grid-cols-4 gap-6 text-sm">
-            <div>
-              <Label className="font-medium text-gray-600">Patient Name:</Label>
-              <div className="font-semibold text-blue-600">{selectedPatient.name}</div>
+          <div className="grid grid-cols-3 gap-6">
+            <div className="col-span-2 space-y-4">
+              <div className="flex items-center gap-4">
+                <Label className="text-sm font-medium">Search Patient:</Label>
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-64 h-8"
+                  placeholder="Enter Patient ID or Name"
+                />
+                <Button onClick={handlePatientSearch} size="sm" className="h-8">
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {selectedPatient ? (
+                <div className="grid grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <Label className="font-medium text-gray-600">Patient Name:</Label>
+                    <div className="font-semibold text-blue-600">
+                      {selectedPatient.surname}, {selectedPatient.baptismalName} {selectedPatient.otherName}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="font-medium text-gray-600">Patient ID:</Label>
+                    <div className="font-semibold text-blue-600">{selectedPatient.patientId}</div>
+                  </div>
+                  <div>
+                    <Label className="font-medium text-gray-600">Gender:</Label>
+                    <div>{selectedPatient.gender}</div>
+                  </div>
+                  <div>
+                    <Label className="font-medium text-gray-600">Age:</Label>
+                    <div>{selectedPatient.age} years</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-gray-500 py-4">
+                  Search and select a patient to begin inpatient management
+                </div>
+              )}
             </div>
-            <div>
-              <Label className="font-medium text-gray-600">OP No.:</Label>
-              <div className="font-semibold text-blue-600">{selectedPatient.opNo}</div>
-            </div>
-            <div>
-              <Label className="font-medium text-gray-600">Gender:</Label>
-              <div>{selectedPatient.gender}</div>
-            </div>
-            <div>
-              <Label className="font-medium text-gray-600">Age:</Label>
-              <div>{selectedPatient.age}</div>
+
+            {/* Patient Photo */}
+            <div className="flex flex-col items-center">
+              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-2">
+                <User className="w-12 h-12 text-gray-400" />
+              </div>
             </div>
           </div>
         </div>
@@ -120,8 +184,10 @@ export default function InpatientManagement() {
               <Card>
                 <CardContent className="p-4">
                   <Textarea
-                    placeholder="Enter patient's medical history..."
+                    placeholder="Enter patient's medical history, previous admissions, chronic conditions, surgeries, etc."
                     className="min-h-32"
+                    value={selectedPatient?.medicalHistory || ""}
+                    readOnly={!selectedPatient}
                   />
                 </CardContent>
               </Card>
@@ -130,7 +196,12 @@ export default function InpatientManagement() {
             <TabsContent value="diagnosis" className="space-y-4">
               <Card>
                 <CardContent className="p-4">
-                  <div className="text-sm">Drug induced psychosis, Gambling addiction</div>
+                  <Textarea
+                    placeholder="Enter current diagnosis, primary and secondary conditions"
+                    className="min-h-32"
+                    value={selectedPatient?.currentDiagnosis || ""}
+                    readOnly={!selectedPatient}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -138,7 +209,12 @@ export default function InpatientManagement() {
             <TabsContent value="allergies" className="space-y-4">
               <Card>
                 <CardContent className="p-4">
-                  <div className="text-sm text-red-600">None</div>
+                  <Textarea
+                    placeholder="List known allergies, drug reactions, food allergies"
+                    className="min-h-32"
+                    value={selectedPatient?.allergies || "None"}
+                    readOnly={!selectedPatient}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -146,7 +222,12 @@ export default function InpatientManagement() {
             <TabsContent value="other-conditions" className="space-y-4">
               <Card>
                 <CardContent className="p-4">
-                  <div className="text-sm">None</div>
+                  <Textarea
+                    placeholder="Enter other underlying medical conditions, comorbidities"
+                    className="min-h-32"
+                    value={selectedPatient?.otherConditions || ""}
+                    readOnly={!selectedPatient}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -154,7 +235,18 @@ export default function InpatientManagement() {
             <TabsContent value="documents" className="space-y-4">
               <Card>
                 <CardContent className="p-4">
-                  <div className="text-sm text-gray-500">No documents uploaded</div>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Button size="sm" variant="outline">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Upload Document
+                      </Button>
+                      <Input type="file" className="hidden" id="document-upload" />
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Upload medical reports, lab results, imaging studies, referral letters
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
