@@ -9,10 +9,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Search, User, Clock, FileText, Save, Plus, Stethoscope, Pill, Activity, FileDown } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Search, User, Clock, FileText, Save, Plus, Stethoscope, Pill, Activity, FileDown, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import ClinicalSummaryForm from "@/components/forms/ClinicalSummaryForm";
+import ReferralOutForm from "@/components/forms/ReferralOutForm";
 
 export default function OutpatientManagement() {
   const { toast } = useToast();
@@ -67,6 +69,8 @@ export default function OutpatientManagement() {
     chiefComplaint: "",
     onObservation: ""
   });
+
+  const [showReferralForm, setShowReferralForm] = useState(false);
 
   const { data: patients = [] } = useQuery({
     queryKey: ["/api/patients"],
@@ -784,8 +788,8 @@ export default function OutpatientManagement() {
                     </div>
                   </div>
 
-                  {/* Save Button */}
-                  <div className="mt-8 text-center">
+                  {/* Action Buttons */}
+                  <div className="mt-8 flex justify-center gap-4">
                     <Button 
                       className="px-12 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400"
                       onClick={() => {
@@ -814,6 +818,34 @@ export default function OutpatientManagement() {
                       }}
                     >
                       Save Referral Notes
+                    </Button>
+                    
+                    <Button 
+                      className="px-8 py-2 bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2"
+                      onClick={() => {
+                        if (!selectedPatient) {
+                          toast({
+                            title: "No Patient Selected",
+                            description: "Please search and select a patient first.",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        
+                        if (!referralForm.facilityName || !referralForm.reasonForReferral) {
+                          toast({
+                            title: "Required Information Missing",
+                            description: "Please fill in facility name and reason for referral.",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+
+                        setShowReferralForm(true);
+                      }}
+                    >
+                      <Printer className="h-4 w-4" />
+                      Generate Referral Form
                     </Button>
                   </div>
                 </CardContent>
@@ -979,6 +1011,19 @@ export default function OutpatientManagement() {
           </Tabs>
         </div>
       </div>
+
+      {/* Referral Form Modal */}
+      <Dialog open={showReferralForm} onOpenChange={setShowReferralForm}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Referral Out Form</DialogTitle>
+          </DialogHeader>
+          <ReferralOutForm 
+            patientData={selectedPatient} 
+            referralData={referralForm}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
