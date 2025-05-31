@@ -661,8 +661,198 @@ export default function BillingInvoicing() {
           </div>
         )}
 
+        {/* History of Admissions Tab */}
+        {activeTab === "history" && (
+          <div>
+            {/* Filter Section */}
+            <div className="p-6 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center gap-4">
+              <Label htmlFor="start-date" className="text-sm font-medium text-gray-700">
+                Filter by Admission Date Starting on
+              </Label>
+              <Input 
+                type="date" 
+                id="start-date" 
+                value={startDate || "2025-05-31"} 
+                onChange={(e) => setStartDate(e.target.value)}
+                className="p-2 border border-gray-300 rounded-md text-sm w-auto"
+              />
+              <Label htmlFor="end-date" className="text-sm font-medium text-gray-700">
+                and ending on
+              </Label>
+              <Input 
+                type="date" 
+                id="end-date" 
+                value={endDate || "2025-05-31"} 
+                onChange={(e) => setEndDate(e.target.value)}
+                className="p-2 border border-gray-300 rounded-md text-sm w-auto"
+              />
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700 text-sm"
+                onClick={() => {
+                  toast({
+                    title: "Filter Applied",
+                    description: `Filtering admissions from ${startDate} to ${endDate}`,
+                  });
+                }}
+              >
+                Filter
+              </Button>
+            </div>
+
+            {/* Main Content Area - Table */}
+            <div className="p-6">
+              <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">File Number</TableHead>
+                      <TableHead className="text-xs">Op. Number</TableHead>
+                      <TableHead className="text-xs">Patient Name</TableHead>
+                      <TableHead className="text-xs">Admission Date</TableHead>
+                      <TableHead className="text-xs">Total Billed</TableHead>
+                      <TableHead className="text-xs">Total Paid + Waived</TableHead>
+                      <TableHead className="text-xs">Balance</TableHead>
+                      <TableHead className="text-xs">Advance Payment</TableHead>
+                      <TableHead className="text-xs">Date Discharged</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {/* Sample historical admissions data */}
+                    <TableRow>
+                      <TableCell className="text-sm">CMH-004</TableCell>
+                      <TableCell className="text-sm">OP-2024-004</TableCell>
+                      <TableCell className="text-sm">Grace Wanjiru Kinyua</TableCell>
+                      <TableCell className="text-sm">2024-01-10</TableCell>
+                      <TableCell className="text-sm">KSH 8,500</TableCell>
+                      <TableCell className="text-sm">KSH 8,500</TableCell>
+                      <TableCell className="text-sm font-bold text-green-600">KSH 0</TableCell>
+                      <TableCell className="text-sm">KSH 0</TableCell>
+                      <TableCell className="text-sm">2024-01-18</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-sm">CMH-005</TableCell>
+                      <TableCell className="text-sm">OP-2024-005</TableCell>
+                      <TableCell className="text-sm">Samuel Ochieng Otieno</TableCell>
+                      <TableCell className="text-sm">2024-01-05</TableCell>
+                      <TableCell className="text-sm">KSH 15,200</TableCell>
+                      <TableCell className="text-sm">KSH 12,000</TableCell>
+                      <TableCell className="text-sm font-bold text-red-600">KSH 3,200</TableCell>
+                      <TableCell className="text-sm">KSH 500</TableCell>
+                      <TableCell className="text-sm">2024-01-25</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-sm">CMH-006</TableCell>
+                      <TableCell className="text-sm">OP-2023-089</TableCell>
+                      <TableCell className="text-sm">Rose Njeri Mukuria</TableCell>
+                      <TableCell className="text-sm">2023-12-28</TableCell>
+                      <TableCell className="text-sm">KSH 6,800</TableCell>
+                      <TableCell className="text-sm">KSH 6,800</TableCell>
+                      <TableCell className="text-sm font-bold text-green-600">KSH 0</TableCell>
+                      <TableCell className="text-sm">KSH 0</TableCell>
+                      <TableCell className="text-sm">2024-01-05</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-sm">CMH-007</TableCell>
+                      <TableCell className="text-sm">OP-2023-085</TableCell>
+                      <TableCell className="text-sm">David Kiprotich Kiplagat</TableCell>
+                      <TableCell className="text-sm">2023-12-20</TableCell>
+                      <TableCell className="text-sm">KSH 11,400</TableCell>
+                      <TableCell className="text-sm">KSH 9,000</TableCell>
+                      <TableCell className="text-sm font-bold text-red-600">KSH 2,400</TableCell>
+                      <TableCell className="text-sm">KSH 0</TableCell>
+                      <TableCell className="text-sm">2023-12-30</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-sm">CMH-008</TableCell>
+                      <TableCell className="text-sm">OP-2023-082</TableCell>
+                      <TableCell className="text-sm">Faith Akinyi Odera</TableCell>
+                      <TableCell className="text-sm">2023-12-15</TableCell>
+                      <TableCell className="text-sm">KSH 9,600</TableCell>
+                      <TableCell className="text-sm">KSH 9,600</TableCell>
+                      <TableCell className="text-sm font-bold text-green-600">KSH 0</TableCell>
+                      <TableCell className="text-sm">KSH 200</TableCell>
+                      <TableCell className="text-sm">2023-12-22</TableCell>
+                    </TableRow>
+                    {/* Placeholder rows */}
+                    {Array(5).fill(0).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell className="text-sm text-gray-400">-</TableCell>
+                        <TableCell className="text-sm text-gray-400">-</TableCell>
+                        <TableCell className="text-sm text-gray-400">-</TableCell>
+                        <TableCell className="text-sm text-gray-400">-</TableCell>
+                        <TableCell className="text-sm text-gray-400">-</TableCell>
+                        <TableCell className="text-sm text-gray-400">-</TableCell>
+                        <TableCell className="text-sm text-gray-400">-</TableCell>
+                        <TableCell className="text-sm text-gray-400">-</TableCell>
+                        <TableCell className="text-sm text-gray-400">-</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+
+            {/* Bottom Summary & Controls */}
+            <div className="bg-gray-50 p-6 border-t border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+              {/* Total Number of Patients */}
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold text-gray-800">Total Number of Patients</h3>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Admitted:</span> 
+                  <span className="font-bold text-blue-600">5</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">With Balances:</span> 
+                  <span className="font-bold text-red-600">2</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Without Balance:</span> 
+                  <span className="font-bold text-green-600">3</span>
+                </div>
+              </div>
+
+              {/* Total Amount */}
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold text-gray-800">Total Amount:</h3>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Billed:</span> 
+                  <span className="font-bold text-gray-900">KSH 51,500</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Paid:</span> 
+                  <span className="font-bold text-gray-900">KSH 45,900</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Unpaid:</span> 
+                  <span className="font-bold text-gray-900">KSH 5,600</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Adv. Payment:</span> 
+                  <span className="font-bold text-gray-900">KSH 700</span>
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col space-y-2 justify-end">
+                <Button 
+                  variant="secondary"
+                  className="w-full text-sm"
+                  onClick={() => {
+                    toast({
+                      title: "Print",
+                      description: "History of admissions report would be generated",
+                    });
+                  }}
+                >
+                  Print
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Other Tab Content Placeholders */}
-        {!["search", "admitted"].includes(activeTab) && (
+        {!["search", "admitted", "history"].includes(activeTab) && (
           <div className="p-6">
             <Card>
               <CardHeader>
