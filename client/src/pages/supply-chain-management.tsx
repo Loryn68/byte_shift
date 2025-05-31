@@ -162,7 +162,7 @@ export default function SupplyChainManagement() {
         {
           type: "expiry_optimization",
           title: "Expiry Date Optimization",
-          description: "AI identified items with high expiry risk - potential waste of $45,000",
+          description: "AI identified items with high expiry risk - potential waste of KSH 45,000",
           confidence: 95,
           recommendation: "Implement FEFO rotation and adjust reorder quantities",
           impact: "medium",
@@ -318,8 +318,8 @@ export default function SupplyChainManagement() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Cost Per Patient Day</p>
-                      <p className="text-3xl font-bold text-gray-900">${supplyChainMetrics.costPerPatientDay}</p>
-                      <p className="text-sm text-green-600">-$8 reduction</p>
+                      <p className="text-3xl font-bold text-gray-900">KSH {supplyChainMetrics.costPerPatientDay}</p>
+                      <p className="text-sm text-green-600">-KSH 8 reduction</p>
                     </div>
                     <DollarSign className="h-12 w-12 text-purple-500" />
                   </div>
@@ -541,8 +541,8 @@ export default function SupplyChainManagement() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-green-600">$485K</p>
-                    <p className="text-sm text-gray-600">vs $520K last month</p>
+                    <p className="text-3xl font-bold text-green-600">KSH 485K</p>
+                    <p className="text-sm text-gray-600">vs KSH 520K last month</p>
                   </div>
                 </CardContent>
               </Card>
@@ -564,7 +564,7 @@ export default function SupplyChainManagement() {
                       <p className="text-sm text-gray-600">Based on predicted 35% demand increase</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold">$28,500</p>
+                      <p className="font-bold">KSH 28,500</p>
                       <Badge className="bg-purple-600">95% confidence</Badge>
                     </div>
                     <Button variant="outline">Review Order</Button>
@@ -679,7 +679,7 @@ export default function SupplyChainManagement() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center">
-                    <p className="text-4xl font-bold text-blue-600">$127K</p>
+                    <p className="text-4xl font-bold text-blue-600">KSH 127K</p>
                     <p className="text-sm text-gray-600">Through AI optimization</p>
                     <Badge className="mt-2 bg-blue-600">This quarter</Badge>
                   </div>

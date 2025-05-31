@@ -31,6 +31,7 @@ import BillingInvoicing from "@/pages/billing-invoicing";
 import CashierCollections from "@/pages/financial-management/cashier-collections";
 import ExpenditureManagement from "@/pages/financial-management/expenditure-management";
 import IncomeManagement from "@/pages/financial-management/income-management";
+import IncomeManagementKenya from "@/pages/financial-management/income-management-kenya";
 import GeneralLedger from "@/pages/financial-management/general-ledger";
 
 // Staff & Payroll Management
