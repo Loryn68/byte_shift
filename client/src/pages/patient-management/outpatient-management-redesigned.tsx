@@ -60,6 +60,14 @@ export default function OutpatientManagement() {
     ]
   });
 
+  const [referralForm, setReferralForm] = useState({
+    referralType: "",
+    facilityName: "",
+    reasonForReferral: "",
+    chiefComplaint: "",
+    onObservation: ""
+  });
+
   const { data: patients = [] } = useQuery({
     queryKey: ["/api/patients"],
   });
@@ -266,7 +274,7 @@ export default function OutpatientManagement() {
         {/* Main Content */}
         <div className="p-6 h-full overflow-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-6 mb-6">
+            <TabsList className="grid w-full grid-cols-7 mb-6">
               <TabsTrigger value="consultation" className="flex items-center gap-2">
                 <Stethoscope className="h-4 w-4" />
                 General Consultation
@@ -282,6 +290,10 @@ export default function OutpatientManagement() {
               <TabsTrigger value="prescription" className="flex items-center gap-2">
                 <Pill className="h-4 w-4" />
                 Prescription
+              </TabsTrigger>
+              <TabsTrigger value="referral" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Referral
               </TabsTrigger>
               <TabsTrigger value="forms" className="flex items-center gap-2">
                 <FileDown className="h-4 w-4" />
@@ -684,6 +696,126 @@ export default function OutpatientManagement() {
                     <Plus className="h-4 w-4 mr-2" />
                     Order Laboratory Test
                   </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Referral Tab */}
+            <TabsContent value="referral" className="space-y-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-2 gap-8">
+                    {/* Left Column - Referral Options */}
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="radio"
+                            id="community"
+                            name="referralType"
+                            value="community"
+                            checked={referralForm.referralType === "community"}
+                            onChange={(e) => setReferralForm(prev => ({ ...prev, referralType: e.target.value }))}
+                            className="h-4 w-4 text-blue-600"
+                          />
+                          <Label htmlFor="community" className="text-sm font-medium">
+                            Refer to Community Unit
+                          </Label>
+                        </div>
+                        
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="radio"
+                            id="facility"
+                            name="referralType"
+                            value="facility"
+                            checked={referralForm.referralType === "facility"}
+                            onChange={(e) => setReferralForm(prev => ({ ...prev, referralType: e.target.value }))}
+                            className="h-4 w-4 text-blue-600"
+                          />
+                          <Label htmlFor="facility" className="text-sm font-medium">
+                            Refer to Another Health Facility
+                          </Label>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Referral Facility Name</Label>
+                        <Input
+                          value={referralForm.facilityName}
+                          onChange={(e) => setReferralForm(prev => ({ ...prev, facilityName: e.target.value }))}
+                          placeholder="Enter facility name"
+                          className="w-full"
+                        />
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Reason for Referral</Label>
+                        <Textarea
+                          value={referralForm.reasonForReferral}
+                          onChange={(e) => setReferralForm(prev => ({ ...prev, reasonForReferral: e.target.value }))}
+                          placeholder="Enter reason for referral"
+                          className="w-full h-32 resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Right Column - Clinical Information */}
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Chief Complaint:</Label>
+                        <Textarea
+                          value={referralForm.chiefComplaint}
+                          onChange={(e) => setReferralForm(prev => ({ ...prev, chiefComplaint: e.target.value }))}
+                          placeholder="Enter chief complaint"
+                          className="w-full h-20 resize-none"
+                        />
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">On Observation:</Label>
+                        <Textarea
+                          value={referralForm.onObservation}
+                          onChange={(e) => setReferralForm(prev => ({ ...prev, onObservation: e.target.value }))}
+                          placeholder="Enter clinical observations"
+                          className="w-full h-20 resize-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Save Button */}
+                  <div className="mt-8 text-center">
+                    <Button 
+                      className="px-12 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400"
+                      onClick={() => {
+                        if (!selectedPatient) {
+                          toast({
+                            title: "No Patient Selected",
+                            description: "Please search and select a patient first.",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        
+                        if (!referralForm.referralType || !referralForm.facilityName || !referralForm.reasonForReferral) {
+                          toast({
+                            title: "Required Fields Missing",
+                            description: "Please fill in all required referral information.",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+
+                        toast({
+                          title: "Referral Notes Saved",
+                          description: "Patient referral information has been saved successfully.",
+                        });
+                      }}
+                    >
+                      Save Referral Notes
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
