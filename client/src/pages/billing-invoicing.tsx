@@ -1326,8 +1326,272 @@ export default function BillingInvoicing() {
           </div>
         )}
 
+        {/* Discharge Queue Tab */}
+        {activeTab === "discharge" && (
+          <div className="p-6">
+            {/* Load List Button */}
+            <div className="mb-6 text-center">
+              <Button 
+                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-base font-semibold"
+                onClick={() => {
+                  toast({
+                    title: "Loading Discharge Queue",
+                    description: "Patient discharge list has been loaded successfully",
+                  });
+                }}
+              >
+                Load List
+              </Button>
+            </div>
+
+            {/* Table for Discharge Queue */}
+            <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs">OPNO</TableHead>
+                    <TableHead className="text-xs">File Number</TableHead>
+                    <TableHead className="text-xs">Patient Name</TableHead>
+                    <TableHead className="text-xs">Gender</TableHead>
+                    <TableHead className="text-xs">Age</TableHead>
+                    <TableHead className="text-xs">Admission Date</TableHead>
+                    <TableHead className="text-xs">Category</TableHead>
+                    <TableHead className="text-xs">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {/* Sample discharge queue patients */}
+                  <TableRow>
+                    <TableCell className="text-sm">OP2024001</TableCell>
+                    <TableCell className="text-sm">FN001234</TableCell>
+                    <TableCell className="text-sm">Maria Wanjiku Njoroge</TableCell>
+                    <TableCell className="text-sm">Female</TableCell>
+                    <TableCell className="text-sm">34</TableCell>
+                    <TableCell className="text-sm">2024-01-15</TableCell>
+                    <TableCell className="text-sm">
+                      <Badge className="bg-blue-100 text-blue-800">Inpatient</Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <div className="flex space-x-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-green-600 hover:text-green-800"
+                          onClick={() => {
+                            toast({
+                              title: "Discharge Process",
+                              description: "Patient discharge process initiated",
+                            });
+                          }}
+                        >
+                          Discharge
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-blue-600 hover:text-blue-800"
+                          onClick={() => {
+                            toast({
+                              title: "View Details",
+                              description: "Patient details displayed",
+                            });
+                          }}
+                        >
+                          View
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="text-sm">OP2024002</TableCell>
+                    <TableCell className="text-sm">FN001235</TableCell>
+                    <TableCell className="text-sm">James Kiprotich Mutai</TableCell>
+                    <TableCell className="text-sm">Male</TableCell>
+                    <TableCell className="text-sm">45</TableCell>
+                    <TableCell className="text-sm">2024-01-18</TableCell>
+                    <TableCell className="text-sm">
+                      <Badge className="bg-orange-100 text-orange-800">Observation</Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <div className="flex space-x-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-green-600 hover:text-green-800"
+                          onClick={() => {
+                            toast({
+                              title: "Discharge Process",
+                              description: "Patient discharge process initiated",
+                            });
+                          }}
+                        >
+                          Discharge
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-blue-600 hover:text-blue-800"
+                          onClick={() => {
+                            toast({
+                              title: "View Details",
+                              description: "Patient details displayed",
+                            });
+                          }}
+                        >
+                          View
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="text-sm">OP2024003</TableCell>
+                    <TableCell className="text-sm">FN001236</TableCell>
+                    <TableCell className="text-sm">Grace Nyawira Kamau</TableCell>
+                    <TableCell className="text-sm">Female</TableCell>
+                    <TableCell className="text-sm">28</TableCell>
+                    <TableCell className="text-sm">2024-01-20</TableCell>
+                    <TableCell className="text-sm">
+                      <Badge className="bg-purple-100 text-purple-800">Therapy</Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <div className="flex space-x-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-green-600 hover:text-green-800"
+                          onClick={() => {
+                            toast({
+                              title: "Discharge Process",
+                              description: "Patient discharge process initiated",
+                            });
+                          }}
+                        >
+                          Discharge
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-blue-600 hover:text-blue-800"
+                          onClick={() => {
+                            toast({
+                              title: "View Details",
+                              description: "Patient details displayed",
+                            });
+                          }}
+                        >
+                          View
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="text-sm">OP2024004</TableCell>
+                    <TableCell className="text-sm">FN001237</TableCell>
+                    <TableCell className="text-sm">Samuel Ochieng Otieno</TableCell>
+                    <TableCell className="text-sm">Male</TableCell>
+                    <TableCell className="text-sm">52</TableCell>
+                    <TableCell className="text-sm">2024-01-22</TableCell>
+                    <TableCell className="text-sm">
+                      <Badge className="bg-red-100 text-red-800">Emergency</Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <div className="flex space-x-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-green-600 hover:text-green-800"
+                          onClick={() => {
+                            toast({
+                              title: "Discharge Process",
+                              description: "Patient discharge process initiated",
+                            });
+                          }}
+                        >
+                          Discharge
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-blue-600 hover:text-blue-800"
+                          onClick={() => {
+                            toast({
+                              title: "View Details",
+                              description: "Patient details displayed",
+                            });
+                          }}
+                        >
+                          View
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                  {/* Placeholder rows to match the empty table appearance */}
+                  {Array(4).fill(0).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Discharge Summary Section */}
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Pending Discharges</p>
+                      <p className="text-2xl font-bold text-orange-600">4</p>
+                    </div>
+                    <div className="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center">
+                      <span className="text-orange-600 text-sm font-bold">4</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Today's Discharges</p>
+                      <p className="text-2xl font-bold text-green-600">12</p>
+                    </div>
+                    <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-sm font-bold">12</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Average Stay</p>
+                      <p className="text-2xl font-bold text-blue-600">7.2</p>
+                      <p className="text-xs text-gray-500">days</p>
+                    </div>
+                    <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 text-sm font-bold">7</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
         {/* Other Tab Content Placeholders */}
-        {!["search", "admitted", "history", "settings", "gate-pass"].includes(activeTab) && (
+        {!["search", "admitted", "history", "settings", "gate-pass", "discharge"].includes(activeTab) && (
           <div className="p-6">
             <Card>
               <CardHeader>
