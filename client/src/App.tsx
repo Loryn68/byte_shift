@@ -18,7 +18,7 @@ import ClinicalEncounters from "@/pages/patient-management/clinical-encounters";
 import OutpatientManagement from "@/pages/patient-management/outpatient-management";
 import InpatientManagement from "@/pages/patient-management/inpatient-management";
 import ElectronicHealthRecords from "@/pages/patient-management/electronic-health-records";
-import TriageManagement from "@/pages/patient-management/triage-management";
+import TriageManagement from "@/pages/patient-management/triage-management-new";
 import TherapyManagement from "@/pages/patient-management/therapy-management";
 
 // Clinical Support Modules
