@@ -39,7 +39,7 @@ import PayrollManagement from "@/pages/staff-payroll/payroll-management";
 
 // Inventory & Supply Chain Management
 import InventoryManagement from "@/pages/inventory-supply/inventory-management";
-import SupplyChainManagement from "@/pages/inventory-supply/supply-chain-management";
+import SupplyChainManagement from "@/pages/supply-chain-management";
 
 // Reports & Analytics
 import OperationalReports from "@/pages/reports-analytics/operational-reports";
