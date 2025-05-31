@@ -8,9 +8,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Printer, Save, Plus, Edit3, Search, User } from "lucide-react";
+import { FileText, Printer, Save, Plus, Edit3, Search, User, FileDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import DischargeSummaryForm from "@/components/forms/DischargeSummaryForm";
+import TreatmentRecordForm from "@/components/forms/TreatmentRecordForm";
 
 export default function InpatientManagement() {
   const { toast } = useToast();

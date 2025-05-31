@@ -9,9 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Search, User, Clock, FileText, Save, Plus, Stethoscope, Pill, Activity } from "lucide-react";
+import { Search, User, Clock, FileText, Save, Plus, Stethoscope, Pill, Activity, FileDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import ClinicalSummaryForm from "@/components/forms/ClinicalSummaryForm";
 
 export default function OutpatientManagement() {
   const { toast } = useToast();
@@ -265,7 +266,7 @@ export default function OutpatientManagement() {
         {/* Main Content */}
         <div className="p-6 h-full overflow-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsList className="grid w-full grid-cols-6 mb-6">
               <TabsTrigger value="consultation" className="flex items-center gap-2">
                 <Stethoscope className="h-4 w-4" />
                 General Consultation
@@ -281,6 +282,10 @@ export default function OutpatientManagement() {
               <TabsTrigger value="prescription" className="flex items-center gap-2">
                 <Pill className="h-4 w-4" />
                 Prescription
+              </TabsTrigger>
+              <TabsTrigger value="forms" className="flex items-center gap-2">
+                <FileDown className="h-4 w-4" />
+                Clinical Forms
               </TabsTrigger>
               <TabsTrigger value="history" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
@@ -768,6 +773,29 @@ export default function OutpatientManagement() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Clinical Forms Tab */}
+            <TabsContent value="forms" className="space-y-4">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-4">Clinical Forms - Child Mental Haven</h3>
+                <p className="text-gray-600 mb-6">Generate, print, and download clinical documentation forms with Child Mental Haven branding</p>
+                
+                {selectedPatient ? (
+                  <ClinicalSummaryForm 
+                    patientData={selectedPatient} 
+                    consultationData={consultationForm} 
+                  />
+                ) : (
+                  <Card className="max-w-md mx-auto">
+                    <CardContent className="p-6 text-center">
+                      <FileDown className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                      <h4 className="text-lg font-medium mb-2">No Patient Selected</h4>
+                      <p className="text-gray-600">Please search and select a patient to generate clinical forms.</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             </TabsContent>
 
             {/* Patient History Tab */}
