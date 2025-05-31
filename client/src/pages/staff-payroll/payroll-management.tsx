@@ -438,7 +438,7 @@ export default function PayrollManagement() {
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
                       <p className="font-semibold">Payroll for January 2024 processed</p>
-                      <p className="text-sm text-gray-600">4 employees • Total: KES {totalNetPay.toLocaleString()}</p>
+                      <p className="text-sm text-gray-600">4 employees • Total: KES {summaryStats.totalNetPay.toLocaleString()}</p>
                     </div>
                     <Badge variant="outline">Completed</Badge>
                   </div>
@@ -766,19 +766,19 @@ export default function PayrollManagement() {
                     </div>
                     <div className="flex justify-between">
                       <span>Total Gross Pay:</span>
-                      <span className="font-bold">KES {totalGrossPay.toLocaleString()}</span>
+                      <span className="font-bold">KES {summaryStats.totalGrossPay.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total Net Pay:</span>
-                      <span className="font-bold">KES {totalNetPay.toLocaleString()}</span>
+                      <span className="font-bold">KES {summaryStats.totalNetPay.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total Tax (PAYE):</span>
-                      <span className="font-bold">KES {totalTaxDeductions.toLocaleString()}</span>
+                      <span className="font-bold">KES {summaryStats.totalTaxDeductions.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Statutory Deductions:</span>
-                      <span className="font-bold">KES {totalStatutoryDeductions.toLocaleString()}</span>
+                      <span className="font-bold">KES {summaryStats.totalStatutoryDeductions.toLocaleString()}</span>
                     </div>
                   </div>
                 </CardContent>
