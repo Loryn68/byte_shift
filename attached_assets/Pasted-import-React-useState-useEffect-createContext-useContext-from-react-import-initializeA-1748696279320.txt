@@ -1,0 +1,787 @@
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, onSnapshot } from 'firebase/firestore';
+
+// Create a context for Firebase and User
+const FirebaseContext = createContext(null);
+
+// Main App Component
+function App() {
+  const [db, setDb] = useState(null);
+  const [auth, setAuth] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'employees', 'leave', 'attendance'
+
+  useEffect(() => {
+    // Initialize Firebase
+    try {
+      const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+      const app = initializeApp(firebaseConfig);
+      const firestore = getFirestore(app);
+      const firebaseAuth = getAuth(app);
+
+      setDb(firestore);
+      setAuth(firebaseAuth);
+
+      // Authenticate user
+      const authenticateUser = async () => {
+        try {
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(firebaseAuth, __initial_auth_token);
+          } else {
+            await signInAnonymously(firebaseAuth);
+          }
+        } catch (error) {
+          console.error("Firebase authentication error:", error);
+          // Fallback to anonymous if custom token fails or is not provided
+          await signInAnonymously(firebaseAuth);
+        }
+      };
+
+      authenticateUser();
+
+      // Listen for auth state changes
+      const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+        if (user) {
+          setUserId(user.uid);
+        } else {
+          setUserId(crypto.randomUUID()); // Anonymous or unauthenticated user ID
+        }
+        setIsAuthReady(true);
+      });
+
+      return () => unsubscribe(); // Cleanup auth listener
+    } catch (e) {
+      console.error("Error initializing Firebase:", e);
+      setIsAuthReady(true); // Ensure app can proceed even if Firebase init fails
+    }
+  }, []); // Run only once on component mount
+
+  if (!isAuthReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-lg font-semibold text-gray-700">Loading Staff Management System...</div>
+      </div>
+    );
+  }
+
+  return (
+    <FirebaseContext.Provider value={{ db, auth, userId }}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-inter antialiased">
+        {/* Header and Navigation */}
+        <header className="bg-white shadow-md p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-blue-800 mb-4 sm:mb-0">Hospital Staff Management</h1>
+          <nav className="flex flex-wrap gap-2 sm:gap-4">
+            <button
+              onClick={() => setCurrentView('dashboard')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                currentView === 'dashboard' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+              }`}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => setCurrentView('employees')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                currentView === 'employees' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+              }`}
+            >
+              Employees
+            </button>
+            <button
+              onClick={() => setCurrentView('leave')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                currentView === 'leave' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+              }`}
+            >
+              Leave
+            </button>
+            <button
+              onClick={() => setCurrentView('attendance')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                currentView === 'attendance' ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+              }`}
+            >
+              Attendance
+            </button>
+          </nav>
+        </header>
+
+        {/* User ID Display */}
+        <div className="p-4 bg-blue-50 text-blue-700 text-center text-sm font-medium">
+          Your User ID: <span className="font-mono text-blue-900">{userId}</span> (Use this for multi-user interactions)
+        </div>
+
+        {/* Main Content Area */}
+        <main className="p-4 sm:p-6 lg:p-8">
+          {currentView === 'dashboard' && <Dashboard />}
+          {currentView === 'employees' && <EmployeeManagement />}
+          {currentView === 'leave' && <LeaveManagement />}
+          {currentView === 'attendance' && <AttendanceTracking />}
+        </main>
+      </div>
+    </FirebaseContext.Provider>
+  );
+}
+
+// Dashboard Component
+function Dashboard() {
+  const { db, userId } = useContext(FirebaseContext);
+  const [employeeCount, setEmployeeCount] = useState(0);
+  const [pendingLeaves, setPendingLeaves] = useState(0);
+  const [totalPresent, setTotalPresent] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!db || !userId) return;
+
+    setLoading(true);
+    setError('');
+
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch Employee Count
+        const employeesRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/employees`);
+        const employeeSnapshot = await getDocs(employeesRef);
+        setEmployeeCount(employeeSnapshot.size);
+
+        // Fetch Pending Leaves (simplified for dashboard)
+        const leavesRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/leaves`);
+        const pendingLeavesQuery = query(leavesRef, where('status', '==', 'Pending'));
+        const pendingLeavesSnapshot = await getDocs(pendingLeavesQuery);
+        setPendingLeaves(pendingLeavesSnapshot.size);
+
+        // Fetch Today's Attendance (simplified: count unique clock-ins for today)
+        const attendanceRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/attendance`);
+        const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+        const todayAttendanceQuery = query(attendanceRef, where('date', '==', today), where('clockIn', '!=', null));
+        const todayAttendanceSnapshot = await getDocs(todayAttendanceQuery);
+        const presentEmployees = new Set();
+        todayAttendanceSnapshot.forEach(doc => {
+          presentEmployees.add(doc.data().employeeId);
+        });
+        setTotalPresent(presentEmployees.size);
+
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+        setError("Failed to load dashboard data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [db, userId]);
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold text-blue-700 mb-6">Dashboard Overview</h2>
+      {loading ? (
+        <p className="text-gray-600">Loading...</p>
+      ) : error ? (
+        <p className="text-red-600">{error}</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <DashboardCard title="Total Employees" value={employeeCount} icon="👥" color="bg-blue-100 text-blue-700" />
+          <DashboardCard title="Pending Leave Requests" value={pendingLeaves} icon="⏳" color="bg-yellow-100 text-yellow-700" />
+          <DashboardCard title="Employees Present Today" value={totalPresent} icon="✅" color="bg-green-100 text-green-700" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DashboardCard({ title, value, icon, color }) {
+  return (
+    <div className={`p-5 rounded-lg shadow-md flex items-center space-x-4 ${color}`}>
+      <span className="text-4xl">{icon}</span>
+      <div>
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <p className="text-3xl font-bold">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+// Employee Management Component
+function EmployeeManagement() {
+  const { db, userId } = useContext(FirebaseContext);
+  const [employees, setEmployees] = useState([]);
+  const [newEmployee, setNewEmployee] = useState({ name: '', employeeId: '', department: '', role: '', contact: '', startDate: '' });
+  const [editingEmployee, setEditingEmployee] = useState(null); // Stores employee being edited
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (!db || !userId) return;
+
+    const employeesRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/employees`);
+    const unsubscribe = onSnapshot(employeesRef, (snapshot) => {
+      const employeeList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setEmployees(employeeList);
+      setLoading(false);
+    }, (err) => {
+      console.error("Error fetching employees:", err);
+      setError("Failed to load employees.");
+      setLoading(false);
+    });
+
+    return () => unsubscribe(); // Cleanup listener
+  }, [db, userId]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (editingEmployee) {
+      setEditingEmployee(prev => ({ ...prev, [name]: value }));
+    } else {
+      setNewEmployee(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage('');
+    setError('');
+
+    if (!db || !userId) {
+      setError("Database not ready. Please try again.");
+      return;
+    }
+
+    try {
+      const employeeData = editingEmployee || newEmployee;
+      if (!employeeData.name || !employeeData.employeeId || !employeeData.department || !employeeData.role || !employeeData.contact || !employeeData.startDate) {
+        setError("All fields are required.");
+        return;
+      }
+
+      const employeesRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/employees`);
+
+      if (editingEmployee) {
+        // Update existing employee
+        const employeeDocRef = doc(db, `artifacts/${__app_id}/users/${userId}/staff_management/employees`, editingEmployee.id);
+        await updateDoc(employeeDocRef, employeeData);
+        setMessage("Employee updated successfully!");
+        setEditingEmployee(null);
+      } else {
+        // Add new employee
+        await addDoc(employeesRef, employeeData);
+        setMessage("Employee added successfully!");
+        setNewEmployee({ name: '', employeeId: '', department: '', role: '', contact: '', startDate: '' });
+      }
+    } catch (err) {
+      console.error("Error saving employee:", err);
+      setError("Failed to save employee. " + err.message);
+    }
+  };
+
+  const handleEdit = (employee) => {
+    setEditingEmployee({ ...employee });
+    setMessage('');
+    setError('');
+  };
+
+  const handleDelete = async (id) => {
+    setMessage('');
+    setError('');
+    if (!db || !userId) {
+      setError("Database not ready. Please try again.");
+      return;
+    }
+    if (window.confirm("Are you sure you want to delete this employee?")) { // Using window.confirm for simplicity, replace with custom modal in production
+      try {
+        const employeeDocRef = doc(db, `artifacts/${__app_id}/users/${userId}/staff_management/employees`, id);
+        await deleteDoc(employeeDocRef);
+        setMessage("Employee deleted successfully!");
+      } catch (err) {
+        console.error("Error deleting employee:", err);
+        setError("Failed to delete employee. " + err.message);
+      }
+    }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold text-blue-700 mb-6">Employee Management</h2>
+
+      {/* Add/Edit Employee Form */}
+      <form onSubmit={handleSubmit} className="mb-8 p-6 bg-blue-50 rounded-lg shadow-inner border border-blue-100">
+        <h3 className="text-xl font-semibold text-blue-800 mb-4">{editingEmployee ? 'Edit Employee' : 'Add New Employee'}</h3>
+        {error && <p className="text-red-600 mb-4">{error}</p>}
+        {message && <p className="text-green-600 mb-4">{message}</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+            <input type="text" id="name" name="name" value={editingEmployee?.name || newEmployee.name} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+          </div>
+          <div>
+            <label htmlFor="employeeId" className="block text-sm font-medium text-gray-700">Employee ID</label>
+            <input type="text" id="employeeId" name="employeeId" value={editingEmployee?.employeeId || newEmployee.employeeId} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+          </div>
+          <div>
+            <label htmlFor="department" className="block text-sm font-medium text-gray-700">Department</label>
+            <input type="text" id="department" name="department" value={editingEmployee?.department || newEmployee.department} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+          </div>
+          <div>
+            <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
+            <input type="text" id="role" name="role" value={editingEmployee?.role || newEmployee.role} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+          </div>
+          <div>
+            <label htmlFor="contact" className="block text-sm font-medium text-gray-700">Contact Info</label>
+            <input type="text" id="contact" name="contact" value={editingEmployee?.contact || newEmployee.contact} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+          </div>
+          <div>
+            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
+            <input type="date" id="startDate" name="startDate" value={editingEmployee?.startDate || newEmployee.startDate} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition-colors duration-200">
+            {editingEmployee ? 'Update Employee' : 'Add Employee'}
+          </button>
+          {editingEmployee && (
+            <button type="button" onClick={() => setEditingEmployee(null)} className="px-6 py-2 bg-gray-300 text-gray-800 rounded-md shadow-md hover:bg-gray-400 transition-colors duration-200">
+              Cancel Edit
+            </button>
+          )}
+        </div>
+      </form>
+
+      {/* Employee List */}
+      <h3 className="text-xl font-semibold text-blue-800 mb-4">All Employees</h3>
+      {loading ? (
+        <p className="text-gray-600">Loading employees...</p>
+      ) : employees.length === 0 ? (
+        <p className="text-gray-600">No employees added yet.</p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {employees.map((emp) => (
+                <tr key={emp.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{emp.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.employeeId}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.department}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.role}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.contact}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{emp.startDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onClick={() => handleEdit(emp)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                    <button onClick={() => handleDelete(emp.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Leave Management Component
+function LeaveManagement() {
+  const { db, userId } = useContext(FirebaseContext);
+  const [leaveRequests, setLeaveRequests] = useState([]);
+  const [newLeaveRequest, setNewLeaveRequest] = useState({ employeeId: '', type: 'Annual', startDate: '', endDate: '', reason: '', status: 'Pending' });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [employees, setEmployees] = useState([]); // To populate employee dropdown
+
+  useEffect(() => {
+    if (!db || !userId) return;
+
+    // Fetch employees for dropdown
+    const employeesRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/employees`);
+    const unsubscribeEmployees = onSnapshot(employeesRef, (snapshot) => {
+      setEmployees(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (err) => {
+      console.error("Error fetching employees for leave:", err);
+      setError("Failed to load employee list.");
+    });
+
+    // Fetch leave requests
+    const leavesRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/leaves`);
+    const unsubscribeLeaves = onSnapshot(leavesRef, (snapshot) => {
+      const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setLeaveRequests(requests);
+      setLoading(false);
+    }, (err) => {
+      console.error("Error fetching leave requests:", err);
+      setError("Failed to load leave requests.");
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribeEmployees();
+      unsubscribeLeaves();
+    }; // Cleanup listeners
+  }, [db, userId]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewLeaveRequest(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage('');
+    setError('');
+
+    if (!db || !userId) {
+      setError("Database not ready. Please try again.");
+      return;
+    }
+
+    try {
+      if (!newLeaveRequest.employeeId || !newLeaveRequest.startDate || !newLeaveRequest.endDate || !newLeaveRequest.reason) {
+        setError("All fields are required.");
+        return;
+      }
+      if (new Date(newLeaveRequest.startDate) > new Date(newLeaveRequest.endDate)) {
+        setError("Start date cannot be after end date.");
+        return;
+      }
+
+      const leavesRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/leaves`);
+      await addDoc(leavesRef, newLeaveRequest);
+      setMessage("Leave request submitted successfully!");
+      setNewLeaveRequest({ employeeId: '', type: 'Annual', startDate: '', endDate: '', reason: '', status: 'Pending' });
+    } catch (err) {
+      console.error("Error submitting leave request:", err);
+      setError("Failed to submit leave request. " + err.message);
+    }
+  };
+
+  const handleStatusChange = async (id, currentStatus) => {
+    setMessage('');
+    setError('');
+    if (!db || !userId) {
+      setError("Database not ready. Please try again.");
+      return;
+    }
+
+    const newStatus = currentStatus === 'Pending' ? 'Approved' : 'Pending'; // Simple toggle for demonstration
+    if (window.confirm(`Change status to ${newStatus} for this request?`)) { // Replace with custom modal
+      try {
+        const leaveDocRef = doc(db, `artifacts/${__app_id}/users/${userId}/staff_management/leaves`, id);
+        await updateDoc(leaveDocRef, { status: newStatus });
+        setMessage("Leave request status updated!");
+      } catch (err) {
+        console.error("Error updating leave status:", err);
+        setError("Failed to update leave status. " + err.message);
+      }
+    }
+  };
+
+  const getEmployeeName = (employeeId) => {
+    const emp = employees.find(e => e.employeeId === employeeId);
+    return emp ? emp.name : 'Unknown Employee';
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold text-blue-700 mb-6">Leave Management</h2>
+
+      {/* Submit Leave Request Form */}
+      <form onSubmit={handleSubmit} className="mb-8 p-6 bg-green-50 rounded-lg shadow-inner border border-green-100">
+        <h3 className="text-xl font-semibold text-green-800 mb-4">Submit New Leave Request</h3>
+        {error && <p className="text-red-600 mb-4">{error}</p>}
+        {message && <p className="text-green-600 mb-4">{message}</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="employeeId" className="block text-sm font-medium text-gray-700">Employee</label>
+            <select id="employeeId" name="employeeId" value={newLeaveRequest.employeeId} onChange={handleChange}
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+              <option value="">Select Employee</option>
+              {employees.map(emp => (
+                <option key={emp.id} value={emp.employeeId}>{emp.name} ({emp.employeeId})</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700">Leave Type</label>
+            <select id="type" name="type" value={newLeaveRequest.type} onChange={handleChange}
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+              <option value="Annual">Annual Leave</option>
+              <option value="Sick">Sick Leave</option>
+              <option value="Maternity">Maternity Leave</option>
+              <option value="Paternity">Paternity Leave</option>
+              <option value="Unpaid">Unpaid Leave</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
+            <input type="date" id="startDate" name="startDate" value={newLeaveRequest.startDate} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+          </div>
+          <div>
+            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
+            <input type="date" id="endDate" name="endDate" value={newLeaveRequest.endDate} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+          </div>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="reason" className="block text-sm font-medium text-gray-700">Reason</label>
+          <textarea id="reason" name="reason" value={newLeaveRequest.reason} onChange={handleChange} rows="3"
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required></textarea>
+        </div>
+        <button type="submit" className="px-6 py-2 bg-green-600 text-white rounded-md shadow-md hover:bg-green-700 transition-colors duration-200">
+          Submit Request
+        </button>
+      </form>
+
+      {/* Leave Request List */}
+      <h3 className="text-xl font-semibold text-blue-800 mb-4">All Leave Requests</h3>
+      {loading ? (
+        <p className="text-gray-600">Loading leave requests...</p>
+      ) : leaveRequests.length === 0 ? (
+        <p className="text-gray-600">No leave requests found.</p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {leaveRequests.map((req) => (
+                <tr key={req.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{getEmployeeName(req.employeeId)} ({req.employeeId})</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{req.type}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{req.startDate} to {req.endDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{req.reason}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      req.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {req.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onClick={() => handleStatusChange(req.id, req.status)} className="text-indigo-600 hover:text-indigo-900">
+                      {req.status === 'Pending' ? 'Approve' : 'Mark Pending'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Attendance Tracking Component
+function AttendanceTracking() {
+  const { db, userId } = useContext(FirebaseContext);
+  const [attendanceRecords, setAttendanceRecords] = useState([]);
+  const [employees, setEmployees] = useState([]); // To populate employee dropdown
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (!db || !userId) return;
+
+    // Fetch employees for dropdown
+    const employeesRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/employees`);
+    const unsubscribeEmployees = onSnapshot(employeesRef, (snapshot) => {
+      setEmployees(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (err) => {
+      console.error("Error fetching employees for attendance:", err);
+      setError("Failed to load employee list.");
+    });
+
+    // Fetch attendance records
+    const attendanceRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/attendance`);
+    const unsubscribeAttendance = onSnapshot(attendanceRef, (snapshot) => {
+      const records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setAttendanceRecords(records);
+      setLoading(false);
+    }, (err) => {
+      console.error("Error fetching attendance records:", err);
+      setError("Failed to load attendance records.");
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribeEmployees();
+      unsubscribeAttendance();
+    }; // Cleanup listeners
+  }, [db, userId]);
+
+  const getEmployeeName = (employeeId) => {
+    const emp = employees.find(e => e.employeeId === employeeId);
+    return emp ? emp.name : 'Unknown Employee';
+  };
+
+  const handleClockIn = async () => {
+    setMessage('');
+    setError('');
+    if (!db || !userId || !selectedEmployeeId) {
+      setError("Please select an employee to clock in.");
+      return;
+    }
+
+    try {
+      const attendanceRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/attendance`);
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      const now = new Date().toLocaleTimeString(); // HH:MM:SS AM/PM
+
+      // Check if employee already clocked in today
+      const q = query(attendanceRef, where('employeeId', '==', selectedEmployeeId), where('date', '==', today));
+      const existingRecords = await getDocs(q);
+
+      if (existingRecords.empty) {
+        await addDoc(attendanceRef, {
+          employeeId: selectedEmployeeId,
+          date: today,
+          clockIn: now,
+          clockOut: null,
+          status: 'Present'
+        });
+        setMessage(`${getEmployeeName(selectedEmployeeId)} clocked in at ${now} on ${today}.`);
+      } else {
+        setError(`${getEmployeeName(selectedEmployeeId)} already clocked in today.`);
+      }
+    } catch (err) {
+      console.error("Error clocking in:", err);
+      setError("Failed to clock in. " + err.message);
+    }
+  };
+
+  const handleClockOut = async () => {
+    setMessage('');
+    setError('');
+    if (!db || !userId || !selectedEmployeeId) {
+      setError("Please select an employee to clock out.");
+      return;
+    }
+
+    try {
+      const attendanceRef = collection(db, `artifacts/${__app_id}/users/${userId}/staff_management/attendance`);
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      const now = new Date().toLocaleTimeString(); // HH:MM:SS AM/PM
+
+      // Find today's clock-in record for the selected employee
+      const q = query(attendanceRef, where('employeeId', '==', selectedEmployeeId), where('date', '==', today), where('clockOut', '==', null));
+      const existingRecords = await getDocs(q);
+
+      if (!existingRecords.empty) {
+        const docToUpdate = existingRecords.docs[0];
+        await updateDoc(doc(db, `artifacts/${__app_id}/users/${userId}/staff_management/attendance`, docToUpdate.id), {
+          clockOut: now
+        });
+        setMessage(`${getEmployeeName(selectedEmployeeId)} clocked out at ${now} on ${today}.`);
+      } else {
+        setError(`${getEmployeeName(selectedEmployeeId)} has not clocked in today or already clocked out.`);
+      }
+    } catch (err) {
+      console.error("Error clocking out:", err);
+      setError("Failed to clock out. " + err.message);
+    }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold text-blue-700 mb-6">Attendance Tracking</h2>
+
+      {/* Clock In/Out Controls */}
+      <div className="mb-8 p-6 bg-purple-50 rounded-lg shadow-inner border border-purple-100">
+        <h3 className="text-xl font-semibold text-purple-800 mb-4">Clock In / Clock Out</h3>
+        {error && <p className="text-red-600 mb-4">{error}</p>}
+        {message && <p className="text-green-600 mb-4">{message}</p>}
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <select
+            value={selectedEmployeeId}
+            onChange={(e) => setSelectedEmployeeId(e.target.value)}
+            className="flex-grow p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Employee</option>
+            {employees.map(emp => (
+              <option key={emp.id} value={emp.employeeId}>{emp.name} ({emp.employeeId})</option>
+            ))}
+          </select>
+          <button onClick={handleClockIn} className="px-6 py-2 bg-green-600 text-white rounded-md shadow-md hover:bg-green-700 transition-colors duration-200">
+            Clock In
+          </button>
+          <button onClick={handleClockOut} className="px-6 py-2 bg-red-600 text-white rounded-md shadow-md hover:bg-red-700 transition-colors duration-200">
+            Clock Out
+          </button>
+        </div>
+      </div>
+
+      {/* Attendance Records List */}
+      <h3 className="text-xl font-semibold text-blue-800 mb-4">Attendance Records</h3>
+      {loading ? (
+        <p className="text-gray-600">Loading attendance records...</p>
+      ) : attendanceRecords.length === 0 ? (
+        <p className="text-gray-600">No attendance records found.</p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clock In</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clock Out</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {attendanceRecords.map((record) => (
+                <tr key={record.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{getEmployeeName(record.employeeId)} ({record.employeeId})</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.date}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.clockIn}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.clockOut || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      record.status === 'Present' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {record.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;

@@ -36,6 +36,7 @@ import GeneralLedger from "@/pages/financial-management/general-ledger";
 // Staff & Payroll Management
 import StaffManagement from "@/pages/staff-payroll/staff-management";
 import PayrollManagement from "@/pages/staff-payroll/payroll-management";
+import StaffManagementSystem from "@/pages/staff-management-system";
 
 // Inventory & Supply Chain Management
 import InventoryManagement from "@/pages/inventory-management-new";
@@ -92,6 +93,8 @@ function App() {
                 {/* Staff & Payroll */}
                 <Route path="/staff/management" component={StaffManagement} />
                 <Route path="/staff/payroll" component={PayrollManagement} />
+                <Route path="/staff-payroll/payroll-management" component={PayrollManagement} />
+                <Route path="/staff/comprehensive" component={StaffManagementSystem} />
                 
                 {/* Inventory & Supply */}
                 <Route path="/inventory/management" component={InventoryManagement} />
