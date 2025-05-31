@@ -448,12 +448,32 @@ export default function IncomeManagementKenya() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 font-inter antialiased">
-      {/* Header and Navigation */}
-      <header className="bg-white shadow-md p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center">
-        <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-4 sm:mb-0">
-          Child Mental Haven - Income Management (Kenya)
-        </h1>
-        <nav className="flex flex-wrap gap-2 sm:gap-4">
+      {/* Header with Logo */}
+      <header className="bg-white shadow-md">
+        <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+          <div className="flex items-center space-x-4">
+            <img 
+              src="/logo.png" 
+              alt="Child Mental Haven" 
+              className="h-16 w-auto"
+            />
+            <div className="flex items-center space-x-2">
+              <h1 className="text-xl font-bold text-green-600">Child Mental Haven</h1>
+              <p className="text-sm text-blue-600 font-medium">- Where Young Minds Evolve</p>
+              <p className="text-xs text-gray-600 ml-4">Income Management System (Kenya)</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-gray-600">Date: {new Date().toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600">Time: {new Date().toLocaleTimeString()}</p>
+          </div>
+        </div>
+        
+        <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-4 sm:mb-0">
+            Income Management (Kenya)
+          </h1>
+          <nav className="flex flex-wrap gap-2 sm:gap-4">
           <Button
             onClick={() => setCurrentView('dashboard')}
             variant={currentView === 'dashboard' ? 'default' : 'outline'}

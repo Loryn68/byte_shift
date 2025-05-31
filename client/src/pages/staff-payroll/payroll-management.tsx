@@ -329,16 +329,36 @@ export default function PayrollManagement() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Calculator className="h-8 w-8 text-blue-600" />
-              Hospital Payroll Management System (Kenya)
-            </h1>
-            <p className="text-gray-600 mt-1">Comprehensive payroll processing with Kenya tax compliance</p>
+      {/* Header with Logo */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+          <div className="flex items-center space-x-4">
+            <img 
+              src="/logo.png" 
+              alt="Child Mental Haven" 
+              className="h-16 w-auto"
+            />
+            <div className="flex items-center space-x-2">
+              <h1 className="text-xl font-bold text-green-600">Child Mental Haven</h1>
+              <p className="text-sm text-blue-600 font-medium">- Where Young Minds Evolve</p>
+              <p className="text-xs text-gray-600 ml-4">Payroll Management System (Kenya)</p>
+            </div>
           </div>
+          <div className="text-right">
+            <p className="text-sm text-gray-600">Date: {new Date().toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600">Time: {new Date().toLocaleTimeString()}</p>
+          </div>
+        </div>
+        
+        <div className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Calculator className="h-8 w-8 text-blue-600" />
+                Payroll Management System (Kenya)
+              </h1>
+              <p className="text-gray-600 mt-1">Comprehensive payroll processing with Kenya tax compliance</p>
+            </div>
           <div className="flex items-center gap-3">
             <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
               <SelectTrigger className="w-48">
