@@ -19,7 +19,7 @@ import OutpatientManagement from "@/pages/patient-management/outpatient-manageme
 import InpatientManagement from "@/pages/patient-management/inpatient-management";
 import ElectronicHealthRecords from "@/pages/patient-management/electronic-health-records";
 import TriageManagement from "@/pages/patient-management/triage-management-new";
-import TherapyManagement from "@/pages/patient-management/therapy-management";
+import TherapyManagement from "@/pages/patient-management/therapy-management-new";
 
 // Clinical Support Modules
 import LaboratoryManagement from "@/pages/clinical-support/laboratory-management";
