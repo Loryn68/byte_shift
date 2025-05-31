@@ -219,17 +219,19 @@ export default function BillingInvoicing() {
         {/* Header with Logo */}
         <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
           <div className="flex items-center space-x-4">
+            <img 
+              src="/logo.png" 
+              alt="Child Mental Haven" 
+              className="h-16 w-auto"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling.style.display = 'flex';
+              }}
+            />
             <div className="flex items-center space-x-2">
-              <div className="h-16 w-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="h-8 w-8 text-white" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-green-600">Child Mental Haven</h1>
-                <p className="text-sm text-blue-600 font-medium">Where Young Minds Evolve</p>
-                <p className="text-xs text-gray-600">Billing & Invoicing System</p>
-              </div>
+              <h1 className="text-xl font-bold text-green-600">Child Mental Haven</h1>
+              <p className="text-sm text-blue-600 font-medium">- Where Young Minds Evolve</p>
+              <p className="text-xs text-gray-600 ml-4">Billing & Invoicing System</p>
             </div>
           </div>
           <div className="text-right">
