@@ -1,0 +1,62 @@
+import React from 'react';
+
+function App() {
+  return (
+    <div className="min-h-screen bg-gray-100 font-inter antialiased p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+        {/* Top Navigation Tabs */}
+        <div className="flex bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700">
+          <div className="px-4 py-2 border-r border-gray-200 hover:bg-gray-100 cursor-pointer">Search By Patient</div>
+          <div className="px-4 py-2 border-r border-gray-200 hover:bg-gray-100 cursor-pointer">Admitted Patients</div>
+          <div className="px-4 py-2 border-r border-gray-200 hover:bg-gray-100 cursor-pointer">History of Admissions</div>
+          <div className="px-4 py-2 border-r border-gray-200 hover:bg-gray-100 cursor-pointer">Automatic Billing Settings</div>
+          <div className="px-4 py-2 border-r border-gray-200 hover:bg-gray-100 cursor-pointer">Gate Pass</div>
+          <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-tl-lg">Discharge Queue</div> {/* Active tab */}
+        </div>
+
+        {/* Main Content Area */}
+        <div className="p-6">
+          {/* Load List Button */}
+          <div className="mb-6 text-center">
+            <button className="px-8 py-3 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition-colors duration-200 text-base font-semibold">
+              Load List
+            </button>
+          </div>
+
+          {/* Table for Discharge Queue */}
+          <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OPNO</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Number</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admission Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200 min-h-[400px] block"> {/* Min-height to match image */}
+                {/* Placeholder rows to match the empty table appearance */}
+                {Array(8).fill(0).map((_, i) => (
+                  <tr key={i}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;

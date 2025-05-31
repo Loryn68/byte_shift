@@ -1120,8 +1120,214 @@ export default function BillingInvoicing() {
           </div>
         )}
 
+        {/* Gate Pass Tab */}
+        {activeTab === "gate-pass" && (
+          <div>
+            {/* Inner Tabs for Gatepass */}
+            <div className="flex bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700">
+              <div 
+                className={`px-4 py-2 border-r border-gray-200 cursor-pointer ${
+                  activeSubTab === "active" ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100"
+                }`}
+                onClick={() => setActiveSubTab("active")}
+              >
+                Active Gatepasses
+              </div>
+              <div 
+                className={`px-4 py-2 cursor-pointer ${
+                  activeSubTab === "history" ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100"
+                }`}
+                onClick={() => setActiveSubTab("history")}
+              >
+                History
+              </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="p-6">
+              {/* Load/Reload Button */}
+              <div className="mb-6 text-center">
+                <Button 
+                  variant="secondary"
+                  className="text-sm"
+                  onClick={() => {
+                    toast({
+                      title: "Loading Gatepasses",
+                      description: activeSubTab === "active" ? "Active gatepasses loaded" : "Gatepass history loaded",
+                    });
+                  }}
+                >
+                  Load/Reload List of {activeSubTab === "active" ? "Active" : "Historical"} Gatepasses
+                </Button>
+              </div>
+
+              {/* Active Gatepasses Table */}
+              {activeSubTab === "active" && (
+                <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs">Patient Name</TableHead>
+                        <TableHead className="text-xs">Headed To</TableHead>
+                        <TableHead className="text-xs">Reason</TableHead>
+                        <TableHead className="text-xs">Accompanied By</TableHead>
+                        <TableHead className="text-xs">Leaving Time</TableHead>
+                        <TableHead className="text-xs">Estimated Expenditure</TableHead>
+                        <TableHead className="text-xs">Created By</TableHead>
+                        <TableHead className="text-xs">Time Created</TableHead>
+                        <TableHead className="text-xs">Edit</TableHead>
+                        <TableHead className="text-xs">Print Preview</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {/* Sample active gatepasses */}
+                      <TableRow>
+                        <TableCell className="text-sm">John Kamau Mwangi</TableCell>
+                        <TableCell className="text-sm">Kenyatta National Hospital</TableCell>
+                        <TableCell className="text-sm">CT Scan Appointment</TableCell>
+                        <TableCell className="text-sm">Mary Wanjiku (Sister)</TableCell>
+                        <TableCell className="text-sm">14:30</TableCell>
+                        <TableCell className="text-sm">KSH 2,500</TableCell>
+                        <TableCell className="text-sm">Dr. Kiprotich</TableCell>
+                        <TableCell className="text-sm">13:45</TableCell>
+                        <TableCell className="text-sm">
+                          <Button size="sm" variant="outline" className="text-blue-600">
+                            Edit
+                          </Button>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          <Button size="sm" variant="outline" className="text-green-600">
+                            Preview
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-sm">Grace Wanjiru Kinyua</TableCell>
+                        <TableCell className="text-sm">Nairobi West Hospital</TableCell>
+                        <TableCell className="text-sm">Specialist Consultation</TableCell>
+                        <TableCell className="text-sm">Peter Kinyua (Husband)</TableCell>
+                        <TableCell className="text-sm">16:00</TableCell>
+                        <TableCell className="text-sm">KSH 3,000</TableCell>
+                        <TableCell className="text-sm">Nurse Jane</TableCell>
+                        <TableCell className="text-sm">15:20</TableCell>
+                        <TableCell className="text-sm">
+                          <Button size="sm" variant="outline" className="text-blue-600">
+                            Edit
+                          </Button>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          <Button size="sm" variant="outline" className="text-green-600">
+                            Preview
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                      {/* Placeholder rows */}
+                      {Array(6).fill(0).map((_, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+
+              {/* History Gatepasses Table */}
+              {activeSubTab === "history" && (
+                <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs">Patient Name</TableHead>
+                        <TableHead className="text-xs">Headed To</TableHead>
+                        <TableHead className="text-xs">Reason</TableHead>
+                        <TableHead className="text-xs">Accompanied By</TableHead>
+                        <TableHead className="text-xs">Leaving Time</TableHead>
+                        <TableHead className="text-xs">Return Time</TableHead>
+                        <TableHead className="text-xs">Actual Expenditure</TableHead>
+                        <TableHead className="text-xs">Created By</TableHead>
+                        <TableHead className="text-xs">Date</TableHead>
+                        <TableHead className="text-xs">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {/* Sample historical gatepasses */}
+                      <TableRow>
+                        <TableCell className="text-sm">Samuel Ochieng Otieno</TableCell>
+                        <TableCell className="text-sm">Aga Khan Hospital</TableCell>
+                        <TableCell className="text-sm">MRI Scan</TableCell>
+                        <TableCell className="text-sm">Agnes Otieno (Wife)</TableCell>
+                        <TableCell className="text-sm">09:00</TableCell>
+                        <TableCell className="text-sm">12:30</TableCell>
+                        <TableCell className="text-sm">KSH 4,500</TableCell>
+                        <TableCell className="text-sm">Dr. Mwangi</TableCell>
+                        <TableCell className="text-sm">2024-01-20</TableCell>
+                        <TableCell className="text-sm">
+                          <Badge className="bg-green-100 text-green-800">Completed</Badge>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-sm">Rose Njeri Mukuria</TableCell>
+                        <TableCell className="text-sm">Gertrude's Children's Hospital</TableCell>
+                        <TableCell className="text-sm">Emergency Consultation</TableCell>
+                        <TableCell className="text-sm">James Mukuria (Son)</TableCell>
+                        <TableCell className="text-sm">20:15</TableCell>
+                        <TableCell className="text-sm">23:45</TableCell>
+                        <TableCell className="text-sm">KSH 6,200</TableCell>
+                        <TableCell className="text-sm">Nurse Mary</TableCell>
+                        <TableCell className="text-sm">2024-01-18</TableCell>
+                        <TableCell className="text-sm">
+                          <Badge className="bg-green-100 text-green-800">Completed</Badge>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-sm">David Kiprotich Kiplagat</TableCell>
+                        <TableCell className="text-sm">MP Shah Hospital</TableCell>
+                        <TableCell className="text-sm">Physiotherapy Session</TableCell>
+                        <TableCell className="text-sm">Sarah Kiplagat (Daughter)</TableCell>
+                        <TableCell className="text-sm">14:00</TableCell>
+                        <TableCell className="text-sm">-</TableCell>
+                        <TableCell className="text-sm">-</TableCell>
+                        <TableCell className="text-sm">Dr. Njoroge</TableCell>
+                        <TableCell className="text-sm">2024-01-15</TableCell>
+                        <TableCell className="text-sm">
+                          <Badge className="bg-red-100 text-red-800">Overdue</Badge>
+                        </TableCell>
+                      </TableRow>
+                      {/* Placeholder rows */}
+                      {Array(5).fill(0).map((_, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                          <TableCell className="text-sm text-gray-400">-</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Other Tab Content Placeholders */}
-        {!["search", "admitted", "history", "settings"].includes(activeTab) && (
+        {!["search", "admitted", "history", "settings", "gate-pass"].includes(activeTab) && (
           <div className="p-6">
             <Card>
               <CardHeader>
