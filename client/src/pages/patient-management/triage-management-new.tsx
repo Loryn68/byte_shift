@@ -134,10 +134,10 @@ export default function TriageManagement() {
   };
 
   return (
-    <div className="h-screen bg-gray-50">
+    <div className="h-screen bg-green-50">
       {/* Header Tabs */}
       <Tabs defaultValue="recordings" className="h-full">
-        <TabsList className="w-full bg-blue-200 rounded-none h-12 grid grid-cols-3">
+        <TabsList className="w-full bg-blue-100 rounded-none h-12 grid grid-cols-3">
           <TabsTrigger value="recordings" className="h-full">Recordings</TabsTrigger>
           <TabsTrigger value="queue" className="h-full">Queue</TabsTrigger>
           <TabsTrigger value="served" className="h-full">Served Patients</TabsTrigger>

@@ -161,7 +161,7 @@ export default function PatientRegistry() {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Left Panel - Patient List */}
-      <div className="w-80 bg-orange-100 border-r border-gray-300">
+      <div className="w-80 bg-green-50 border-r border-green-200">
         <div className="p-4">
           <Button 
             className="w-full mb-4 bg-gray-300 text-gray-700 hover:bg-gray-400 text-sm"
@@ -188,12 +188,12 @@ export default function PatientRegistry() {
       </div>
 
       {/* Right Panel - Patient Registration Form */}
-      <div className="flex-1 bg-blue-100">
+      <div className="flex-1 bg-blue-50">
         <div className="p-6">
           <h2 className="text-lg font-semibold mb-4 text-center">Add New Patient</h2>
           
           {/* Search Section */}
-          <div className="mb-6 bg-blue-200 p-3 rounded">
+          <div className="mb-6 bg-blue-100 p-3 rounded">
             <div className="flex items-center gap-4">
               <Label className="font-medium text-sm">Search by Surname/ ID/Tel/OP-No.</Label>
               <Input
