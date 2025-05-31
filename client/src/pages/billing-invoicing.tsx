@@ -524,8 +524,145 @@ export default function BillingInvoicing() {
           </div>
         )}
 
+        {/* Admitted Patients Tab */}
+        {activeTab === "admitted" && (
+          <div className="p-6">
+            <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs">File Number</TableHead>
+                    <TableHead className="text-xs">Op. Number</TableHead>
+                    <TableHead className="text-xs">Patient Name</TableHead>
+                    <TableHead className="text-xs">Admission Date</TableHead>
+                    <TableHead className="text-xs">Total Billed</TableHead>
+                    <TableHead className="text-xs">Total Paid + Waived</TableHead>
+                    <TableHead className="text-xs">Balance</TableHead>
+                    <TableHead className="text-xs">Advance Payment</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {/* Sample admitted patients data */}
+                  <TableRow>
+                    <TableCell className="text-sm">CMH-001</TableCell>
+                    <TableCell className="text-sm">OP-2024-001</TableCell>
+                    <TableCell className="text-sm">John Kamau Mwangi</TableCell>
+                    <TableCell className="text-sm">2024-01-15</TableCell>
+                    <TableCell className="text-sm">KSH 7,700</TableCell>
+                    <TableCell className="text-sm">KSH 4,200</TableCell>
+                    <TableCell className="text-sm font-bold text-red-600">KSH 3,500</TableCell>
+                    <TableCell className="text-sm">KSH 0</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="text-sm">CMH-002</TableCell>
+                    <TableCell className="text-sm">OP-2024-002</TableCell>
+                    <TableCell className="text-sm">Mary Wanjiku Njoroge</TableCell>
+                    <TableCell className="text-sm">2024-01-20</TableCell>
+                    <TableCell className="text-sm">KSH 5,200</TableCell>
+                    <TableCell className="text-sm">KSH 5,200</TableCell>
+                    <TableCell className="text-sm font-bold text-green-600">KSH 0</TableCell>
+                    <TableCell className="text-sm">KSH 1,000</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="text-sm">CMH-003</TableCell>
+                    <TableCell className="text-sm">OP-2024-003</TableCell>
+                    <TableCell className="text-sm">Peter Mwangi Kimani</TableCell>
+                    <TableCell className="text-sm">2024-01-22</TableCell>
+                    <TableCell className="text-sm">KSH 12,300</TableCell>
+                    <TableCell className="text-sm">KSH 8,000</TableCell>
+                    <TableCell className="text-sm font-bold text-red-600">KSH 4,300</TableCell>
+                    <TableCell className="text-sm">KSH 0</TableCell>
+                  </TableRow>
+                  {/* Placeholder rows */}
+                  {Array(7).fill(0).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                      <TableCell className="text-sm text-gray-400">-</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Bottom Summary & Controls */}
+            <div className="bg-gray-50 p-6 mt-6 border border-gray-200 rounded-lg grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+              {/* Total Number of Patients */}
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold text-gray-800">Total Number of Patients</h3>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Admitted:</span> 
+                  <span className="font-bold text-blue-600">3</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">With Balances:</span> 
+                  <span className="font-bold text-red-600">2</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Without Balance:</span> 
+                  <span className="font-bold text-green-600">1</span>
+                </div>
+              </div>
+
+              {/* Total Amount */}
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold text-gray-800">Total Amount:</h3>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Billed:</span> 
+                  <span className="font-bold text-gray-900">KSH 25,200</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Paid:</span> 
+                  <span className="font-bold text-gray-900">KSH 17,400</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Unpaid:</span> 
+                  <span className="font-bold text-gray-900">KSH 7,800</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-700">Adv. Payment:</span> 
+                  <span className="font-bold text-gray-900">KSH 1,000</span>
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-col space-y-2 justify-end">
+                <Button 
+                  variant="secondary"
+                  className="w-full text-sm"
+                  onClick={() => {
+                    toast({
+                      title: "Data Reloaded",
+                      description: "Admitted patients data has been refreshed",
+                    });
+                  }}
+                >
+                  Load / Reload
+                </Button>
+                <Button 
+                  variant="secondary"
+                  className="w-full text-sm"
+                  onClick={() => {
+                    toast({
+                      title: "Print",
+                      description: "Print functionality would open here",
+                    });
+                  }}
+                >
+                  Print
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Other Tab Content Placeholders */}
-        {activeTab !== "search" && (
+        {!["search", "admitted"].includes(activeTab) && (
           <div className="p-6">
             <Card>
               <CardHeader>
