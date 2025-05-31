@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, UserCheck, UserX, Key, Activity, Shield, Settings, Plus, Edit, Trash2 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Users, UserCheck, UserX, Key, Activity, Shield, Settings, Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -30,6 +31,7 @@ export default function AdministratorDashboard() {
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState("users");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Fetch users
   const { data: users = [], isLoading: usersLoading } = useQuery({
@@ -47,38 +49,41 @@ export default function AdministratorDashboard() {
     isActive: true
   });
 
-  // User mutation
-  const userMutation = useMutation({
+  // User mutations
+  const createUserMutation = useMutation({
     mutationFn: async (userData: any) => {
-      if (editingUser) {
-        return await apiRequest("PUT", `/api/users/${editingUser.id}`, userData);
-      } else {
-        return await apiRequest("POST", "/api/users", userData);
-      }
+      return await apiRequest("POST", "/api/users", userData);
     },
     onSuccess: () => {
       toast({
-        title: editingUser ? "User Updated" : "User Created",
-        description: `User ${editingUser ? "updated" : "created"} successfully.`,
+        title: "User Created",
+        description: "New user has been created successfully.",
       });
       setShowUserModal(false);
-      setEditingUser(null);
-      resetForm();
+      resetUserForm();
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: `Failed to ${editingUser ? "update" : "create"} user.`,
-        variant: "destructive",
-      });
     },
   });
 
-  // Delete user mutation
+  const updateUserMutation = useMutation({
+    mutationFn: async ({ id, userData }: { id: number; userData: any }) => {
+      return await apiRequest("PUT", `/api/users/${id}`, userData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "User Updated",
+        description: "User information has been updated successfully.",
+      });
+      setShowUserModal(false);
+      setEditingUser(null);
+      resetUserForm();
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    },
+  });
+
   const deleteUserMutation = useMutation({
-    mutationFn: async (userId: number) => {
-      return await apiRequest("DELETE", `/api/users/${userId}`);
+    mutationFn: async (id: number) => {
+      return await apiRequest("DELETE", `/api/users/${id}`);
     },
     onSuccess: () => {
       toast({
@@ -87,37 +92,22 @@ export default function AdministratorDashboard() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
     },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete user.",
-        variant: "destructive",
-      });
-    },
   });
 
-  // Toggle user status mutation
-  const toggleUserMutation = useMutation({
-    mutationFn: async ({ userId, isActive }: { userId: number; isActive: boolean }) => {
-      return await apiRequest("PUT", `/api/users/${userId}`, { isActive });
+  const toggleUserStatusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      return await apiRequest("PATCH", `/api/users/${id}/status`, { isActive });
     },
     onSuccess: () => {
       toast({
         title: "User Status Updated",
-        description: "User status has been changed successfully.",
+        description: "User access status has been changed.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
     },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update user status.",
-        variant: "destructive",
-      });
-    },
   });
 
-  const resetForm = () => {
+  const resetUserForm = () => {
     setUserForm({
       username: "",
       email: "",
@@ -129,7 +119,7 @@ export default function AdministratorDashboard() {
     });
   };
 
-  const handleEditUser = (user: User) => {
+  const openEditModal = (user: User) => {
     setEditingUser(user);
     setUserForm({
       username: user.username,
@@ -143,324 +133,304 @@ export default function AdministratorDashboard() {
     setShowUserModal(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    userMutation.mutate(userForm);
-  };
+  const handleUserSubmit = () => {
+    if (!userForm.username || !userForm.email || !userForm.firstName || !userForm.lastName) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-  const handleDeleteUser = (userId: number) => {
-    if (confirm("Are you sure you want to delete this user?")) {
-      deleteUserMutation.mutate(userId);
+    if (!editingUser && !userForm.password) {
+      toast({
+        title: "Password Required",
+        description: "Password is required for new users.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (editingUser) {
+      updateUserMutation.mutate({ id: editingUser.id, userData: userForm });
+    } else {
+      createUserMutation.mutate(userForm);
     }
   };
 
-  const handleToggleUser = (userId: number, currentStatus: boolean) => {
-    toggleUserMutation.mutate({ userId, isActive: !currentStatus });
+  const handleDeleteUser = (user: User) => {
+    if (confirm(`Are you sure you want to delete user "${user.username}"? This action cannot be undone.`)) {
+      deleteUserMutation.mutate(user.id);
+    }
+  };
+
+  const handleToggleUserStatus = (user: User) => {
+    const action = user.isActive ? "deactivate" : "activate";
+    if (confirm(`Are you sure you want to ${action} user "${user.username}"?`)) {
+      toggleUserStatusMutation.mutate({ id: user.id, isActive: !user.isActive });
+    }
+  };
+
+  const getRoleBadge = (role: string) => {
+    const roleColors = {
+      admin: "bg-red-100 text-red-800",
+      doctor: "bg-blue-100 text-blue-800",
+      nurse: "bg-green-100 text-green-800",
+      pharmacist: "bg-purple-100 text-purple-800",
+      cashier: "bg-yellow-100 text-yellow-800",
+      receptionist: "bg-gray-100 text-gray-800",
+      therapist: "bg-indigo-100 text-indigo-800",
+      staff: "bg-orange-100 text-orange-800"
+    };
+    
+    return (
+      <Badge className={roleColors[role as keyof typeof roleColors] || "bg-gray-100 text-gray-800"}>
+        {role.charAt(0).toUpperCase() + role.slice(1)}
+      </Badge>
+    );
   };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Shield className="h-8 w-8 text-blue-600" />
+            <Shield className="h-8 w-8 text-red-600" />
             Administrator Dashboard
           </h1>
-          <p className="text-gray-600">Complete system administration and user management</p>
+          <p className="text-gray-600">Manage system users, settings, and administrative functions</p>
         </div>
-        <Button
-          onClick={() => {
-            resetForm();
-            setEditingUser(null);
-            setShowUserModal(true);
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add New User
-        </Button>
       </div>
 
-      {/* Admin Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="border-blue-200 bg-blue-50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-800">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-900">{users.length}</div>
-            <p className="text-xs text-blue-600">Registered in system</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-800">Active Users</CardTitle>
-            <UserCheck className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900">
-              {users.filter((user: User) => user.isActive).length}
-            </div>
-            <p className="text-xs text-green-600">Currently active</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-red-200 bg-red-50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-red-800">Inactive Users</CardTitle>
-            <UserX className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-900">
-              {users.filter((user: User) => !user.isActive).length}
-            </div>
-            <p className="text-xs text-red-600">Deactivated accounts</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-purple-200 bg-purple-50">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-800">Administrators</CardTitle>
-            <Settings className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-900">
-              {users.filter((user: User) => user.role === 'admin').length}
-            </div>
-            <p className="text-xs text-purple-600">Admin privileges</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Admin Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="users">Registered Users</TabsTrigger>
-          <TabsTrigger value="roles">User Rights</TabsTrigger>
-          <TabsTrigger value="security">Password Management</TabsTrigger>
-          <TabsTrigger value="activity">User Activity</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="users" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            User Management
+          </TabsTrigger>
+          <TabsTrigger value="system" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            System Settings
+          </TabsTrigger>
+          <TabsTrigger value="audit" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Audit Logs
+          </TabsTrigger>
         </TabsList>
 
-        {/* Users Management Tab */}
-        <TabsContent value="users" className="space-y-4">
+        {/* User Management Tab */}
+        <TabsContent value="users" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-semibold">User Management</h2>
+              <p className="text-gray-600">Create, edit, and manage system users and their permissions</p>
+            </div>
+            <Button onClick={() => {
+              setEditingUser(null);
+              resetUserForm();
+              setShowUserModal(true);
+            }}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add New User
+            </Button>
+          </div>
+
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-600" />
-                User Management
-              </CardTitle>
+              <CardTitle>System Users</CardTitle>
             </CardHeader>
             <CardContent>
               {usersLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="text-center py-8">Loading users...</div>
+              ) : users.length === 0 ? (
+                <div className="text-center py-8">
+                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500">No users found. Create your first user to get started.</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {users.map((user: User) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-shrink-0">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                            user.isActive ? 'bg-green-100' : 'bg-red-100'
-                          }`}>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>User</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user: any) => (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{user.firstName} {user.lastName}</div>
+                            <div className="text-sm text-gray-500">@{user.username}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{getRoleBadge(user.role)}</TableCell>
+                        <TableCell>
+                          <Badge variant={user.isActive ? "default" : "secondary"}>
                             {user.isActive ? (
-                              <UserCheck className="h-6 w-6 text-green-600" />
+                              <>
+                                <UserCheck className="w-3 h-3 mr-1" />
+                                Active
+                              </>
                             ) : (
-                              <UserX className="h-6 w-6 text-red-600" />
+                              <>
+                                <UserX className="w-3 h-3 mr-1" />
+                                Inactive
+                              </>
                             )}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(user.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openEditModal(user)}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={user.isActive ? "secondary" : "default"}
+                              onClick={() => handleToggleUserStatus(user)}
+                            >
+                              {user.isActive ? <UserX className="h-3 w-3" /> : <UserCheck className="h-3 w-3" />}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDeleteUser(user)}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
                           </div>
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-gray-900">
-                            {user.firstName} {user.lastName}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            @{user.username} | {user.email}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                              {user.role}
-                            </Badge>
-                            <Badge variant={user.isActive ? 'default' : 'destructive'}>
-                              {user.isActive ? 'Active' : 'Inactive'}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditUser(user)}
-                        >
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </Button>
-                        <Button
-                          variant={user.isActive ? "destructive" : "default"}
-                          size="sm"
-                          onClick={() => handleToggleUser(user.id, user.isActive)}
-                        >
-                          {user.isActive ? (
-                            <>
-                              <UserX className="h-4 w-4 mr-2" />
-                              Deactivate
-                            </>
-                          ) : (
-                            <>
-                              <UserCheck className="h-4 w-4 mr-2" />
-                              Activate
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* User Rights Tab */}
-        <TabsContent value="roles" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5 text-blue-600" />
-                User Rights & Permissions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="p-4 border rounded-lg bg-blue-50">
-                  <h3 className="font-semibold text-blue-800 mb-2">Administrator</h3>
-                  <ul className="text-sm text-blue-700 space-y-1">
-                    <li>• Full system access</li>
-                    <li>• User management</li>
-                    <li>• Financial controls</li>
-                    <li>• Reports & analytics</li>
-                    <li>• System configuration</li>
-                  </ul>
+        {/* System Settings Tab */}
+        <TabsContent value="system" className="space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold">System Settings</h2>
+            <p className="text-gray-600">Configure system-wide settings and preferences</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Hospital Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Hospital Name</Label>
+                  <Input defaultValue="Child Mental Haven" />
                 </div>
-                <div className="p-4 border rounded-lg bg-green-50">
-                  <h3 className="font-semibold text-green-800 mb-2">Doctor</h3>
-                  <ul className="text-sm text-green-700 space-y-1">
-                    <li>• Patient consultations</li>
-                    <li>• Medical records</li>
-                    <li>• Prescriptions</li>
-                    <li>• Laboratory orders</li>
-                    <li>• Patient reports</li>
-                  </ul>
+                <div>
+                  <Label>Address</Label>
+                  <Input defaultValue="Muchai Drive Off Ngong Road" />
                 </div>
-                <div className="p-4 border rounded-lg bg-purple-50">
-                  <h3 className="font-semibold text-purple-800 mb-2">Nurse</h3>
-                  <ul className="text-sm text-purple-700 space-y-1">
-                    <li>• Patient registration</li>
-                    <li>• Vital signs</li>
-                    <li>• Triage assessment</li>
-                    <li>• Basic patient care</li>
-                    <li>• Medication administration</li>
-                  </ul>
+                <div>
+                  <Label>Phone</Label>
+                  <Input defaultValue="254746170159" />
                 </div>
-                <div className="p-4 border rounded-lg bg-orange-50">
-                  <h3 className="font-semibold text-orange-800 mb-2">Cashier</h3>
-                  <ul className="text-sm text-orange-700 space-y-1">
-                    <li>• Payment processing</li>
-                    <li>• Billing management</li>
-                    <li>• Receipt generation</li>
-                    <li>• Financial transactions</li>
-                    <li>• Insurance processing</li>
-                  </ul>
+                <div>
+                  <Label>Email</Label>
+                  <Input defaultValue="info@childmentalhaven.org" />
                 </div>
-                <div className="p-4 border rounded-lg bg-cyan-50">
-                  <h3 className="font-semibold text-cyan-800 mb-2">Lab Technician</h3>
-                  <ul className="text-sm text-cyan-700 space-y-1">
-                    <li>• Laboratory tests</li>
-                    <li>• Sample processing</li>
-                    <li>• Result reporting</li>
-                    <li>• Equipment management</li>
-                    <li>• Quality control</li>
-                  </ul>
+                <Button>Save Changes</Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>System Configuration</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Patient ID Format</Label>
+                  <Input defaultValue="CMH-{YEAR}{MONTH}{INITIALS}{COUNTER}" disabled />
+                  <p className="text-sm text-gray-500 mt-1">Current format: CMH-202501LKM001</p>
                 </div>
-                <div className="p-4 border rounded-lg bg-pink-50">
-                  <h3 className="font-semibold text-pink-800 mb-2">Therapist</h3>
-                  <ul className="text-sm text-pink-700 space-y-1">
-                    <li>• Therapy sessions</li>
-                    <li>• Mental health assessments</li>
-                    <li>• Treatment planning</li>
-                    <li>• Progress tracking</li>
-                    <li>• Specialist referrals</li>
-                  </ul>
+                <div>
+                  <Label>Session Timeout (minutes)</Label>
+                  <Input type="number" defaultValue="30" />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+                <div>
+                  <Label>Backup Frequency</Label>
+                  <Select defaultValue="daily">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hourly">Hourly</SelectItem>
+                      <SelectItem value="daily">Daily</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button>Update Settings</Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
-        {/* Password Management Tab */}
-        <TabsContent value="security" className="space-y-4">
+        {/* Audit Logs Tab */}
+        <TabsContent value="audit" className="space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold">Audit Logs</h2>
+            <p className="text-gray-600">Monitor system activity and user actions</p>
+          </div>
+
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5 text-blue-600" />
-                Password & Security Management
-              </CardTitle>
+              <CardTitle>Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-4 border rounded-lg bg-yellow-50">
-                  <h3 className="font-semibold text-yellow-800 mb-2">Password Policies</h3>
-                  <ul className="text-sm text-yellow-700 space-y-1">
-                    <li>• Minimum 8 characters required</li>
-                    <li>• Must contain uppercase, lowercase, and numbers</li>
-                    <li>• Password expires every 90 days</li>
-                    <li>• Cannot reuse last 5 passwords</li>
-                    <li>• Account locks after 5 failed attempts</li>
-                  </ul>
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <p className="font-medium">User login</p>
+                    <p className="text-sm text-gray-600">admin logged into the system</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-500">Today, 7:00 AM</p>
+                    <Badge variant="default">Authentication</Badge>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button className="bg-red-600 hover:bg-red-700 text-white">
-                    <Key className="h-4 w-4 mr-2" />
-                    Force Password Reset for All Users
-                  </Button>
-                  <Button variant="outline">
-                    <Shield className="h-4 w-4 mr-2" />
-                    Generate Security Report
-                  </Button>
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <p className="font-medium">Patient registered</p>
+                    <p className="text-sm text-gray-600">New patient added to the system</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-500">Yesterday, 4:30 PM</p>
+                    <Badge variant="secondary">Registration</Badge>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* User Activity Tab */}
-        <TabsContent value="activity" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-blue-600" />
-                User Activity Monitoring
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-center py-8 text-gray-500">
-                  <Activity className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p>User activity logs will be displayed here</p>
-                  <p className="text-sm">Login times, actions performed, and system access</p>
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <p className="font-medium">Prescription approved</p>
+                    <p className="text-sm text-gray-600">Pharmacist approved medication</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-500">Yesterday, 2:15 PM</p>
+                    <Badge variant="outline">Pharmacy</Badge>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -473,52 +443,43 @@ export default function AdministratorDashboard() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editingUser ? "Edit User" : "Add New User"}
+              {editingUser ? "Edit User" : "Create New User"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>First Name</Label>
+                <Label>First Name *</Label>
                 <Input
                   value={userForm.firstName}
                   onChange={(e) => setUserForm({...userForm, firstName: e.target.value})}
-                  required
+                  placeholder="Enter first name"
                 />
               </div>
               <div>
-                <Label>Last Name</Label>
+                <Label>Last Name *</Label>
                 <Input
                   value={userForm.lastName}
                   onChange={(e) => setUserForm({...userForm, lastName: e.target.value})}
-                  required
+                  placeholder="Enter last name"
                 />
               </div>
             </div>
             <div>
-              <Label>Username</Label>
+              <Label>Username *</Label>
               <Input
                 value={userForm.username}
                 onChange={(e) => setUserForm({...userForm, username: e.target.value})}
-                required
+                placeholder="Enter username"
               />
             </div>
             <div>
-              <Label>Email</Label>
+              <Label>Email *</Label>
               <Input
                 type="email"
                 value={userForm.email}
                 onChange={(e) => setUserForm({...userForm, email: e.target.value})}
-                required
-              />
-            </div>
-            <div>
-              <Label>Password {editingUser && "(leave blank to keep current)"}</Label>
-              <Input
-                type="password"
-                value={userForm.password}
-                onChange={(e) => setUserForm({...userForm, password: e.target.value})}
-                required={!editingUser}
+                placeholder="Enter email address"
               />
             </div>
             <div>
@@ -531,30 +492,43 @@ export default function AdministratorDashboard() {
                   <SelectItem value="admin">Administrator</SelectItem>
                   <SelectItem value="doctor">Doctor</SelectItem>
                   <SelectItem value="nurse">Nurse</SelectItem>
+                  <SelectItem value="pharmacist">Pharmacist</SelectItem>
                   <SelectItem value="cashier">Cashier</SelectItem>
-                  <SelectItem value="lab_tech">Lab Technician</SelectItem>
+                  <SelectItem value="receptionist">Receptionist</SelectItem>
                   <SelectItem value="therapist">Therapist</SelectItem>
-                  <SelectItem value="staff">General Staff</SelectItem>
+                  <SelectItem value="staff">Staff</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={userForm.isActive}
-                onChange={(e) => setUserForm({...userForm, isActive: e.target.checked})}
-              />
-              <Label>Active User</Label>
+            <div>
+              <Label>Password {!editingUser && "*"}</Label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={userForm.password}
+                  onChange={(e) => setUserForm({...userForm, password: e.target.value})}
+                  placeholder={editingUser ? "Leave blank to keep current password" : "Enter password"}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
-            <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={() => setShowUserModal(false)}>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowUserModal(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={userMutation.isPending}>
-                {userMutation.isPending ? "Saving..." : (editingUser ? "Update" : "Create")}
+              <Button onClick={handleUserSubmit} disabled={createUserMutation.isPending || updateUserMutation.isPending}>
+                {createUserMutation.isPending || updateUserMutation.isPending ? "Saving..." : (editingUser ? "Update User" : "Create User")}
               </Button>
             </div>
-          </form>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
