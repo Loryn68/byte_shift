@@ -851,8 +851,277 @@ export default function BillingInvoicing() {
           </div>
         )}
 
+        {/* Automatic Billing Settings Tab */}
+        {activeTab === "settings" && (
+          <div>
+            {/* Retrieve Billed Items Link */}
+            <div className="p-4 bg-gray-100 border-b border-gray-200 text-center">
+              <button 
+                className="text-blue-600 hover:underline text-sm"
+                onClick={() => {
+                  toast({
+                    title: "Retrieving Items",
+                    description: "Automatically billed items are being retrieved",
+                  });
+                }}
+              >
+                Click here to Retrieve Automatically Billed Items
+              </button>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="p-6">
+              {/* Inner Tabs for Settings */}
+              <div className="flex bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700 mb-6 overflow-x-auto">
+                <div 
+                  className={`px-4 py-2 border-r border-gray-200 cursor-pointer whitespace-nowrap ${
+                    activeSubTab === "global" ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100"
+                  }`}
+                  onClick={() => setActiveSubTab("global")}
+                >
+                  Global Settings
+                </div>
+                <div 
+                  className={`px-4 py-2 border-r border-gray-200 cursor-pointer whitespace-nowrap ${
+                    activeSubTab === "individual" ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100"
+                  }`}
+                  onClick={() => setActiveSubTab("individual")}
+                >
+                  Individual Level Settings
+                </div>
+                <div 
+                  className={`px-4 py-2 cursor-pointer whitespace-nowrap ${
+                    activeSubTab === "perform" ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100"
+                  }`}
+                  onClick={() => setActiveSubTab("perform")}
+                >
+                  Perform Automatic Billing
+                </div>
+              </div>
+
+              {/* Global Settings Content */}
+              {activeSubTab === "global" && (
+                <div className="bg-gray-50 p-6 rounded-lg shadow-md border border-gray-200">
+                  <div className="mb-6">
+                    <Label htmlFor="item-name" className="block text-sm font-medium text-gray-700 mb-1">
+                      Item
+                    </Label>
+                    <Input
+                      type="text"
+                      id="item-name"
+                      className="w-full text-sm"
+                      placeholder="Enter billing item name..."
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="mb-6">
+                    <Label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Billing Days
+                    </Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 text-sm">
+                      {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                        <div key={day} className="flex items-center">
+                          <input 
+                            type="checkbox" 
+                            id={day.toLowerCase()} 
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded mr-2" 
+                          />
+                          <Label htmlFor={day.toLowerCase()} className="text-gray-700">
+                            {day}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-4 mb-6">
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700 text-sm"
+                      onClick={() => {
+                        toast({
+                          title: "Settings Saved",
+                          description: "Global billing settings have been saved successfully",
+                        });
+                      }}
+                    >
+                      Save
+                    </Button>
+                    <Button 
+                      variant="secondary"
+                      className="text-sm"
+                      onClick={() => {
+                        setNotes("");
+                        toast({
+                          title: "Cancelled",
+                          description: "Changes have been cancelled",
+                        });
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+
+                  {/* Table for Billed Items */}
+                  <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs">Item</TableHead>
+                          <TableHead className="text-xs">Billing Day</TableHead>
+                          <TableHead className="text-xs">Delete</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {/* Sample billing items */}
+                        <TableRow>
+                          <TableCell className="text-sm">Daily Bed Charge</TableCell>
+                          <TableCell className="text-sm">Monday, Tuesday, Wednesday, Thursday, Friday</TableCell>
+                          <TableCell className="text-sm">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-red-600 hover:text-red-800"
+                              onClick={() => {
+                                toast({
+                                  title: "Item Deleted",
+                                  description: "Billing item has been removed",
+                                });
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-sm">Nursing Fee</TableCell>
+                          <TableCell className="text-sm">Daily</TableCell>
+                          <TableCell className="text-sm">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-red-600 hover:text-red-800"
+                              onClick={() => {
+                                toast({
+                                  title: "Item Deleted",
+                                  description: "Billing item has been removed",
+                                });
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                        {/* Placeholder rows */}
+                        {Array(3).fill(0).map((_, i) => (
+                          <TableRow key={i}>
+                            <TableCell className="text-sm text-gray-400">-</TableCell>
+                            <TableCell className="text-sm text-gray-400">-</TableCell>
+                            <TableCell className="text-sm text-gray-400">-</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
+
+              {/* Individual Level Settings Content */}
+              {activeSubTab === "individual" && (
+                <div className="bg-gray-50 p-6 rounded-lg shadow-md border border-gray-200">
+                  <div className="text-center py-12">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Individual Level Settings</h3>
+                    <p className="text-gray-600 mb-4">
+                      Configure automatic billing settings for individual patients or departments.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <Label className="block text-sm font-medium text-gray-700 mb-2">
+                          Select Patient
+                        </Label>
+                        <Input
+                          type="text"
+                          placeholder="Search patient by name or ID..."
+                          className="w-full text-sm"
+                        />
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <Label className="block text-sm font-medium text-gray-700 mb-2">
+                          Select Department
+                        </Label>
+                        <Input
+                          type="text"
+                          placeholder="Choose department..."
+                          className="w-full text-sm"
+                        />
+                      </div>
+                    </div>
+                    <Button className="mt-4 bg-blue-600 hover:bg-blue-700">
+                      Configure Individual Settings
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Perform Automatic Billing Content */}
+              {activeSubTab === "perform" && (
+                <div className="bg-gray-50 p-6 rounded-lg shadow-md border border-gray-200">
+                  <div className="text-center py-12">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Perform Automatic Billing</h3>
+                    <p className="text-gray-600 mb-6">
+                      Execute automatic billing for all configured items and patients.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-6">
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <h4 className="font-semibold text-gray-800 mb-2">Daily Charges</h4>
+                        <p className="text-2xl font-bold text-blue-600">15</p>
+                        <p className="text-sm text-gray-600">Items to be billed</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <h4 className="font-semibold text-gray-800 mb-2">Affected Patients</h4>
+                        <p className="text-2xl font-bold text-green-600">8</p>
+                        <p className="text-sm text-gray-600">Currently admitted</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <h4 className="font-semibold text-gray-800 mb-2">Total Amount</h4>
+                        <p className="text-2xl font-bold text-orange-600">KSH 24,500</p>
+                        <p className="text-sm text-gray-600">To be billed today</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-center space-x-4">
+                      <Button 
+                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => {
+                          toast({
+                            title: "Automatic Billing Executed",
+                            description: "All configured items have been billed successfully",
+                          });
+                        }}
+                      >
+                        Execute Billing
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          toast({
+                            title: "Preview Generated",
+                            description: "Billing preview has been generated",
+                          });
+                        }}
+                      >
+                        Preview Billing
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Other Tab Content Placeholders */}
-        {!["search", "admitted", "history"].includes(activeTab) && (
+        {!["search", "admitted", "history", "settings"].includes(activeTab) && (
           <div className="p-6">
             <Card>
               <CardHeader>
