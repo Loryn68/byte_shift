@@ -290,48 +290,48 @@ export default function OutpatientManagement() {
         )}
 
         {/* Main Content */}
-        <div className="p-6 h-full overflow-auto">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-8 mb-6">
-              <TabsTrigger value="consultation" className="flex items-center gap-2">
+        <div className="p-4 h-full overflow-auto">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
+            <TabsList className="grid w-full grid-cols-8 mb-6 h-auto">
+              <TabsTrigger value="consultation" className="flex flex-col items-center gap-1 py-3 px-2 text-xs">
                 <Stethoscope className="h-4 w-4" />
-                General Consultation
+                <span className="text-center leading-tight">General Consultation</span>
               </TabsTrigger>
-              <TabsTrigger value="queue" className="flex items-center gap-2">
+              <TabsTrigger value="queue" className="flex flex-col items-center gap-1 py-3 px-2 text-xs">
                 <Clock className="h-4 w-4" />
-                Patient Queue
+                <span className="text-center leading-tight">Patient Queue</span>
               </TabsTrigger>
-              <TabsTrigger value="laboratory" className="flex items-center gap-2">
+              <TabsTrigger value="laboratory" className="flex flex-col items-center gap-1 py-3 px-2 text-xs">
                 <Activity className="h-4 w-4" />
-                Laboratory
+                <span className="text-center leading-tight">Laboratory</span>
               </TabsTrigger>
-              <TabsTrigger value="prescription" className="flex items-center gap-2">
+              <TabsTrigger value="prescription" className="flex flex-col items-center gap-1 py-3 px-2 text-xs">
                 <Pill className="h-4 w-4" />
-                Prescription
+                <span className="text-center leading-tight">Prescription</span>
               </TabsTrigger>
-              <TabsTrigger value="referral" className="flex items-center gap-2">
+              <TabsTrigger value="referral" className="flex flex-col items-center gap-1 py-3 px-2 text-xs">
                 <User className="h-4 w-4" />
-                Referral
+                <span className="text-center leading-tight">Referral</span>
               </TabsTrigger>
-              <TabsTrigger value="admit" className="flex items-center gap-2">
+              <TabsTrigger value="admit" className="flex flex-col items-center gap-1 py-3 px-2 text-xs">
                 <User className="h-4 w-4" />
-                Admit Patient
+                <span className="text-center leading-tight">Admit Patient</span>
               </TabsTrigger>
-              <TabsTrigger value="forms" className="flex items-center gap-2">
+              <TabsTrigger value="forms" className="flex flex-col items-center gap-1 py-3 px-2 text-xs">
                 <FileDown className="h-4 w-4" />
-                Clinical Forms
+                <span className="text-center leading-tight">Clinical Forms</span>
               </TabsTrigger>
-              <TabsTrigger value="history" className="flex items-center gap-2">
+              <TabsTrigger value="history" className="flex flex-col items-center gap-1 py-3 px-2 text-xs">
                 <FileText className="h-4 w-4" />
-                Patient History
+                <span className="text-center leading-tight">Patient History</span>
               </TabsTrigger>
             </TabsList>
 
             {/* General Consultation Tab */}
-            <TabsContent value="consultation" className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
+            <TabsContent value="consultation" className="flex-1 overflow-auto">
+              <div className="grid grid-cols-2 gap-4 h-full">
                 {/* Left Panel - Clinical Assessment */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {/* Consultation Details */}
                   <Card>
                     <CardHeader>
@@ -605,10 +605,10 @@ export default function OutpatientManagement() {
             </TabsContent>
 
             {/* Patient Queue Tab */}
-            <TabsContent value="queue" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Outpatient Queue</CardTitle>
+            <TabsContent value="queue" className="flex-1 overflow-auto">
+              <Card className="h-full">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Outpatient Queue</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Table>
