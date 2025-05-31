@@ -33,13 +33,8 @@ import Billing from "@/pages/billing";
 import ProfessionalBilling from "@/pages/professional-billing";
 import Cashier from "@/pages/cashier";
 import Reports from "@/pages/reports";
-import AdministratorDashboard from "@/pages/administrator-dashboard";
-import RegisterUser from "@/pages/register-user";
-import RegisteredUsers from "@/pages/administrator/registered-users";
-import AssignUserRights from "@/pages/administrator/assign-rights";
-import RemoveUsers from "@/pages/administrator/remove-users";
-import ChangePasswords from "@/pages/administrator/change-passwords";
-import UserActivity from "@/pages/administrator/user-activity";
+import UserManagement from "@/pages/core-administration/user-management";
+import SystemConfiguration from "@/pages/core-administration/system-configuration";
 import FinancialManagement from "@/pages/financial-management";
 import ReportsAnalytics from "@/pages/reports-analytics";
 import NotFound from "@/pages/not-found";
@@ -92,13 +87,12 @@ function Router() {
             <Route path="/insurance" component={Billing} />
             <Route path="/reports" component={Reports} />
             <Route path="/analytics" component={Reports} />
-            <Route path="/administrator" component={AdministratorDashboard} />
-            <Route path="/administrator/register" component={RegisterUser} />
-            <Route path="/administrator/users" component={RegisteredUsers} />
-            <Route path="/administrator/rights" component={AssignUserRights} />
-            <Route path="/administrator/remove" component={RemoveUsers} />
-            <Route path="/administrator/passwords" component={ChangePasswords} />
-            <Route path="/administrator/activity" component={UserActivity} />
+            <Route path="/administrator/register" component={UserManagement} />
+            <Route path="/administrator/users" component={UserManagement} />
+            <Route path="/administrator/rights" component={UserManagement} />
+            <Route path="/administrator/remove" component={UserManagement} />
+            <Route path="/administrator/passwords" component={UserManagement} />
+            <Route path="/administrator/activity" component={UserManagement} />
             <Route path="/financial-management" component={FinancialManagement} />
             <Route path="/reports-analytics" component={ReportsAnalytics} />
             <Route component={NotFound} />
