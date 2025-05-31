@@ -6,6 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Plus, Edit, Trash2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -15,6 +20,7 @@ export default function PatientRegistry() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
 
+  const [activeTab, setActiveTab] = useState("registration");
   const [patientForm, setPatientForm] = useState({
     telNo: "",
     idNo: "",
@@ -33,6 +39,9 @@ export default function PatientRegistry() {
     patientCategorization: "",
     paymentOption: "",
     referralSource: "",
+    medicalHistory: "",
+    allergies: "",
+    emergencyContact: "",
     issueCard: false
   });
 
