@@ -235,47 +235,12 @@ export default function PatientRegistry() {
 
               <div className="grid grid-cols-2 gap-2 items-center">
                 <Label className="text-sm">D.O.B:</Label>
-                <div className="flex gap-1">
-                  <Select value={new Date(patientForm.dateOfBirth || Date.now()).toLocaleDateString('en-US', { weekday: 'long' })} onValueChange={() => {}}>
-                    <SelectTrigger className="h-8 bg-white text-xs">
-                      <SelectValue placeholder="Saturday" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Monday">Monday</SelectItem>
-                      <SelectItem value="Tuesday">Tuesday</SelectItem>
-                      <SelectItem value="Wednesday">Wednesday</SelectItem>
-                      <SelectItem value="Thursday">Thursday</SelectItem>
-                      <SelectItem value="Friday">Friday</SelectItem>
-                      <SelectItem value="Saturday">Saturday</SelectItem>
-                      <SelectItem value="Sunday">Sunday</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={new Date(patientForm.dateOfBirth || Date.now()).toLocaleDateString('en-US', { month: 'short' })} onValueChange={() => {}}>
-                    <SelectTrigger className="h-8 bg-white text-xs">
-                      <SelectValue placeholder="May" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Jan">Jan</SelectItem>
-                      <SelectItem value="Feb">Feb</SelectItem>
-                      <SelectItem value="Mar">Mar</SelectItem>
-                      <SelectItem value="Apr">Apr</SelectItem>
-                      <SelectItem value="May">May</SelectItem>
-                      <SelectItem value="Jun">Jun</SelectItem>
-                      <SelectItem value="Jul">Jul</SelectItem>
-                      <SelectItem value="Aug">Aug</SelectItem>
-                      <SelectItem value="Sep">Sep</SelectItem>
-                      <SelectItem value="Oct">Oct</SelectItem>
-                      <SelectItem value="Nov">Nov</SelectItem>
-                      <SelectItem value="Dec">Dec</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="date"
-                    value={patientForm.dateOfBirth}
-                    onChange={(e) => setPatientForm(prev => ({ ...prev, dateOfBirth: e.target.value }))}
-                    className="h-8 bg-white"
-                  />
-                </div>
+                <Input
+                  type="date"
+                  value={patientForm.dateOfBirth}
+                  onChange={(e) => setPatientForm(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+                  className="h-8 bg-white"
+                />
               </div>
 
               <div className="space-y-2">
