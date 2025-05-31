@@ -35,6 +35,11 @@ import Cashier from "@/pages/cashier";
 import Reports from "@/pages/reports";
 import AdministratorDashboard from "@/pages/administrator-dashboard";
 import RegisterUser from "@/pages/register-user";
+import RegisteredUsers from "@/pages/administrator/registered-users";
+import AssignUserRights from "@/pages/administrator/assign-rights";
+import RemoveUsers from "@/pages/administrator/remove-users";
+import ChangePasswords from "@/pages/administrator/change-passwords";
+import UserActivity from "@/pages/administrator/user-activity";
 import FinancialManagement from "@/pages/financial-management";
 import ReportsAnalytics from "@/pages/reports-analytics";
 import NotFound from "@/pages/not-found";
@@ -89,6 +94,11 @@ function Router() {
             <Route path="/analytics" component={Reports} />
             <Route path="/administrator" component={AdministratorDashboard} />
             <Route path="/administrator/register" component={RegisterUser} />
+            <Route path="/administrator/users" component={RegisteredUsers} />
+            <Route path="/administrator/rights" component={AssignUserRights} />
+            <Route path="/administrator/remove" component={RemoveUsers} />
+            <Route path="/administrator/passwords" component={ChangePasswords} />
+            <Route path="/administrator/activity" component={UserActivity} />
             <Route path="/financial-management" component={FinancialManagement} />
             <Route path="/reports-analytics" component={ReportsAnalytics} />
             <Route component={NotFound} />
