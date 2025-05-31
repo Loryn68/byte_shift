@@ -491,6 +491,7 @@ export default function IncomeManagementKenya() {
             Income Records
           </Button>
         </nav>
+        </div>
       </header>
 
       {/* User ID Display */}

@@ -359,7 +359,7 @@ export default function PayrollManagement() {
               </h1>
               <p className="text-gray-600 mt-1">Comprehensive payroll processing with Kenya tax compliance</p>
             </div>
-          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
             <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
               <SelectTrigger className="w-48">
                 <SelectValue />
@@ -460,6 +460,7 @@ export default function PayrollManagement() {
             >
               {selectedPeriod === 'current' ? 'Live' : selectedPeriod === 'previous' ? 'Previous' : 'Custom'}
             </Badge>
+          </div>
           </div>
         </div>
       </div>

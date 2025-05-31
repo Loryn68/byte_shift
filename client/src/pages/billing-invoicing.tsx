@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Receipt, Search, RefreshCw, FileText, CreditCard, Users, Calendar } from "lucide-react";
+import { Receipt, Search, RefreshCw, FileText, CreditCard, Users, Calendar, DollarSign } from "lucide-react";
 
 interface Patient {
   id: string;
@@ -197,6 +197,7 @@ export default function BillingInvoicing() {
 
   const mainTabs = [
     { id: "search", label: "Search By Patient", icon: <Search className="h-4 w-4" /> },
+    { id: "receive-payment", label: "Receive Payment", icon: <DollarSign className="h-4 w-4" /> },
     { id: "admitted", label: "Admitted Patients", icon: <Users className="h-4 w-4" /> },
     { id: "history", label: "History of Admissions", icon: <Calendar className="h-4 w-4" /> },
     { id: "settings", label: "Automatic Billing Settings", icon: <FileText className="h-4 w-4" /> },
