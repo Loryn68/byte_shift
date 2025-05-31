@@ -9,11 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 import { 
   Calculator, DollarSign, Users, FileText, Calendar, Download,
   Plus, Edit3, Eye, Search, Filter, AlertTriangle, CheckCircle,
-  TrendingUp, PieChart, BarChart3, Settings, Printer, Mail
+  TrendingUp, PieChart, BarChart3, Settings, Printer, Mail,
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 
 interface Employee {
@@ -53,6 +56,8 @@ export default function PayrollManagement() {
   const [calculatedPayslip, setCalculatedPayslip] = useState<Payslip | null>(null);
   const [payrollError, setPayrollError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -286,6 +291,42 @@ export default function PayrollManagement() {
   // Destructure for backward compatibility
   const { totalGrossPay, totalNetPay, totalTaxDeductions, totalStatutoryDeductions } = summaryStats;
 
+  // Format current month/year for display
+  const formatDisplayMonth = (date: Date) => {
+    return format(date, "MMMM yyyy");
+  };
+
+  // Handle month navigation
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newDate = new Date(selectedDate);
+    if (direction === 'prev') {
+      newDate.setMonth(newDate.getMonth() - 1);
+    } else {
+      newDate.setMonth(newDate.getMonth() + 1);
+    }
+    setSelectedDate(newDate);
+    
+    // Update selected period to custom when navigating
+    if (selectedPeriod !== 'custom') {
+      setSelectedPeriod('custom');
+    }
+  };
+
+  // Handle period change
+  const handlePeriodChange = (value: string) => {
+    setSelectedPeriod(value);
+    const now = new Date();
+    
+    if (value === 'current') {
+      setSelectedDate(now);
+    } else if (value === 'previous') {
+      const prevMonth = new Date(now);
+      prevMonth.setMonth(prevMonth.getMonth() - 1);
+      setSelectedDate(prevMonth);
+    }
+    // For 'custom', keep current selectedDate
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       {/* Header */}
@@ -299,7 +340,7 @@ export default function PayrollManagement() {
             <p className="text-gray-600 mt-1">Comprehensive payroll processing with Kenya tax compliance</p>
           </div>
           <div className="flex items-center gap-3">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
               <SelectTrigger className="w-48">
                 <SelectValue />
               </SelectTrigger>
@@ -309,9 +350,95 @@ export default function PayrollManagement() {
                 <SelectItem value="custom">Custom Period</SelectItem>
               </SelectContent>
             </Select>
-            <Badge variant="outline" className="px-3 py-1">
-              <Calendar className="h-4 w-4 mr-1" />
-              January 2024
+            
+            {/* Interactive Calendar Display */}
+            <div className="flex items-center gap-2 bg-white border rounded-lg px-4 py-2 shadow-sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigateMonth('prev')}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <Popover open={showCalendar} onOpenChange={setShowCalendar}>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2 font-medium">
+                    <Calendar className="h-4 w-4" />
+                    {formatDisplayMonth(selectedDate)}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <div className="p-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-sm">Select Payroll Period</h4>
+                      <div className="grid grid-cols-3 gap-2">
+                        {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, index) => (
+                          <Button
+                            key={month}
+                            variant={selectedDate.getMonth() === index ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => {
+                              const newDate = new Date(selectedDate);
+                              newDate.setMonth(index);
+                              setSelectedDate(newDate);
+                              setSelectedPeriod('custom');
+                              setShowCalendar(false);
+                            }}
+                            className="text-xs"
+                          >
+                            {month}
+                          </Button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2 pt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newDate = new Date(selectedDate);
+                            newDate.setFullYear(newDate.getFullYear() - 1);
+                            setSelectedDate(newDate);
+                          }}
+                        >
+                          {selectedDate.getFullYear() - 1}
+                        </Button>
+                        <span className="font-medium text-sm flex-1 text-center">
+                          {selectedDate.getFullYear()}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newDate = new Date(selectedDate);
+                            newDate.setFullYear(newDate.getFullYear() + 1);
+                            setSelectedDate(newDate);
+                          }}
+                        >
+                          {selectedDate.getFullYear() + 1}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigateMonth('next')}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <Badge 
+              variant={selectedPeriod === 'current' ? "default" : "secondary"} 
+              className="px-3 py-1"
+            >
+              {selectedPeriod === 'current' ? 'Live' : selectedPeriod === 'previous' ? 'Previous' : 'Custom'}
             </Badge>
           </div>
         </div>
