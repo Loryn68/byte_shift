@@ -72,6 +72,20 @@ export default function OutpatientManagement() {
 
   const [showReferralForm, setShowReferralForm] = useState(false);
 
+  const [admissionForm, setAdmissionForm] = useState({
+    modeOfAdmission: "",
+    allegation: "",
+    patientReaction: "",
+    onset: "",
+    duration: "",
+    department: "",
+    ward: "",
+    bed: "",
+    dailyCharges: "",
+    dateOfAdmission: new Date().toISOString().slice(0, 16),
+    patientPhoto: null as File | null
+  });
+
   const { data: patients = [] } = useQuery({
     queryKey: ["/api/patients"],
   });
@@ -278,7 +292,7 @@ export default function OutpatientManagement() {
         {/* Main Content */}
         <div className="p-6 h-full overflow-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-7 mb-6">
+            <TabsList className="grid w-full grid-cols-8 mb-6">
               <TabsTrigger value="consultation" className="flex items-center gap-2">
                 <Stethoscope className="h-4 w-4" />
                 General Consultation
@@ -298,6 +312,10 @@ export default function OutpatientManagement() {
               <TabsTrigger value="referral" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Referral
+              </TabsTrigger>
+              <TabsTrigger value="admit" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Admit Patient
               </TabsTrigger>
               <TabsTrigger value="forms" className="flex items-center gap-2">
                 <FileDown className="h-4 w-4" />
@@ -847,6 +865,233 @@ export default function OutpatientManagement() {
                       <Printer className="h-4 w-4" />
                       Generate Referral Form
                     </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Admit Patient Tab */}
+            <TabsContent value="admit" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Patient Admission</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-2 gap-8">
+                    {/* Left Column */}
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Mode of Admission:</Label>
+                        <Select
+                          value={admissionForm.modeOfAdmission}
+                          onValueChange={(value) => setAdmissionForm(prev => ({ ...prev, modeOfAdmission: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select mode of admission" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="emergency">Emergency</SelectItem>
+                            <SelectItem value="planned">Planned</SelectItem>
+                            <SelectItem value="transfer">Transfer</SelectItem>
+                            <SelectItem value="referral">Referral</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Allegation:</Label>
+                        <Textarea
+                          value={admissionForm.allegation}
+                          onChange={(e) => setAdmissionForm(prev => ({ ...prev, allegation: e.target.value }))}
+                          placeholder="Enter allegation details"
+                          className="h-16 resize-none"
+                        />
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Patient Reaction:</Label>
+                        <Select
+                          value={admissionForm.patientReaction}
+                          onValueChange={(value) => setAdmissionForm(prev => ({ ...prev, patientReaction: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select patient reaction" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cooperative">Cooperative</SelectItem>
+                            <SelectItem value="anxious">Anxious</SelectItem>
+                            <SelectItem value="agitated">Agitated</SelectItem>
+                            <SelectItem value="confused">Confused</SelectItem>
+                            <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Onset:</Label>
+                        <Select
+                          value={admissionForm.onset}
+                          onValueChange={(value) => setAdmissionForm(prev => ({ ...prev, onset: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select onset" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="acute">Acute</SelectItem>
+                            <SelectItem value="gradual">Gradual</SelectItem>
+                            <SelectItem value="chronic">Chronic</SelectItem>
+                            <SelectItem value="sudden">Sudden</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Duration:</Label>
+                        <Input
+                          value={admissionForm.duration}
+                          onChange={(e) => setAdmissionForm(prev => ({ ...prev, duration: e.target.value }))}
+                          placeholder="Enter duration"
+                        />
+                      </div>
+
+                      {/* Large text area for additional notes */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Additional Notes:</Label>
+                        <Textarea
+                          placeholder="Enter additional admission notes..."
+                          className="h-32 resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Department:</Label>
+                        <Select
+                          value={admissionForm.department}
+                          onValueChange={(value) => setAdmissionForm(prev => ({ ...prev, department: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select department" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="psychiatry">Psychiatry</SelectItem>
+                            <SelectItem value="psychology">Psychology</SelectItem>
+                            <SelectItem value="addiction">Addiction Services</SelectItem>
+                            <SelectItem value="therapy">Therapy Unit</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Ward:</Label>
+                        <Select
+                          value={admissionForm.ward}
+                          onValueChange={(value) => setAdmissionForm(prev => ({ ...prev, ward: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select ward" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="male-ward">Male Ward</SelectItem>
+                            <SelectItem value="female-ward">Female Ward</SelectItem>
+                            <SelectItem value="pediatric-ward">Pediatric Ward</SelectItem>
+                            <SelectItem value="intensive-care">Intensive Care</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Bed:</Label>
+                        <Select
+                          value={admissionForm.bed}
+                          onValueChange={(value) => setAdmissionForm(prev => ({ ...prev, bed: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select bed" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bed-1">Bed 1</SelectItem>
+                            <SelectItem value="bed-2">Bed 2</SelectItem>
+                            <SelectItem value="bed-3">Bed 3</SelectItem>
+                            <SelectItem value="bed-4">Bed 4</SelectItem>
+                            <SelectItem value="bed-5">Bed 5</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <Label className="text-sm font-medium">Daily Charges:</Label>
+                          <div className="flex">
+                            <span className="inline-flex items-center px-3 py-2 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                              KSh
+                            </span>
+                            <Input
+                              value={admissionForm.dailyCharges}
+                              onChange={(e) => setAdmissionForm(prev => ({ ...prev, dailyCharges: e.target.value }))}
+                              placeholder="0.00"
+                              className="rounded-l-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <Label className="text-sm font-medium">Date of Admission:</Label>
+                          <Input
+                            type="datetime-local"
+                            value={admissionForm.dateOfAdmission}
+                            onChange={(e) => setAdmissionForm(prev => ({ ...prev, dateOfAdmission: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Patient Photo Section */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Patient Photo:</Label>
+                        <div className="flex flex-col items-center p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                          <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                            <User className="h-12 w-12 text-gray-400" />
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Upload Image
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Save Button */}
+                      <div className="pt-4">
+                        <Button 
+                          className="w-full bg-gray-300 text-gray-700 hover:bg-gray-400"
+                          onClick={() => {
+                            if (!selectedPatient) {
+                              toast({
+                                title: "No Patient Selected",
+                                description: "Please search and select a patient first.",
+                                variant: "destructive"
+                              });
+                              return;
+                            }
+                            
+                            if (!admissionForm.modeOfAdmission || !admissionForm.department || !admissionForm.ward || !admissionForm.bed) {
+                              toast({
+                                title: "Required Fields Missing",
+                                description: "Please fill in all required admission information.",
+                                variant: "destructive"
+                              });
+                              return;
+                            }
+
+                            toast({
+                              title: "Admission Details Saved",
+                              description: "Patient admission information has been saved successfully.",
+                            });
+                          }}
+                        >
+                          Save Admission Details
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
