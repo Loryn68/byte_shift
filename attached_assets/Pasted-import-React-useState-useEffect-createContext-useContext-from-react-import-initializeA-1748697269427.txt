@@ -1,0 +1,407 @@
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, onSnapshot } from 'firebase/firestore';
+
+// Create a context for Firebase and User
+const FirebaseContext = createContext(null);
+
+// Main App Component
+function App() {
+  const [db, setDb] = useState(null);
+  const [auth, setAuth] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'income_records'
+
+  useEffect(() => {
+    // Initialize Firebase
+    try {
+      const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+      const app = initializeApp(firebaseConfig);
+      const firestore = getFirestore(app);
+      const firebaseAuth = getAuth(app);
+
+      setDb(firestore);
+      setAuth(firebaseAuth);
+
+      // Authenticate user
+      const authenticateUser = async () => {
+        try {
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(firebaseAuth, __initial_auth_token);
+          } else {
+            await signInAnonymously(firebaseAuth);
+          }
+        } catch (error) {
+          console.error("Firebase authentication error:", error);
+          // Fallback to anonymous if custom token fails or is not provided
+          await signInAnonymously(firebaseAuth);
+        }
+      };
+
+      authenticateUser();
+
+      // Listen for auth state changes
+      const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+        if (user) {
+          setUserId(user.uid);
+        } else {
+          setUserId(crypto.randomUUID()); // Anonymous or unauthenticated user ID
+        }
+        setIsAuthReady(true);
+      });
+
+      return () => unsubscribe(); // Cleanup auth listener
+    } catch (e) {
+      console.error("Error initializing Firebase:", e);
+      setIsAuthReady(true); // Ensure app can proceed even if Firebase init fails
+    }
+  }, []); // Run only once on component mount
+
+  if (!isAuthReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-lg font-semibold text-gray-700">Loading Hospital Income Management System...</div>
+      </div>
+    );
+  }
+
+  return (
+    <FirebaseContext.Provider value={{ db, auth, userId }}>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 font-inter antialiased">
+        {/* Header and Navigation */}
+        <header className="bg-white shadow-md p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-4 sm:mb-0">Hospital Income Management</h1>
+          <nav className="flex flex-wrap gap-2 sm:gap-4">
+            <button
+              onClick={() => setCurrentView('dashboard')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                currentView === 'dashboard' ? 'bg-purple-600 text-white shadow-md' : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+              }`}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => setCurrentView('income_records')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                currentView === 'income_records' ? 'bg-purple-600 text-white shadow-md' : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+              }`}
+            >
+              Income Records
+            </button>
+          </nav>
+        </header>
+
+        {/* User ID Display */}
+        <div className="p-4 bg-purple-50 text-purple-700 text-center text-sm font-medium">
+          Your User ID: <span className="font-mono text-purple-900">{userId}</span> (Your income data is stored under this ID)
+        </div>
+
+        {/* Main Content Area */}
+        <main className="p-4 sm:p-6 lg:p-8">
+          {currentView === 'dashboard' && <IncomeDashboard />}
+          {currentView === 'income_records' && <IncomeManagement />}
+        </main>
+      </div>
+    </FirebaseContext.Provider>
+  );
+}
+
+// Income Dashboard Component
+function IncomeDashboard() {
+  const { db, userId } = useContext(FirebaseContext);
+  const [totalIncomeAllTime, setTotalIncomeAllTime] = useState(0);
+  const [totalIncomeThisMonth, setTotalIncomeThisMonth] = useState(0);
+  const [incomeByMonth, setIncomeByMonth] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!db || !userId) return;
+
+    setLoading(true);
+    setError('');
+
+    const incomeRef = collection(db, `artifacts/${__app_id}/users/${userId}/income_management`);
+    const unsubscribe = onSnapshot(incomeRef, (snapshot) => {
+      let allTime = 0;
+      let thisMonth = 0;
+      const monthlyData = {};
+      const currentMonthYear = new Date().toISOString().slice(0, 7); // YYYY-MM
+
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        const amount = parseFloat(data.amount) || 0;
+        allTime += amount;
+
+        if (data.date && data.date.startsWith(currentMonthYear)) {
+          thisMonth += amount;
+        }
+
+        if (data.date) {
+          const monthYear = data.date.slice(0, 7);
+          monthlyData[monthYear] = (monthlyData[monthYear] || 0) + amount;
+        }
+      });
+      setTotalIncomeAllTime(allTime);
+      setTotalIncomeThisMonth(thisMonth);
+      setIncomeByMonth(monthlyData);
+      setLoading(false);
+    }, (err) => {
+      console.error("Error fetching dashboard income data:", err);
+      setError("Failed to load dashboard data.");
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [db, userId]);
+
+  const sortedMonths = Object.keys(incomeByMonth).sort().reverse(); // Sort descending for recent months first
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold text-purple-700 mb-6">Income Dashboard</h2>
+      {loading ? (
+        <p className="text-gray-600">Loading income data...</p>
+      ) : error ? (
+        <p className="text-red-600">{error}</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <DashboardCard title="Total Income (All Time)" value={`KES ${totalIncomeAllTime.toFixed(2)}`} icon="📈" color="bg-green-100 text-green-700" />
+          <DashboardCard title="Total Income (This Month)" value={`KES ${totalIncomeThisMonth.toFixed(2)}`} icon="🗓️" color="bg-blue-100 text-blue-700" />
+        </div>
+      )}
+
+      {/* Monthly Income Breakdown */}
+      <h3 className="text-xl font-semibold text-purple-800 mb-4">Monthly Income Breakdown</h3>
+      {sortedMonths.length === 0 ? (
+        <p className="text-gray-600">No monthly income data available.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sortedMonths.map(month => (
+            <div key={month} className="p-4 rounded-lg shadow-sm bg-gray-50 border border-gray-200">
+              <h4 className="text-md font-semibold text-gray-800">{month}</h4>
+              <p className="text-xl font-bold text-gray-900">KES {incomeByMonth[month].toFixed(2)}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DashboardCard({ title, value, icon, color }) {
+  return (
+    <div className={`p-5 rounded-lg shadow-md flex items-center space-x-4 ${color}`}>
+      <span className="text-4xl">{icon}</span>
+      <div>
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <p className="text-3xl font-bold">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+// Income Management Component (Core functionality)
+function IncomeManagement() {
+  const { db, userId } = useContext(FirebaseContext);
+  const [incomeRecords, setIncomeRecords] = useState([]);
+  const [newIncome, setNewIncome] = useState({ date: '', incomeType: 'Patient Fees', amount: '', source: '', notes: '' });
+  const [editingIncome, setEditingIncome] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (!db || !userId) return;
+
+    // Data for income management will be stored under 'income_management'
+    const incomeRef = collection(db, `artifacts/${__app_id}/users/${userId}/income_management`);
+    const unsubscribe = onSnapshot(incomeRef, (snapshot) => {
+      const records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setIncomeRecords(records);
+      setLoading(false);
+    }, (err) => {
+      console.error("Error fetching income records:", err);
+      setError("Failed to load income records.");
+      setLoading(false);
+    });
+
+    return () => unsubscribe(); // Cleanup listener
+  }, [db, userId]);
+
+  const handleChange = (e) => {
+    const { name, value, type } = e.target;
+    const val = type === 'number' ? parseFloat(value) || '' : value;
+
+    if (editingIncome) {
+      setEditingIncome(prev => ({ ...prev, [name]: val }));
+    } else {
+      setNewIncome(prev => ({ ...prev, [name]: val }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage('');
+    setError('');
+
+    if (!db || !userId) {
+      setError("Database not ready. Please try again.");
+      return;
+    }
+
+    try {
+      const incomeData = editingIncome || newIncome;
+      if (!incomeData.date || !incomeData.incomeType || !incomeData.amount || !incomeData.source) {
+        setError("Date, Income Type, Amount, and Source are required.");
+        return;
+      }
+      if (isNaN(incomeData.amount) || parseFloat(incomeData.amount) <= 0) {
+        setError("Amount must be a positive number.");
+        return;
+      }
+
+      const incomeRef = collection(db, `artifacts/${__app_id}/users/${userId}/income_management`);
+
+      if (editingIncome) {
+        // Update existing income record
+        const incomeDocRef = doc(db, `artifacts/${__app_id}/users/${userId}/income_management`, editingIncome.id);
+        await updateDoc(incomeDocRef, incomeData);
+        setMessage("Income record updated successfully!");
+        setEditingIncome(null);
+      } else {
+        // Add new income record
+        await addDoc(incomeRef, incomeData);
+        setMessage("Income record added successfully!");
+        setNewIncome({ date: '', incomeType: 'Patient Fees', amount: '', source: '', notes: '' });
+      }
+    } catch (err) {
+      console.error("Error saving income record:", err);
+      setError("Failed to save income record. " + err.message);
+    }
+  };
+
+  const handleEdit = (record) => {
+    setEditingIncome({ ...record });
+    setMessage('');
+    setError('');
+  };
+
+  const handleDelete = async (id) => {
+    setMessage('');
+    setError('');
+    if (!db || !userId) {
+      setError("Database not ready. Please try again.");
+      return;
+    }
+    // Using window.confirm for simplicity, replace with custom modal in production
+    if (window.confirm("Are you sure you want to delete this income record?")) {
+      try {
+        const incomeDocRef = doc(db, `artifacts/${__app_id}/users/${userId}/income_management`, id);
+        await deleteDoc(incomeDocRef);
+        setMessage("Income record deleted successfully!");
+      } catch (err) {
+        console.error("Error deleting income record:", err);
+        setError("Failed to delete income record. " + err.message);
+      }
+    }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold text-purple-700 mb-6">Manage Income Records</h2>
+
+      {/* Add/Edit Income Form */}
+      <form onSubmit={handleSubmit} className="mb-8 p-6 bg-yellow-50 rounded-lg shadow-inner border border-yellow-100">
+        <h3 className="text-xl font-semibold text-yellow-800 mb-4">{editingIncome ? 'Edit Income Record' : 'Add New Income Record'}</h3>
+        {error && <p className="text-red-600 mb-4">{error}</p>}
+        {message && <p className="text-green-600 mb-4">{message}</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700">Date</label>
+            <input type="date" id="date" name="date" value={editingIncome?.date || newIncome.date} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required />
+          </div>
+          <div>
+            <label htmlFor="incomeType" className="block text-sm font-medium text-gray-700">Income Type</label>
+            <select id="incomeType" name="incomeType" value={editingIncome?.incomeType || newIncome.incomeType} onChange={handleChange}
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required>
+              <option value="Patient Fees">Patient Fees</option>
+              <option value="Insurance Claims">Insurance Claims</option>
+              <option value="Grants">Grants</option>
+              <option value="Donations">Donations</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="amount" className="block text-sm font-medium text-gray-700">Amount (KES)</label>
+            <input type="number" id="amount" name="amount" value={editingIncome?.amount || newIncome.amount} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required min="0" step="0.01" />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="source" className="block text-sm font-medium text-gray-700">Source/Payer</label>
+            <input type="text" id="source" name="source" value={editingIncome?.source || newIncome.source} onChange={handleChange}
+                   className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" required />
+          </div>
+          <div className="md:col-span-3">
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700">Notes</label>
+            <textarea id="notes" name="notes" value={editingIncome?.notes || newIncome.notes} onChange={handleChange} rows="2"
+                      className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"></textarea>
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <button type="submit" className="px-6 py-2 bg-purple-600 text-white rounded-md shadow-md hover:bg-purple-700 transition-colors duration-200">
+            {editingIncome ? 'Update Record' : 'Add Record'}
+          </button>
+          {editingIncome && (
+            <button type="button" onClick={() => setEditingIncome(null)} className="px-6 py-2 bg-gray-300 text-gray-800 rounded-md shadow-md hover:bg-gray-400 transition-colors duration-200">
+              Cancel Edit
+            </button>
+          )}
+        </div>
+      </form>
+
+      {/* Income Records List */}
+      <h3 className="text-xl font-semibold text-purple-800 mb-4">All Income Records</h3>
+      {loading ? (
+        <p className="text-gray-600">Loading income records...</p>
+      ) : incomeRecords.length === 0 ? (
+        <p className="text-gray-600">No income records found. Add one above!</p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (KES)</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {incomeRecords.map((record) => (
+                <tr key={record.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{record.date}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.incomeType}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{parseFloat(record.amount).toFixed(2)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.source}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.notes || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onClick={() => handleEdit(record)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                    <button onClick={() => handleDelete(record.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;

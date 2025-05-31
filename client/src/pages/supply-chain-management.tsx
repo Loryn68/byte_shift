@@ -437,7 +437,7 @@ export default function SupplyChainManagement() {
                     <h3 className="font-semibold text-sm mb-2">{category.name}</h3>
                     <div className="space-y-1">
                       <p className="text-xs text-gray-600">{category.items} items</p>
-                      <p className="text-sm font-bold">${category.value.toLocaleString()}</p>
+                      <p className="text-sm font-bold">KSH {category.value.toLocaleString()}</p>
                       <Badge variant="outline" className="text-xs">
                         {category.turnover}x turnover
                       </Badge>
