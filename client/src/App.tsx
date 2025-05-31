@@ -12,7 +12,7 @@ import UserManagement from "@/pages/core-administration/user-management";
 import SystemConfiguration from "@/pages/core-administration/system-configuration";
 
 // Patient Management
-import PatientRegistry from "@/pages/patient-management/patient-registry";
+import PatientRegistry from "@/pages/patient-management/patient-registry-new";
 import AppointmentScheduling from "@/pages/patient-management/appointment-scheduling";
 import ClinicalEncounters from "@/pages/patient-management/clinical-encounters";
 import OutpatientManagement from "@/pages/patient-management/outpatient-management";
