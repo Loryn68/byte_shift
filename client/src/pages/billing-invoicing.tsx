@@ -20,13 +20,8 @@ export default function BillingInvoicing() {
   const [activeTab, setActiveTab] = useState("search");
   const [filterByDate, setFilterByDate] = useState(false);
   const [includeAdmDay, setIncludeAdmDay] = useState(false);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [notes, setNotes] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   // Mock data for demonstration
   const mockPatients = [
@@ -38,14 +33,13 @@ export default function BillingInvoicing() {
   const mockBillingItems = [
     {
       id: 1,
-      item: "General Consultation",
+      item: "Consultation Fee",
       quantity: 1,
       sellingPrice: 2500,
       totalCost: 2500,
       paid: 2500,
       waived: 0,
-      balance: 0,
-      status: "paid"
+      balance: 0
     },
     {
       id: 2,
@@ -55,8 +49,7 @@ export default function BillingInvoicing() {
       totalCost: 1500,
       paid: 0,
       waived: 0,
-      balance: 1500,
-      status: "pending"
+      balance: 1500
     }
   ];
 
@@ -69,7 +62,7 @@ export default function BillingInvoicing() {
       });
       return;
     }
-    // Simulate search
+    
     const found = mockPatients.find(p => 
       p.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.fileNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -92,441 +85,253 @@ export default function BillingInvoicing() {
     }
   };
 
-  const handlePayment = async () => {
-    if (!selectedPatient) {
-      toast({
-        title: "No Patient Selected",
-        description: "Please select a patient to process payment",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!paymentMethod) {
-      toast({
-        title: "Payment Method Required",
-        description: "Please select a payment method",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsProcessing(true);
-    // Simulate payment processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      toast({
-        title: "Payment Processed",
-        description: "Payment has been successfully recorded",
-      });
-    }, 2000);
+  const billingData = {
+    totalBill: selectedPatient ? mockBillingItems.reduce((sum, item) => sum + item.totalCost, 0) : 0,
+    allocated: selectedPatient ? mockBillingItems.reduce((sum, item) => sum + item.paid, 0) : 0,
+    unallocated: selectedPatient ? mockBillingItems.reduce((sum, item) => sum + item.balance, 0) : 0,
+    totalPaid: selectedPatient ? mockBillingItems.reduce((sum, item) => sum + item.paid, 0) : 0,
+    discountGiven: 0,
+    systemBal: selectedPatient ? mockBillingItems.reduce((sum, item) => sum + item.balance, 0) : 0,
+    actualBal: selectedPatient ? mockBillingItems.reduce((sum, item) => sum + item.balance, 0) : 0
   };
-
-  const handleItemSelection = (itemId: number) => {
-    setSelectedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
-
-  const calculateTotals = () => {
-    const items = selectedPatient ? mockBillingItems : [];
-    return {
-      totalBill: items.reduce((sum, item) => sum + item.totalCost, 0),
-      totalPaid: items.reduce((sum, item) => sum + item.paid, 0),
-      totalWaived: items.reduce((sum, item) => sum + item.waived, 0),
-      totalBalance: items.reduce((sum, item) => sum + item.balance, 0),
-    };
-  };
-
-  const totals = calculateTotals();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <CreditCard className="h-8 w-8 text-blue-600" />
-              Billing & Invoicing
-            </h1>
-            <p className="text-gray-600 mt-1">Comprehensive patient billing and payment management system</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge variant="outline" className="px-3 py-1">
-              <TrendingUp className="h-4 w-4 mr-1" />
-              Active Session
-            </Badge>
-          </div>
-        </div>
-      </div>
-
+    <div className="flex h-screen bg-gray-50">
       {/* Main Content */}
-      <div className="p-6">
-        <div className="grid grid-cols-12 gap-6">
-          {/* Left Sidebar */}
-          <div className="col-span-4 space-y-6">
-            {/* Search Panel */}
-            <Card className="shadow-lg border-l-4 border-l-blue-500">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Search className="h-5 w-5 text-blue-600" />
-                  Patient Search
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">
-                    Search by Surname/ID/Tel/OP No.
-                  </Label>
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className="bg-white border-b p-4">
+          <h1 className="text-2xl font-bold text-gray-800">Billing & Invoicing Management</h1>
+          <p className="text-gray-600">Comprehensive patient billing and payment processing</p>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 p-4 overflow-auto">
+          <div className="grid grid-cols-12 gap-4 h-full">
+            {/* Left Panel - Search and Actions */}
+            <div className="col-span-3 bg-orange-100 rounded-lg p-4">
+              <div className="space-y-3">
+                {/* Search Section */}
+                <div className="bg-white rounded p-3">
+                  <Label className="text-sm font-medium">Search Patient by Surname/ID/Tel/OP No.</Label>
                   <div className="flex gap-2 mt-2">
                     <Input
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Enter patient details..."
-                      className="flex-1"
+                      placeholder="Enter search criteria"
+                      className="text-sm"
                       onKeyPress={(e) => e.key === 'Enter' && handlePatientSearch()}
                     />
-                    <Button 
-                      onClick={handlePatientSearch}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
+                    <Button size="sm" onClick={handlePatientSearch} className="bg-gray-400 hover:bg-gray-500">
                       <Search className="h-4 w-4" />
                     </Button>
                   </div>
+                  
+                  {/* Search Options */}
+                  <div className="space-y-2 mt-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="filterDate" 
+                        checked={filterByDate}
+                        onCheckedChange={(checked) => setFilterByDate(checked === true)}
+                      />
+                      <Label htmlFor="filterDate" className="text-xs">Filter by Date between</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="includeAdm" 
+                        checked={includeAdmDay}
+                        onCheckedChange={(checked) => setIncludeAdmDay(checked === true)}
+                      />
+                      <Label htmlFor="includeAdm" className="text-xs">Include Adm Day</Label>
+                    </div>
+                  </div>
                 </div>
-                
-                <Separator />
-                
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="filterDate" 
-                      checked={filterByDate}
-                      onCheckedChange={(checked) => setFilterByDate(checked === true)}
-                    />
-                    <Label htmlFor="filterDate" className="text-sm">Filter by date range</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="includeAdm" 
-                      checked={includeAdmDay}
-                      onCheckedChange={(checked) => setIncludeAdmDay(checked === true)}
-                    />
-                    <Label htmlFor="includeAdm" className="text-sm">Include admission day</Label>
+
+                {/* Patient Details */}
+                <div className="bg-white rounded p-3">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Full Name:</span>
+                      <span>{selectedPatient?.fullName || "-"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>File No.:</span>
+                      <span>{selectedPatient?.fileNo || "-"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>OP Number:</span>
+                      <span>{selectedPatient?.opNumber || "-"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Age:</span>
+                      <span>{selectedPatient?.age || "-"}</span>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Patient Details */}
-            <Card className="shadow-lg border-l-4 border-l-green-500">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Users className="h-5 w-5 text-green-600" />
-                  Patient Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {selectedPatient ? (
-                  <div className="space-y-3">
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="font-medium text-gray-600">Full Name:</span>
-                      <span className="font-semibold">{selectedPatient.fullName}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="font-medium text-gray-600">File No.:</span>
-                      <span>{selectedPatient.fileNo}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="font-medium text-gray-600">OP Number:</span>
-                      <span>{selectedPatient.opNumber}</span>
-                    </div>
-                    <div className="flex justify-between py-2">
-                      <span className="font-medium text-gray-600">Age:</span>
-                      <span>{selectedPatient.age} years</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <AlertCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                    <p>No patient selected</p>
-                    <p className="text-sm">Search and select a patient to view details</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <Card className="shadow-lg border-l-4 border-l-orange-500">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Calculator className="h-5 w-5 text-orange-600" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    onClick={handlePayment}
-                    disabled={!selectedPatient || isProcessing}
-                    className="bg-green-600 hover:bg-green-700 h-12"
-                  >
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Payment
+                {/* Action Buttons */}
+                <div className="space-y-2">
+                  <Button className="w-full bg-orange-300 text-black hover:bg-orange-400 text-sm py-2">
+                    Receive Payment
                   </Button>
-                  <Button variant="outline" className="h-12">
-                    <Receipt className="h-4 w-4 mr-2" />
-                    Invoice
+                  <Button className="w-full bg-orange-300 text-black hover:bg-orange-400 text-sm py-2">
+                    Billing
                   </Button>
-                  <Button variant="outline" className="h-12">
-                    <RefreshCw className="h-4 w-4 mr-2" />
+                  <Button className="w-full bg-gray-300 text-black hover:bg-gray-400 text-sm py-2">
+                    Update Bed Details
+                  </Button>
+                  <Button className="w-full bg-gray-300 text-black hover:bg-gray-400 text-sm py-2">
                     Refresh
                   </Button>
-                  <Button variant="outline" className="h-12">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Reports
+                  <Button className="w-full bg-orange-300 text-black hover:bg-orange-400 text-sm py-2">
+                    Invoice
+                  </Button>
+                  <Button className="w-full bg-orange-300 text-black hover:bg-orange-400 text-sm py-2">
+                    Detailed
+                  </Button>
+                  <Button className="w-full bg-gray-300 text-black hover:bg-gray-400 text-sm py-2">
+                    Detailed - NHIF
+                  </Button>
+                  <Button className="w-full bg-orange-300 text-black hover:bg-orange-400 text-sm py-2">
+                    Top-Up Other Services Account
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Panel - Main Content */}
-          <div className="col-span-8 space-y-6">
-            {/* Billing Summary Cards */}
-            <div className="grid grid-cols-4 gap-4">
-              <Card className="border-l-4 border-l-blue-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Total Bill</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        KSh {selectedPatient ? totals.totalBill.toLocaleString() : '0'}
-                      </p>
-                    </div>
-                    <DollarSign className="h-8 w-8 text-blue-500" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-l-4 border-l-green-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Total Paid</p>
-                      <p className="text-2xl font-bold text-green-600">
-                        KSh {selectedPatient ? totals.totalPaid.toLocaleString() : '0'}
-                      </p>
-                    </div>
-                    <CreditCard className="h-8 w-8 text-green-500" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-l-4 border-l-orange-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Balance</p>
-                      <p className="text-2xl font-bold text-orange-600">
-                        KSh {selectedPatient ? totals.totalBalance.toLocaleString() : '0'}
-                      </p>
-                    </div>
-                    <AlertCircle className="h-8 w-8 text-orange-500" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-l-4 border-l-purple-500">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Payment Method</p>
-                      <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                        <SelectTrigger className="w-full mt-1">
-                          <SelectValue placeholder="Select method" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="cash">Cash</SelectItem>
-                          <SelectItem value="card">Card</SelectItem>
-                          <SelectItem value="insurance">Insurance</SelectItem>
-                          <SelectItem value="mobile">Mobile Money</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              </div>
             </div>
 
-            {/* Main Billing Content */}
-            <Card className="shadow-lg">
+            {/* Right Panel - Main Content */}
+            <div className="col-span-9 bg-white rounded-lg">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-                <div className="border-b bg-gray-50 px-6 py-3">
-                  <TabsList className="grid w-full grid-cols-6 bg-white">
-                    <TabsTrigger value="search" className="text-sm">Search By Patient</TabsTrigger>
-                    <TabsTrigger value="admitted" className="text-sm">Admitted Patients</TabsTrigger>
-                    <TabsTrigger value="history" className="text-sm">History</TabsTrigger>
-                    <TabsTrigger value="settings" className="text-sm">Settings</TabsTrigger>
-                    <TabsTrigger value="gatepass" className="text-sm">Gate Pass</TabsTrigger>
-                    <TabsTrigger value="discharge" className="text-sm">Discharge</TabsTrigger>
+                {/* Tab Navigation */}
+                <div className="border-b">
+                  <TabsList className="grid w-full grid-cols-6 bg-gray-100 rounded-none h-auto">
+                    <TabsTrigger value="search" className="text-xs py-2">Search By Patient</TabsTrigger>
+                    <TabsTrigger value="admitted" className="text-xs py-2">Admitted Patients</TabsTrigger>
+                    <TabsTrigger value="history" className="text-xs py-2">History of Admissions</TabsTrigger>
+                    <TabsTrigger value="settings" className="text-xs py-2">Automatic Billing Settings</TabsTrigger>
+                    <TabsTrigger value="gatepass" className="text-xs py-2">Gate Pass</TabsTrigger>
+                    <TabsTrigger value="discharge" className="text-xs py-2">Discharge Queue</TabsTrigger>
                   </TabsList>
                 </div>
 
                 {/* Search By Patient Tab */}
-                <TabsContent value="search" className="p-6 space-y-6">
-                  {selectedPatient ? (
-                    <>
-                      {/* Billing Items Table */}
-                      <Card>
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">Billing Items - {selectedPatient.fullName}</CardTitle>
-                            <div className="flex gap-2">
-                              <Button size="sm" variant="outline">
-                                <Plus className="h-4 w-4 mr-2" />
-                                Add Item
-                              </Button>
-                              <Button size="sm" variant="outline">
-                                <Download className="h-4 w-4 mr-2" />
-                                Export
-                              </Button>
-                            </div>
+                <TabsContent value="search" className="flex-1 p-4">
+                  <div className="grid grid-cols-12 gap-4 h-full">
+                    {/* Billing Summary */}
+                    <div className="col-span-4">
+                      <div className="bg-gray-50 rounded p-3">
+                        <h3 className="font-semibold mb-3">Summary</h3>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>Total Bill:</span>
+                            <Badge variant="secondary">{billingData.totalBill}</Badge>
                           </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="border rounded-lg overflow-hidden">
-                            <Table>
-                              <TableHeader className="bg-gray-50">
-                                <TableRow>
-                                  <TableHead className="w-12">
-                                    <Checkbox />
-                                  </TableHead>
-                                  <TableHead className="font-semibold">Item Description</TableHead>
-                                  <TableHead className="text-center font-semibold">Qty</TableHead>
-                                  <TableHead className="text-center font-semibold">Unit Price</TableHead>
-                                  <TableHead className="text-center font-semibold">Total Cost</TableHead>
-                                  <TableHead className="text-center font-semibold">Paid</TableHead>
-                                  <TableHead className="text-center font-semibold">Balance</TableHead>
-                                  <TableHead className="text-center font-semibold">Status</TableHead>
-                                  <TableHead className="text-center font-semibold">Actions</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {mockBillingItems.map((item: any) => (
-                                  <TableRow key={item.id} className="hover:bg-gray-50">
-                                    <TableCell>
-                                      <Checkbox 
-                                        checked={selectedItems.includes(item.id)}
-                                        onCheckedChange={() => handleItemSelection(item.id)}
-                                      />
-                                    </TableCell>
-                                    <TableCell className="font-medium">{item.item}</TableCell>
-                                    <TableCell className="text-center">{item.quantity}</TableCell>
-                                    <TableCell className="text-center">KSh {item.sellingPrice.toLocaleString()}</TableCell>
-                                    <TableCell className="text-center font-semibold">KSh {item.totalCost.toLocaleString()}</TableCell>
-                                    <TableCell className="text-center text-green-600 font-semibold">KSh {item.paid.toLocaleString()}</TableCell>
-                                    <TableCell className="text-center text-orange-600 font-semibold">KSh {item.balance.toLocaleString()}</TableCell>
-                                    <TableCell className="text-center">
-                                      <Badge variant={item.status === 'paid' ? 'default' : 'secondary'} 
-                                             className={item.status === 'paid' ? 'bg-green-600' : 'bg-orange-600'}>
-                                        {item.status}
-                                      </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                      <div className="flex gap-1 justify-center">
-                                        <Button size="sm" variant="ghost">
-                                          <Eye className="h-4 w-4" />
-                                        </Button>
-                                        <Button size="sm" variant="ghost">
-                                          <Edit3 className="h-4 w-4" />
-                                        </Button>
-                                      </div>
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                            
-                            {/* Footer Totals */}
-                            <div className="bg-gradient-to-r from-blue-50 to-green-50 p-4 border-t">
-                              <div className="flex justify-between items-center">
-                                <div className="flex gap-6 text-sm font-medium">
-                                  <span>Totals:</span>
-                                  <span>Bill: KSh {totals.totalBill.toLocaleString()}</span>
-                                </div>
-                                <div className="flex gap-6 text-sm font-medium">
-                                  <span>Paid: <Badge className="bg-green-600">KSh {totals.totalPaid.toLocaleString()}</Badge></span>
-                                  <span>Waived: <Badge className="bg-gray-600">KSh {totals.totalWaived.toLocaleString()}</Badge></span>
-                                  <span>Balance: <Badge className="bg-orange-600">KSh {totals.totalBalance.toLocaleString()}</Badge></span>
-                                </div>
-                              </div>
-                            </div>
+                          <div className="flex justify-between">
+                            <span>Allocated:</span>
+                            <Badge className="bg-green-600">{billingData.allocated}</Badge>
                           </div>
-                        </CardContent>
-                      </Card>
-                    </>
-                  ) : (
-                    <div className="text-center py-16">
-                      <AlertCircle className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Patient Selected</h3>
-                      <p className="text-gray-500 mb-6">Search for a patient to view and manage their billing information</p>
-                      <Button 
-                        onClick={() => document.querySelector<HTMLInputElement>('[placeholder="Enter patient details..."]')?.focus()}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        <Search className="h-4 w-4 mr-2" />
-                        Start Patient Search
-                      </Button>
+                          <div className="flex justify-between">
+                            <span>Unallocated:</span>
+                            <Badge className="bg-black">{billingData.unallocated}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Total Paid:</span>
+                            <Badge className="bg-green-600">{billingData.totalPaid}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Discount Given:</span>
+                            <Badge className="bg-black">{billingData.discountGiven}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>System Bal:</span>
+                            <Badge className="bg-black">{billingData.systemBal}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Actual Bal:</span>
+                            <Badge className="bg-black">{billingData.actualBal}</Badge>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  )}
+
+                    {/* Main Billing Table */}
+                    <div className="col-span-8">
+                      <div className="border rounded-lg overflow-hidden">
+                        <Table>
+                          <TableHeader className="bg-gray-100">
+                            <TableRow>
+                              <TableHead className="text-xs">Item</TableHead>
+                              <TableHead className="text-xs">Quantity</TableHead>
+                              <TableHead className="text-xs">Selling Price</TableHead>
+                              <TableHead className="text-xs">Total Cost</TableHead>
+                              <TableHead className="text-xs">Paid</TableHead>
+                              <TableHead className="text-xs">Waived</TableHead>
+                              <TableHead className="text-xs">Balance</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {selectedPatient ? mockBillingItems.map((item) => (
+                              <TableRow key={item.id} className="text-sm">
+                                <TableCell>{item.item}</TableCell>
+                                <TableCell>{item.quantity}</TableCell>
+                                <TableCell>{item.sellingPrice.toLocaleString()}</TableCell>
+                                <TableCell>{item.totalCost.toLocaleString()}</TableCell>
+                                <TableCell>{item.paid.toLocaleString()}</TableCell>
+                                <TableCell>{item.waived.toLocaleString()}</TableCell>
+                                <TableCell>{item.balance.toLocaleString()}</TableCell>
+                              </TableRow>
+                            )) : (
+                              <TableRow>
+                                <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                                  No patient selected. Please search for a patient to view billing details.
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  </div>
                 </TabsContent>
 
                 {/* Other Tabs */}
-                <TabsContent value="admitted" className="p-6">
-                  <div className="text-center py-16">
-                    <Users className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Admitted Patients</h3>
-                    <p className="text-gray-500">Billing management for currently admitted patients</p>
+                <TabsContent value="admitted" className="p-4">
+                  <div className="text-center py-8 text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">Admitted Patients</h3>
+                    <p>Billing management for currently admitted patients</p>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="history" className="p-6">
-                  <div className="text-center py-16">
-                    <Clock className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Admission History</h3>
-                    <p className="text-gray-500">Historical billing and admission records</p>
+                <TabsContent value="history" className="p-4">
+                  <div className="text-center py-8 text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">History of Admissions</h3>
+                    <p>Historical billing and admission records</p>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="settings" className="p-6">
-                  <div className="text-center py-16">
-                    <Settings className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Billing Settings</h3>
-                    <p className="text-gray-500">Configure automatic billing and payment settings</p>
+                <TabsContent value="settings" className="p-4">
+                  <div className="text-center py-8 text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">Automatic Billing Settings</h3>
+                    <p>Configure automatic billing and payment settings</p>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="gatepass" className="p-6">
-                  <div className="text-center py-16">
-                    <FileText className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Gate Pass Management</h3>
-                    <p className="text-gray-500">Issue and manage patient gate passes</p>
+                <TabsContent value="gatepass" className="p-4">
+                  <div className="text-center py-8 text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">Gate Pass</h3>
+                    <p>Issue and manage patient gate passes</p>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="discharge" className="p-6">
-                  <div className="text-center py-16">
-                    <Receipt className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Discharge Queue</h3>
-                    <p className="text-gray-500">Final billing and discharge processing</p>
+                <TabsContent value="discharge" className="p-4">
+                  <div className="text-center py-8 text-gray-500">
+                    <h3 className="text-lg font-medium mb-2">Discharge Queue</h3>
+                    <p>Final billing and discharge processing</p>
                   </div>
                 </TabsContent>
               </Tabs>
-            </Card>
+            </div>
           </div>
         </div>
       </div>
