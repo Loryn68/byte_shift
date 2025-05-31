@@ -15,7 +15,7 @@ import SystemConfiguration from "@/pages/core-administration/system-configuratio
 import PatientRegistry from "@/pages/patient-management/patient-registry-redesigned";
 import AppointmentScheduling from "@/pages/patient-management/appointment-scheduling";
 import ClinicalEncounters from "@/pages/patient-management/clinical-encounters";
-import OutpatientManagement from "@/pages/patient-management/outpatient-management-new";
+import OutpatientManagement from "@/pages/patient-management/outpatient-management-redesigned";
 import InpatientManagement from "@/pages/patient-management/inpatient-management-new";
 import ElectronicHealthRecords from "@/pages/patient-management/electronic-health-records";
 import TriageManagement from "@/pages/patient-management/triage-management-redesigned";
