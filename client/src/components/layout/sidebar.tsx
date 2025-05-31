@@ -108,19 +108,9 @@ const navigationItems = [
         icon: FlaskRound
       },
       {
-        title: "Pharmacy Management",
+        title: "Pharmacy",
         href: "/pharmacy",
         icon: Pill
-      },
-      {
-        title: "Prescription Approval",
-        href: "/pharmacy-approval",
-        icon: UserCheck
-      },
-      {
-        title: "External Prescriptions",
-        href: "/registry-prescription",
-        icon: FileText
       }
     ]
   },
