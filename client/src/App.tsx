@@ -16,7 +16,7 @@ import PatientRegistry from "@/pages/patient-management/patient-registry-new";
 import AppointmentScheduling from "@/pages/patient-management/appointment-scheduling";
 import ClinicalEncounters from "@/pages/patient-management/clinical-encounters";
 import OutpatientManagement from "@/pages/patient-management/outpatient-management-new";
-import InpatientManagement from "@/pages/patient-management/inpatient-management";
+import InpatientManagement from "@/pages/patient-management/inpatient-management-new";
 import ElectronicHealthRecords from "@/pages/patient-management/electronic-health-records";
 import TriageManagement from "@/pages/patient-management/triage-management-new";
 import TherapyManagement from "@/pages/patient-management/therapy-management-new";
