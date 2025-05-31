@@ -27,7 +27,7 @@ import PharmacyManagement from "@/pages/clinical-support/pharmacy-management";
 import RadiologyManagement from "@/pages/clinical-support/radiology-management";
 
 // Financial Management
-import BillingInvoicing from "@/pages/financial-management/billing-invoicing";
+import BillingInvoicing from "@/pages/billing-invoicing";
 import CashierCollections from "@/pages/financial-management/cashier-collections";
 import ExpenditureManagement from "@/pages/financial-management/expenditure-management";
 import IncomeManagement from "@/pages/financial-management/income-management";
