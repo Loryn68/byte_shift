@@ -79,6 +79,7 @@ export default function BillingInvoicing() {
   const [retainChange, setRetainChange] = useState(false);
   const [printReceipt, setPrintReceipt] = useState(true);
   const [fileNo, setFileNo] = useState("205202519");
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   const { toast } = useToast();
 
@@ -170,10 +171,15 @@ export default function BillingInvoicing() {
   };
 
   const handleReceivePayment = () => {
-    toast({
-      title: "Payment Processing",
-      description: "Payment processing interface would open here",
-    });
+    if (!selectedPatient) {
+      toast({
+        title: "No Patient Selected",
+        description: "Please search and select a patient first",
+        variant: "destructive"
+      });
+      return;
+    }
+    setShowPaymentForm(true);
   };
 
   const handleBilling = () => {
@@ -213,7 +219,6 @@ export default function BillingInvoicing() {
 
   const mainTabs = [
     { id: "search", label: "Search By Patient", icon: <Search className="h-4 w-4" /> },
-    { id: "receive-payment", label: "Receive Payment", icon: <DollarSign className="h-4 w-4" /> },
     { id: "admitted", label: "Admitted Patients", icon: <Users className="h-4 w-4" /> },
     { id: "history", label: "History of Admissions", icon: <Calendar className="h-4 w-4" /> },
     { id: "settings", label: "Automatic Billing Settings", icon: <FileText className="h-4 w-4" /> },
@@ -839,12 +844,12 @@ export default function BillingInvoicing() {
           </div>
         )}
 
-        {/* Receive Payment Tab */}
-        {activeTab === "receive-payment" && (
-          <div className="p-6">
-            <div className="bg-white rounded-lg border border-gray-200 shadow-lg">
+        {/* Payment Form Overlay */}
+        {showPaymentForm && selectedPatient && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="max-w-4xl w-full bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
               {/* Header with Logo */}
-              <div className="p-4 border-b border-gray-200 bg-orange-50">
+              <div className="flex items-center justify-between p-4 bg-orange-50 border-b border-gray-200">
                 <div className="flex items-center space-x-3">
                   <img 
                     src="/logo.png" 
@@ -852,36 +857,31 @@ export default function BillingInvoicing() {
                     className="h-10 w-10 object-contain"
                   />
                   <div>
-                    <h2 className="text-lg font-bold text-orange-800">Child Mental Haven</h2>
-                    <p className="text-sm text-orange-600">Where Young Minds Evolve</p>
+                    <h1 className="text-lg font-bold text-orange-800">Child Mental Haven</h1>
+                    <p className="text-sm text-orange-600 font-medium">Where Young Minds Evolve</p>
+                    <p className="text-xs text-gray-600">Payment Reception</p>
                   </div>
                 </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowPaymentForm(false)}
+                >
+                  Close
+                </Button>
               </div>
 
-              {/* Patient Search Section */}
-              <div className="p-6 border-b border-gray-200 bg-gray-50">
+              {/* Patient Info Section */}
+              <div className="p-6 bg-gray-50 border-b border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="payment-search" className="block text-sm font-medium text-gray-700 mb-2">
-                      Search Patient by Surname/ID/Tel/OP-No.
-                    </Label>
-                    <div className="flex space-x-2">
-                      <Input
-                        type="text"
-                        id="payment-search"
-                        className="flex-grow"
-                        placeholder="Enter search criteria..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handlePatientSearch()}
-                      />
-                      <Button 
-                        onClick={handlePatientSearch}
-                        className="bg-orange-600 hover:bg-orange-700"
-                      >
-                        Search
-                      </Button>
-                    </div>
+                    <Label className="block text-sm font-medium text-gray-700 mb-2">Patient Name</Label>
+                    <Input
+                      type="text"
+                      value={selectedPatient.fullName}
+                      className="w-full bg-white"
+                      readOnly
+                    />
                   </div>
                   
                   <div>
@@ -908,197 +908,185 @@ export default function BillingInvoicing() {
               </div>
 
               {/* Payment Form */}
-              {selectedPatient && (
-                <div className="p-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Left Column - Payment Details */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-4">Payment Details</h3>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label className="block text-sm font-medium text-gray-700 mb-2">Amount Received *</Label>
-                          <Input
-                            type="number"
-                            value={amountReceived}
-                            onChange={(e) => setAmountReceived(e.target.value)}
-                            className="w-full"
-                            placeholder="0.00"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label className="block text-sm font-medium text-gray-700 mb-2">Adv. Payment</Label>
-                          <Input
-                            type="text"
-                            value={advPayment}
-                            onChange={(e) => setAdvPayment(e.target.value)}
-                            className="w-full bg-gray-100"
-                            readOnly
-                          />
-                        </div>
-                      </div>
-
+              <div className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Left Column - Payment Details */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Payment Details</h3>
+                    
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="block text-sm font-medium text-gray-700 mb-2">Date Received</Label>
+                        <Label className="block text-sm font-medium text-gray-700 mb-2">Amount Received *</Label>
+                        <Input
+                          type="number"
+                          value={amountReceived}
+                          onChange={(e) => setAmountReceived(e.target.value)}
+                          className="w-full"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="block text-sm font-medium text-gray-700 mb-2">Adv. Payment</Label>
                         <Input
                           type="text"
-                          value={dateReceived}
-                          onChange={(e) => setDateReceived(e.target.value)}
+                          value={advPayment}
+                          onChange={(e) => setAdvPayment(e.target.value)}
                           className="w-full bg-gray-100"
                           readOnly
                         />
                       </div>
+                    </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label className="block text-sm font-medium text-gray-700 mb-2">Payment Method *</Label>
-                          <select
-                            value={paymentMethod}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                          >
-                            <option value="">Select Method</option>
-                            <option value="Cash">Cash</option>
-                            <option value="M-Pesa">M-Pesa</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
-                            <option value="Card">Card Payment</option>
-                            <option value="Cheque">Cheque</option>
-                          </select>
-                        </div>
-                        
-                        <div>
-                          <Label className="block text-sm font-medium text-gray-700 mb-2">Ref Number</Label>
-                          <Input
-                            type="text"
-                            value={refNumber}
-                            onChange={(e) => setRefNumber(e.target.value)}
-                            className="w-full"
-                            placeholder="Reference number"
-                          />
-                        </div>
-                      </div>
+                    <div>
+                      <Label className="block text-sm font-medium text-gray-700 mb-2">Date Received</Label>
+                      <Input
+                        type="text"
+                        value={dateReceived}
+                        onChange={(e) => setDateReceived(e.target.value)}
+                        className="w-full bg-gray-100"
+                        readOnly
+                      />
+                    </div>
 
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="block text-sm font-medium text-gray-700 mb-2">Narration</Label>
-                        <Textarea
-                          value={narration}
-                          onChange={(e) => setNarration(e.target.value)}
+                        <Label className="block text-sm font-medium text-gray-700 mb-2">Payment Method *</Label>
+                        <select
+                          value={paymentMethod}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        >
+                          <option value="">Select Method</option>
+                          <option value="Cash">Cash</option>
+                          <option value="M-Pesa">M-Pesa</option>
+                          <option value="Bank Transfer">Bank Transfer</option>
+                          <option value="Card">Card Payment</option>
+                          <option value="Cheque">Cheque</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <Label className="block text-sm font-medium text-gray-700 mb-2">Ref Number</Label>
+                        <Input
+                          type="text"
+                          value={refNumber}
+                          onChange={(e) => setRefNumber(e.target.value)}
                           className="w-full"
-                          rows={3}
-                          placeholder="Payment description or notes..."
+                          placeholder="Reference number"
                         />
                       </div>
                     </div>
 
-                    {/* Right Column - Summary */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-4">Payment Summary</h3>
+                    <div>
+                      <Label className="block text-sm font-medium text-gray-700 mb-2">Narration</Label>
+                      <Textarea
+                        value={narration}
+                        onChange={(e) => setNarration(e.target.value)}
+                        className="w-full"
+                        rows={3}
+                        placeholder="Payment description or notes..."
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right Column - Summary */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Payment Summary</h3>
+                    
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Total Allocated:</span>
+                        <span className="text-sm font-medium">{totalAllocated}</span>
+                      </div>
                       
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Total Allocated:</span>
-                          <span className="text-sm font-medium">{totalAllocated}</span>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Balance Before Payment:</span>
-                          <span className="text-sm font-medium text-red-600">{balanceBeforePayment}</span>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Balance After Payment:</span>
-                          <span className="text-sm font-medium">{balanceAfterPayment}</span>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Change Amount:</span>
-                          <span className="text-sm font-medium">{changeAmount}</span>
-                        </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Balance Before Payment:</span>
+                        <span className="text-sm font-medium text-red-600">{balanceBeforePayment}</span>
                       </div>
-
-                      <div className="space-y-3">
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id="retain-change"
-                            checked={retainChange}
-                            onChange={(e) => setRetainChange(e.target.checked)}
-                            className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                          />
-                          <Label htmlFor="retain-change" className="text-sm text-gray-700">
-                            Retain change as credit
-                          </Label>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id="print-receipt"
-                            checked={printReceipt}
-                            onChange={(e) => setPrintReceipt(e.target.checked)}
-                            className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                          />
-                          <Label htmlFor="print-receipt" className="text-sm text-gray-700">
-                            Print receipt
-                          </Label>
-                        </div>
+                      
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Balance After Payment:</span>
+                        <span className="text-sm font-medium">{balanceAfterPayment}</span>
                       </div>
+                      
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Change Amount:</span>
+                        <span className="text-sm font-medium">{changeAmount}</span>
+                      </div>
+                    </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex space-x-3 pt-4">
-                        <Button 
-                          className="flex-1 bg-orange-600 hover:bg-orange-700"
-                          onClick={() => {
-                            if (!amountReceived || !paymentMethod) {
-                              toast({
-                                title: "Missing Information",
-                                description: "Please fill in amount received and payment method",
-                                variant: "destructive",
-                              });
-                              return;
-                            }
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="retain-change"
+                          checked={retainChange}
+                          onChange={(e) => setRetainChange(e.target.checked)}
+                          className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                        />
+                        <Label htmlFor="retain-change" className="text-sm text-gray-700">
+                          Retain change as credit
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="print-receipt"
+                          checked={printReceipt}
+                          onChange={(e) => setPrintReceipt(e.target.checked)}
+                          className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                        />
+                        <Label htmlFor="print-receipt" className="text-sm text-gray-700">
+                          Print receipt
+                        </Label>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex space-x-3 pt-4">
+                      <Button 
+                        className="flex-1 bg-orange-600 hover:bg-orange-700"
+                        onClick={() => {
+                          if (!amountReceived || !paymentMethod) {
                             toast({
-                              title: "Payment Received",
-                              description: `KSH ${amountReceived} received for ${selectedPatient.fullName} via ${paymentMethod}`,
+                              title: "Missing Information",
+                              description: "Please fill in amount received and payment method",
+                              variant: "destructive",
                             });
-                            setAmountReceived("");
-                            setPaymentMethod("");
-                            setRefNumber("");
-                            setNarration("");
-                          }}
-                        >
-                          <CreditCard className="h-4 w-4 mr-2" />
-                          Receive Payment
-                        </Button>
-                        
-                        <Button 
-                          variant="outline"
-                          onClick={() => {
-                            setAmountReceived("");
-                            setPaymentMethod("");
-                            setRefNumber("");
-                            setNarration("");
-                          }}
-                        >
-                          Clear
-                        </Button>
-                      </div>
+                            return;
+                          }
+                          toast({
+                            title: "Payment Received",
+                            description: `KSH ${amountReceived} received for ${selectedPatient.fullName} via ${paymentMethod}`,
+                          });
+                          setAmountReceived("");
+                          setPaymentMethod("");
+                          setRefNumber("");
+                          setNarration("");
+                          setShowPaymentForm(false);
+                        }}
+                      >
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Receive Payment
+                      </Button>
+                      
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          setAmountReceived("");
+                          setPaymentMethod("");
+                          setRefNumber("");
+                          setNarration("");
+                        }}
+                      >
+                        Clear
+                      </Button>
                     </div>
                   </div>
                 </div>
-              )}
-
-              {/* Patient Selection Prompt */}
-              {!selectedPatient && (
-                <div className="p-8 text-center">
-                  <div className="bg-gray-100 rounded-lg p-6">
-                    <DollarSign className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-700 mb-2">Receive Payment</h3>
-                    <p className="text-gray-500">Search for a patient above to start receiving payments</p>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           </div>
         )}
