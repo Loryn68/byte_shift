@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Receipt, Search, RefreshCw, FileText, CreditCard, Users, Calendar, DollarSign } from "lucide-react";
+import { Receipt, Search, RefreshCw, FileText, CreditCard, Users, Calendar } from "lucide-react";
 
 interface Patient {
   id: string;
