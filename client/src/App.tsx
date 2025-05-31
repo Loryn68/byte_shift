@@ -14,6 +14,7 @@ import SystemConfiguration from "@/pages/core-administration/system-configuratio
 // Patient Management
 import PatientRegistry from "@/pages/patient-management/patient-registry";
 import AppointmentScheduling from "@/pages/patient-management/appointment-scheduling";
+import ClinicalEncounters from "@/pages/patient-management/clinical-encounters";
 import OutpatientManagement from "@/pages/patient-management/outpatient-management";
 import InpatientManagement from "@/pages/patient-management/inpatient-management";
 import ElectronicHealthRecords from "@/pages/patient-management/electronic-health-records";
@@ -69,6 +70,7 @@ function App() {
                 {/* Patient Management */}
                 <Route path="/patient/registry" component={PatientRegistry} />
                 <Route path="/patient/appointments" component={AppointmentScheduling} />
+                <Route path="/patient/encounters" component={ClinicalEncounters} />
                 <Route path="/patient/outpatient" component={OutpatientManagement} />
                 <Route path="/patient/inpatient" component={InpatientManagement} />
                 <Route path="/patient/ehr" component={ElectronicHealthRecords} />
