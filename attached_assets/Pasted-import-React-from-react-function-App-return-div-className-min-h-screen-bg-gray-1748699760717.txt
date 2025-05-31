@@ -1,0 +1,109 @@
+import React from 'react';
+
+function App() {
+  return (
+    <div className="min-h-screen bg-gray-100 font-inter antialiased p-4 sm:p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+        {/* Top Search Section */}
+        <div className="p-6 bg-gray-50 border-b border-gray-200">
+          <div className="flex items-center space-x-2 mb-4">
+            <label htmlFor="search-patient" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+              Search Patient by Surname/ID/Tel/OP-No.
+            </label>
+            <input
+              type="text"
+              id="search-patient"
+              className="flex-grow p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+              placeholder=""
+            />
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 transition-colors duration-200 text-sm">
+              Search
+            </button>
+          </div>
+
+          {/* Patient Details */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="flex items-center">
+              <label className="w-24 text-sm font-medium text-gray-700">Full Name :</label>
+              <input type="text" className="flex-grow p-1 border-b border-gray-300 bg-transparent text-sm" readOnly value="-" />
+            </div>
+            <div className="flex items-center">
+              <label className="w-24 text-sm font-medium text-gray-700">OP Number :</label>
+              <input type="text" className="flex-grow p-1 border-b border-gray-300 bg-transparent text-sm" readOnly value="-" />
+            </div>
+            <div className="flex items-center">
+              <label className="w-24 text-sm font-medium text-gray-700">File No. :</label>
+              <input type="text" className="flex-grow p-1 border-b border-gray-300 bg-transparent text-sm" readOnly value="-" />
+            </div>
+          </div>
+
+          {/* Billing Category and Date */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div className="flex items-center">
+              <label htmlFor="category" className="w-24 text-sm font-medium text-gray-700">Category :</label>
+              <select id="category" className="flex-grow p-2 border border-gray-300 rounded-md text-sm">
+                <option>Bill</option>
+                {/* Add other options if known */}
+              </select>
+            </div>
+            <div className="flex items-center md:col-span-2">
+              <label htmlFor="billing-date" className="w-24 text-sm font-medium text-gray-700">Billing Date :</label>
+              <input type="date" id="billing-date" defaultValue="2025-05-31" className="p-2 border border-gray-300 rounded-md text-sm" />
+            </div>
+          </div>
+        </div>
+
+        {/* Item Entry Section */}
+        <div className="p-6">
+          <input
+            type="text"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm mb-4"
+            placeholder=""
+          />
+
+          {/* Billing Items Table */}
+          <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Description</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity Bought</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</th>
+                </tr>
+              </thead>
+              <tbody className="bg-gray-200 divide-y divide-gray-300 min-h-[200px] block"> {/* Gray background for empty table */}
+                {/* Placeholder rows to match the empty table appearance */}
+                {Array(5).fill(0).map((_, i) => (
+                  <tr key={i}>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Bottom Summary and Action Buttons */}
+        <div className="p-6 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row justify-end items-center space-y-4 sm:space-y-0 sm:space-x-6">
+          <div className="flex items-center space-x-2 text-lg font-semibold text-gray-800">
+            <span>Total :</span> <span className="font-bold">0</span>
+          </div>
+          <button className="px-6 py-2 bg-gray-300 text-gray-800 rounded-md shadow-sm hover:bg-gray-400 transition-colors duration-200 text-sm">
+            Save
+          </button>
+          <button className="px-6 py-2 bg-gray-300 text-gray-800 rounded-md shadow-sm hover:bg-gray-400 transition-colors duration-200 text-sm">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;

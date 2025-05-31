@@ -59,6 +59,10 @@ export default function BillingInvoicing() {
     discountGiven: 0,
     actualBal: 0
   });
+  const [showBillingForm, setShowBillingForm] = useState(false);
+  const [billingItems, setBillingItems] = useState<any[]>([]);
+  const [newItemDescription, setNewItemDescription] = useState("");
+  const [billingCategory, setBillingCategory] = useState("Bill");
 
   const { toast } = useToast();
 
@@ -157,9 +161,18 @@ export default function BillingInvoicing() {
   };
 
   const handleBilling = () => {
+    if (!selectedPatient) {
+      toast({
+        title: "No Patient Selected",
+        description: "Please search and select a patient first",
+        variant: "destructive"
+      });
+      return;
+    }
+    setShowBillingForm(true);
     toast({
-      title: "Billing",
-      description: "Billing interface would open here",
+      title: "Billing Interface",
+      description: `Opening billing form for ${selectedPatient.fullName}`,
     });
   };
 
@@ -519,6 +532,254 @@ export default function BillingInvoicing() {
                     </TableBody>
                   </Table>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Billing Form Overlay */}
+        {showBillingForm && selectedPatient && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="max-w-4xl w-full bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+              {/* Top Search Section */}
+              <div className="p-6 bg-gray-50 border-b border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Billing Interface</h3>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowBillingForm(false)}
+                  >
+                    Close
+                  </Button>
+                </div>
+                
+                <div className="flex items-center space-x-2 mb-4">
+                  <Label htmlFor="search-patient" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                    Search Patient by Surname/ID/Tel/OP-No.
+                  </Label>
+                  <Input
+                    type="text"
+                    id="search-patient"
+                    className="flex-grow text-sm"
+                    placeholder=""
+                    value={selectedPatient.fullName}
+                    readOnly
+                  />
+                  <Button className="text-sm bg-blue-600 hover:bg-blue-700">
+                    Search
+                  </Button>
+                </div>
+
+                {/* Patient Details */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="flex items-center">
+                    <Label className="w-24 text-sm font-medium text-gray-700">Full Name :</Label>
+                    <Input 
+                      type="text" 
+                      className="flex-grow p-1 border-b border-gray-300 bg-transparent text-sm border-t-0 border-l-0 border-r-0 rounded-none" 
+                      readOnly 
+                      value={selectedPatient.fullName} 
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <Label className="w-24 text-sm font-medium text-gray-700">OP Number :</Label>
+                    <Input 
+                      type="text" 
+                      className="flex-grow p-1 border-b border-gray-300 bg-transparent text-sm border-t-0 border-l-0 border-r-0 rounded-none" 
+                      readOnly 
+                      value={selectedPatient.opNumber} 
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <Label className="w-24 text-sm font-medium text-gray-700">File No. :</Label>
+                    <Input 
+                      type="text" 
+                      className="flex-grow p-1 border-b border-gray-300 bg-transparent text-sm border-t-0 border-l-0 border-r-0 rounded-none" 
+                      readOnly 
+                      value={selectedPatient.fileNo} 
+                    />
+                  </div>
+                </div>
+
+                {/* Billing Category and Date */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                  <div className="flex items-center">
+                    <Label htmlFor="category" className="w-24 text-sm font-medium text-gray-700">Category :</Label>
+                    <select 
+                      id="category" 
+                      className="flex-grow p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                      value={billingCategory}
+                      onChange={(e) => setBillingCategory(e.target.value)}
+                    >
+                      <option value="Bill">Bill</option>
+                      <option value="Consultation">Consultation</option>
+                      <option value="Procedure">Procedure</option>
+                      <option value="Medication">Medication</option>
+                      <option value="Lab Test">Lab Test</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center md:col-span-2">
+                    <Label htmlFor="billing-date" className="w-24 text-sm font-medium text-gray-700">Billing Date :</Label>
+                    <Input 
+                      type="date" 
+                      id="billing-date" 
+                      defaultValue="2025-05-31" 
+                      className="p-2 border border-gray-300 rounded-md text-sm" 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Item Entry Section */}
+              <div className="p-6">
+                <div className="mb-4">
+                  <Input
+                    type="text"
+                    className="w-full text-sm"
+                    placeholder="Enter item description to add billing item..."
+                    value={newItemDescription}
+                    onChange={(e) => setNewItemDescription(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && newItemDescription.trim()) {
+                        const newItem = {
+                          id: Date.now(),
+                          description: newItemDescription,
+                          quantity: 1,
+                          price: 0,
+                          totalCost: 0
+                        };
+                        setBillingItems([...billingItems, newItem]);
+                        setNewItemDescription("");
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* Billing Items Table */}
+                <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200 bg-white">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs">#</TableHead>
+                        <TableHead className="text-xs">Item Description</TableHead>
+                        <TableHead className="text-xs">Quantity Bought</TableHead>
+                        <TableHead className="text-xs">Price</TableHead>
+                        <TableHead className="text-xs">Total Cost</TableHead>
+                        <TableHead className="text-xs">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="bg-gray-200 divide-y divide-gray-300">
+                      {billingItems.length > 0 ? (
+                        billingItems.map((item, index) => (
+                          <TableRow key={item.id}>
+                            <TableCell className="text-sm">{index + 1}</TableCell>
+                            <TableCell className="text-sm">
+                              <Input
+                                value={item.description}
+                                onChange={(e) => {
+                                  const updatedItems = [...billingItems];
+                                  updatedItems[index].description = e.target.value;
+                                  setBillingItems(updatedItems);
+                                }}
+                                className="border-0 p-1 text-sm bg-transparent"
+                              />
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              <Input
+                                type="number"
+                                value={item.quantity}
+                                onChange={(e) => {
+                                  const updatedItems = [...billingItems];
+                                  const quantity = parseInt(e.target.value) || 0;
+                                  updatedItems[index].quantity = quantity;
+                                  updatedItems[index].totalCost = quantity * updatedItems[index].price;
+                                  setBillingItems(updatedItems);
+                                }}
+                                className="border-0 p-1 text-sm w-20 bg-transparent"
+                              />
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              <Input
+                                type="number"
+                                value={item.price}
+                                onChange={(e) => {
+                                  const updatedItems = [...billingItems];
+                                  const price = parseFloat(e.target.value) || 0;
+                                  updatedItems[index].price = price;
+                                  updatedItems[index].totalCost = updatedItems[index].quantity * price;
+                                  setBillingItems(updatedItems);
+                                }}
+                                className="border-0 p-1 text-sm w-24 bg-transparent"
+                                placeholder="KSH"
+                              />
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {item.totalCost.toLocaleString()}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-red-600 hover:text-red-800"
+                                onClick={() => {
+                                  setBillingItems(billingItems.filter((_, i) => i !== index));
+                                }}
+                              >
+                                Remove
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        Array(5).fill(0).map((_, i) => (
+                          <TableRow key={i}>
+                            <TableCell className="text-sm text-gray-500">-</TableCell>
+                            <TableCell className="text-sm text-gray-500">-</TableCell>
+                            <TableCell className="text-sm text-gray-500">-</TableCell>
+                            <TableCell className="text-sm text-gray-500">-</TableCell>
+                            <TableCell className="text-sm text-gray-500">-</TableCell>
+                            <TableCell className="text-sm text-gray-500">-</TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+
+              {/* Bottom Summary and Action Buttons */}
+              <div className="p-6 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row justify-end items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <div className="flex items-center space-x-2 text-lg font-semibold text-gray-800">
+                  <span>Total :</span> 
+                  <span className="font-bold">
+                    KSH {billingItems.reduce((sum, item) => sum + item.totalCost, 0).toLocaleString()}
+                  </span>
+                </div>
+                <Button 
+                  variant="secondary"
+                  className="text-sm"
+                  onClick={() => {
+                    toast({
+                      title: "Bill Saved",
+                      description: `Bill saved for ${selectedPatient.fullName} with total KSH ${billingItems.reduce((sum, item) => sum + item.totalCost, 0).toLocaleString()}`,
+                    });
+                    setShowBillingForm(false);
+                  }}
+                >
+                  Save
+                </Button>
+                <Button 
+                  variant="secondary"
+                  className="text-sm"
+                  onClick={() => {
+                    setBillingItems([]);
+                    setNewItemDescription("");
+                    setShowBillingForm(false);
+                  }}
+                >
+                  Cancel
+                </Button>
               </div>
             </div>
           </div>
