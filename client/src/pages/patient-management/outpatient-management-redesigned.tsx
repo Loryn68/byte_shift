@@ -237,7 +237,27 @@ export default function OutpatientManagement() {
   return (
     <div className="h-screen bg-green-50 p-6">
       <div className="bg-white rounded-lg shadow-sm h-full">
-        {/* Header */}
+        {/* Header with Logo */}
+        <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+          <div className="flex items-center space-x-4">
+            <img 
+              src="/logo.png" 
+              alt="Child Mental Haven" 
+              className="h-16 w-auto"
+            />
+            <div className="flex items-center space-x-2">
+              <h1 className="text-xl font-bold text-green-600">Child Mental Haven</h1>
+              <p className="text-sm text-blue-600 font-medium">- Where Young Minds Evolve</p>
+              <p className="text-xs text-gray-600 ml-4">Outpatient Management System</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-gray-600">Date: {new Date().toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600">Time: {new Date().toLocaleTimeString()}</p>
+          </div>
+        </div>
+
+        {/* Content Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex justify-between items-center">
             <div>

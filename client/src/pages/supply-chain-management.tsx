@@ -205,33 +205,50 @@ export default function SupplyChainManagement() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Brain className="h-8 w-8 text-blue-600" />
-              AI-Powered Supply Chain Management
-            </h1>
-            <p className="text-gray-600 mt-1">Intelligent hospital supply chain optimization with predictive analytics</p>
+      {/* Header with Logo */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+          <div className="flex items-center space-x-4">
+            <img 
+              src="/logo.png" 
+              alt="Child Mental Haven" 
+              className="h-16 w-auto"
+            />
+            <div className="flex items-center space-x-2">
+              <h1 className="text-xl font-bold text-green-600">Child Mental Haven</h1>
+              <p className="text-sm text-blue-600 font-medium">- Where Young Minds Evolve</p>
+              <p className="text-xs text-gray-600 ml-4">Supply Chain Management System</p>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button 
-              onClick={generateAIInsights} 
-              disabled={isGeneratingInsights}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {isGeneratingInsights ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Zap className="h-4 w-4 mr-2" />
-              )}
-              Generate AI Insights
-            </Button>
-            <Badge variant="outline" className="px-3 py-1">
-              <Activity className="h-4 w-4 mr-1" />
-              Live Monitoring
-            </Badge>
+          <div className="text-right">
+            <p className="text-sm text-gray-600">Date: {new Date().toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600">Time: {new Date().toLocaleTimeString()}</p>
+          </div>
+        </div>
+        
+        <div className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Brain className="h-8 w-8 text-blue-600" />
+                AI-Powered Supply Chain Management
+              </h1>
+              <p className="text-gray-600 mt-1">Intelligent hospital supply chain optimization with predictive analytics</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button 
+                onClick={generateAIInsights} 
+                disabled={isGeneratingInsights}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {isGeneratingInsights ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Zap className="h-4 w-4 mr-2" />
+                )}
+                Generate AI Insights
+              </Button>
+            </div>
           </div>
         </div>
       </div>
