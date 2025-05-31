@@ -216,6 +216,25 @@ export default function BillingInvoicing() {
   return (
     <div className="min-h-screen bg-gray-100 font-inter antialiased p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+        {/* Header with Logo */}
+        <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+          <div className="flex items-center space-x-4">
+            <img 
+              src="/attached_assets/image_1748700593151.png" 
+              alt="Child Mental Haven" 
+              className="h-16 w-auto"
+            />
+            <div>
+              <h1 className="text-xl font-bold text-gray-800">Child Mental Haven</h1>
+              <p className="text-sm text-gray-600">Billing & Invoicing System</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-gray-600">Date: {new Date().toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600">Time: {new Date().toLocaleTimeString()}</p>
+          </div>
+        </div>
+
         {/* Top Navigation Tabs */}
         <div className="flex bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700 overflow-x-auto">
           {mainTabs.map((tab) => (
@@ -541,18 +560,30 @@ export default function BillingInvoicing() {
         {showBillingForm && selectedPatient && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="max-w-4xl w-full bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+              {/* Header with Logo */}
+              <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+                <div className="flex items-center space-x-4">
+                  <img 
+                    src="/attached_assets/image_1748700593151.png" 
+                    alt="Child Mental Haven" 
+                    className="h-12 w-auto"
+                  />
+                  <div>
+                    <h1 className="text-lg font-bold text-gray-800">Child Mental Haven</h1>
+                    <p className="text-sm text-gray-600">Billing Interface</p>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowBillingForm(false)}
+                >
+                  Close
+                </Button>
+              </div>
+
               {/* Top Search Section */}
               <div className="p-6 bg-gray-50 border-b border-gray-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Billing Interface</h3>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setShowBillingForm(false)}
-                  >
-                    Close
-                  </Button>
-                </div>
                 
                 <div className="flex items-center space-x-2 mb-4">
                   <Label htmlFor="search-patient" className="text-sm font-medium text-gray-700 whitespace-nowrap">
