@@ -283,6 +283,9 @@ export default function PayrollManagement() {
     };
   }, [employees]);
 
+  // Destructure for backward compatibility
+  const { totalGrossPay, totalNetPay, totalTaxDeductions, totalStatutoryDeductions } = summaryStats;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       {/* Header */}
@@ -353,7 +356,7 @@ export default function PayrollManagement() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Gross Pay</p>
-                      <p className="text-3xl font-bold text-gray-900">KES {summaryStats.totalGrossPay.toLocaleString()}</p>
+                      <p className="text-3xl font-bold text-gray-900">KES {totalGrossPay.toLocaleString()}</p>
                       <p className="text-sm text-blue-600">Current month</p>
                     </div>
                     <DollarSign className="h-12 w-12 text-blue-500" />
@@ -366,7 +369,7 @@ export default function PayrollManagement() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Net Pay</p>
-                      <p className="text-3xl font-bold text-gray-900">KES {summaryStats.totalNetPay.toLocaleString()}</p>
+                      <p className="text-3xl font-bold text-gray-900">KES {totalNetPay.toLocaleString()}</p>
                       <p className="text-sm text-green-600">After deductions</p>
                     </div>
                     <CheckCircle className="h-12 w-12 text-green-500" />
@@ -379,7 +382,7 @@ export default function PayrollManagement() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">PAYE Tax</p>
-                      <p className="text-3xl font-bold text-gray-900">KES {summaryStats.totalTaxDeductions.toLocaleString()}</p>
+                      <p className="text-3xl font-bold text-gray-900">KES {totalTaxDeductions.toLocaleString()}</p>
                       <p className="text-sm text-orange-600">Income tax</p>
                     </div>
                     <Calculator className="h-12 w-12 text-orange-500" />
@@ -392,7 +395,7 @@ export default function PayrollManagement() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Statutory Deductions</p>
-                      <p className="text-3xl font-bold text-gray-900">KES {summaryStats.totalStatutoryDeductions.toLocaleString()}</p>
+                      <p className="text-3xl font-bold text-gray-900">KES {totalStatutoryDeductions.toLocaleString()}</p>
                       <p className="text-sm text-purple-600">NSSF + SHIF + Housing</p>
                     </div>
                     <PieChart className="h-12 w-12 text-purple-500" />
@@ -438,7 +441,7 @@ export default function PayrollManagement() {
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
                       <p className="font-semibold">Payroll for January 2024 processed</p>
-                      <p className="text-sm text-gray-600">4 employees • Total: KES {summaryStats.totalNetPay.toLocaleString()}</p>
+                      <p className="text-sm text-gray-600">4 employees • Total: KES {totalNetPay.toLocaleString()}</p>
                     </div>
                     <Badge variant="outline">Completed</Badge>
                   </div>
@@ -766,19 +769,19 @@ export default function PayrollManagement() {
                     </div>
                     <div className="flex justify-between">
                       <span>Total Gross Pay:</span>
-                      <span className="font-bold">KES {summaryStats.totalGrossPay.toLocaleString()}</span>
+                      <span className="font-bold">KES {totalGrossPay.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total Net Pay:</span>
-                      <span className="font-bold">KES {summaryStats.totalNetPay.toLocaleString()}</span>
+                      <span className="font-bold">KES {totalNetPay.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total Tax (PAYE):</span>
-                      <span className="font-bold">KES {summaryStats.totalTaxDeductions.toLocaleString()}</span>
+                      <span className="font-bold">KES {totalTaxDeductions.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Statutory Deductions:</span>
-                      <span className="font-bold">KES {summaryStats.totalStatutoryDeductions.toLocaleString()}</span>
+                      <span className="font-bold">KES {totalStatutoryDeductions.toLocaleString()}</span>
                     </div>
                   </div>
                 </CardContent>
