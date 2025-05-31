@@ -1210,46 +1210,139 @@ export default function OutpatientManagement() {
             {/* Patient History Tab */}
             <TabsContent value="history" className="space-y-4">
               <Card>
-                <CardHeader>
-                  <CardTitle>Previous Consultations</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Consultation Type</TableHead>
-                        <TableHead>Chief Complaint</TableHead>
-                        <TableHead>Diagnosis</TableHead>
-                        <TableHead>Doctor</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {consultations.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                            No consultation history available
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        consultations.map((consultation: any) => (
-                          <TableRow key={consultation.id}>
-                            <TableCell>{new Date(consultation.consultationDate).toLocaleDateString()}</TableCell>
-                            <TableCell>{consultation.consultationType}</TableCell>
-                            <TableCell className="max-w-xs truncate">{consultation.chiefComplaint}</TableCell>
-                            <TableCell className="max-w-xs truncate">{consultation.provisionalDiagnosis}</TableCell>
-                            <TableCell>{consultation.consultedBy}</TableCell>
-                            <TableCell>
-                              <Button size="sm" variant="outline">
-                                View Details
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
+                <CardContent className="p-6">
+                  {selectedPatient ? (
+                    <div className="space-y-4">
+                      {/* Show Patient History Button */}
+                      <div className="text-center">
+                        <Button className="bg-gray-400 text-white px-8 py-2 hover:bg-gray-500">
+                          Show Patient History
+                        </Button>
+                      </div>
+                      
+                      {/* Grouping Instructions */}
+                      <div className="text-center text-sm text-gray-600 italic">
+                        Drag a column here to group by this column.
+                      </div>
+                      
+                      {/* Patient History Table */}
+                      <div className="border rounded-lg">
+                        <Table>
+                          <TableHeader className="bg-blue-100">
+                            <TableRow>
+                              <TableHead className="text-center border-r">
+                                <div className="flex items-center justify-center gap-2">
+                                  Visit Date
+                                  <div className="flex flex-col">
+                                    <span className="text-xs">▲</span>
+                                    <span className="text-xs">▼</span>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Contains: ⚙
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-center border-r">
+                                <div className="flex items-center justify-center gap-2">
+                                  Visit Reason
+                                  <div className="flex flex-col">
+                                    <span className="text-xs">▲</span>
+                                    <span className="text-xs">▼</span>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Contains: ⚙
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-center border-r">
+                                <div className="flex items-center justify-center gap-2">
+                                  Symptoms
+                                  <div className="flex flex-col">
+                                    <span className="text-xs">▲</span>
+                                    <span className="text-xs">▼</span>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Contains: ⚙
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-center border-r">
+                                <div className="flex items-center justify-center gap-2">
+                                  Impression
+                                  <div className="flex flex-col">
+                                    <span className="text-xs">▲</span>
+                                    <span className="text-xs">▼</span>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Contains: ⚙
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-center border-r">
+                                <div className="flex items-center justify-center gap-2">
+                                  Diagnosis
+                                  <div className="flex flex-col">
+                                    <span className="text-xs">▲</span>
+                                    <span className="text-xs">▼</span>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Contains: ⚙
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-center border-r">
+                                <div className="flex items-center justify-center gap-2">
+                                  Age
+                                  <div className="flex flex-col">
+                                    <span className="text-xs">▲</span>
+                                    <span className="text-xs">▼</span>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Contains: ⚙
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-center border-r">
+                                <div className="flex items-center justify-center gap-2">
+                                  Doctor
+                                  <div className="flex flex-col">
+                                    <span className="text-xs">▲</span>
+                                    <span className="text-xs">▼</span>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Contains: ⚙
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-center">
+                                <div className="flex items-center justify-center gap-2">
+                                  Admitted
+                                  <div className="flex flex-col">
+                                    <span className="text-xs">▲</span>
+                                    <span className="text-xs">▼</span>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Contains: ⚙
+                                </div>
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                                No patient history records found. Patient visit history will appear here when available.
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <p className="text-gray-500 text-lg">Please search and select a patient to view their medical history</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
