@@ -439,7 +439,7 @@ export default function OutpatientFlow() {
                 Patients Ready for Outpatient Consultation
               </CardTitle>
               <CardDescription>
-                Patients who completed Registry → Cashier → Triage flow
+                Patients ready for outpatient consultation
               </CardDescription>
             </CardHeader>
             <CardContent>

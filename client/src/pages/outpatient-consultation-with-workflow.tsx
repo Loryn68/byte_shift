@@ -211,7 +211,7 @@ export default function OutpatientConsultationWithWorkflow({ params }: Consultat
               Outpatient Consultation
             </h1>
             <p className="text-gray-600">
-              Registry → Cashier → Triage → Outpatient → Next Step
+              Complete patient consultation and determine next steps
             </p>
           </div>
         </div>
@@ -399,18 +399,13 @@ export default function OutpatientConsultationWithWorkflow({ params }: Consultat
       <Dialog open={showWorkflowDialog} onOpenChange={setShowWorkflowDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Route Patient - Next Step in Outpatient Flow</DialogTitle>
+            <DialogTitle>Route Patient</DialogTitle>
             <DialogDescription>
-              Select where to route the patient according to the outpatient administration flow chart
+              Select the next department or action for this patient
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-6">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-700">
-                Current Flow: <strong>Registry → Cashier → Triage → Outpatient → [Next Step]</strong>
-              </p>
-            </div>
 
             <div>
               <Label>Select Next Step *</Label>

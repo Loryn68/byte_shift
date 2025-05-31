@@ -258,7 +258,7 @@ export default function PharmacyApproval() {
                 Prescriptions Awaiting Approval
               </CardTitle>
               <CardDescription>
-                Review prescriptions and approve for billing or reject with reason
+                Review and approve prescriptions for dispensing
               </CardDescription>
             </CardHeader>
             <CardContent>
