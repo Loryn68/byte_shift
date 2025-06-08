@@ -596,43 +596,67 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  // Keep all other methods from MemStorage for now
+  // Patient methods
   async getPatient(id: number): Promise<Patient | undefined> {
-    return undefined;
+    const [patient] = await db.select().from(patients).where(eq(patients.id, id));
+    return patient || undefined;
   }
 
   async getPatientByPatientId(patientId: string): Promise<Patient | undefined> {
-    return undefined;
+    const [patient] = await db.select().from(patients).where(eq(patients.patientId, patientId));
+    return patient || undefined;
   }
 
   async createPatient(patient: InsertPatient): Promise<Patient> {
-    throw new Error("Not implemented");
+    // Generate patientId if not provided
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const initials = (patient.firstName[0] || 'X').toUpperCase() + (patient.lastName[0] || 'X').toUpperCase();
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const patientId = `CMH-${year}${month}${initials}${random}`;
+    const [created] = await db.insert(patients).values({ ...patient, patientId }).returning();
+    return created;
   }
 
   async updatePatient(id: number, patient: Partial<InsertPatient>): Promise<Patient | undefined> {
-    return undefined;
+    const [updated] = await db.update(patients).set({ ...patient, updatedAt: new Date() }).where(eq(patients.id, id)).returning();
+    return updated || undefined;
   }
 
   async getAllPatients(): Promise<Patient[]> {
-    return [];
+    return await db.select().from(patients);
   }
 
   async getOutpatients(): Promise<Patient[]> {
-    return [];
+    return await db.select().from(patients).where(eq(patients.patientType, 'outpatient'));
   }
 
   async getInpatients(): Promise<Patient[]> {
-    return [];
+    return await db.select().from(patients).where(eq(patients.patientType, 'inpatient'));
   }
 
   async admitPatient(patientId: number, admissionData: { ward: string; bed: string; department: string }): Promise<Patient | undefined> {
-    return undefined;
+    const [updated] = await db.update(patients).set({
+      patientType: 'inpatient',
+      wardAssignment: admissionData.ward,
+      bedNumber: admissionData.bed,
+      admissionDate: new Date(),
+      updatedAt: new Date(),
+    }).where(eq(patients.id, patientId)).returning();
+    return updated || undefined;
   }
 
   async searchPatients(query: string): Promise<Patient[]> {
-    return [];
+    // Simple search by firstName, lastName, patientId, or phone
+    const q = `%${query}%`;
+    return await db.execute(
+      `SELECT * FROM patients WHERE first_name ILIKE $1 OR last_name ILIKE $1 OR patient_id ILIKE $1 OR phone ILIKE $1`,
+      [q]
+    );
   }
 
+  // Appointment methods
   async getAppointment(id: number): Promise<Appointment | undefined> {
     return undefined;
   }
@@ -657,6 +681,7 @@ export class DatabaseStorage implements IStorage {
     return [];
   }
 
+  // Lab test methods
   async getLabTest(id: number): Promise<LabTest | undefined> {
     return undefined;
   }
@@ -677,6 +702,7 @@ export class DatabaseStorage implements IStorage {
     return [];
   }
 
+  // Medication methods
   async getMedication(id: number): Promise<Medication | undefined> {
     return undefined;
   }
@@ -697,6 +723,7 @@ export class DatabaseStorage implements IStorage {
     return [];
   }
 
+  // Prescription methods
   async getPrescription(id: number): Promise<Prescription | undefined> {
     return undefined;
   }
@@ -717,6 +744,7 @@ export class DatabaseStorage implements IStorage {
     return [];
   }
 
+  // Billing methods
   async getBilling(id: number): Promise<Billing | undefined> {
     return undefined;
   }
@@ -752,6 +780,28 @@ export class DatabaseStorage implements IStorage {
       bedOccupancy: 0,
     };
   }
+
+  // Therapy session management
+  async getTherapySession(id: number): Promise<TherapySession | undefined> {
+    throw new Error("Not implemented");
+  }
+
+  async createTherapySession(session: InsertTherapySession): Promise<TherapySession> {
+    throw new Error("Not implemented");
+  }
+
+  async updateTherapySession(id: number, session: Partial<InsertTherapySession>): Promise<TherapySession | undefined> {
+    throw new Error("Not implemented");
+  }
+
+  async getTherapySessionsByPatient(patientId: number): Promise<TherapySession[]> {
+    return [];
+  }
+
+  async getAllTherapySessions(): Promise<TherapySession[]> {
+    return [];
+  }
 }
 
-export const storage = new MemStorage();
+// Choose storage implementation based on environment
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();

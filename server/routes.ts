@@ -185,7 +185,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Clean patient data:", cleanPatientData);
       const patient = await storage.createPatient(cleanPatientData);
       console.log("Patient created successfully:", patient);
-      res.status(201).json(patient);
+      res.status(201).json({
+        message: "Registration successful",
+        patientId: patient.patientId || patient.id,
+        patient
+      });
     } catch (error: any) {
       console.error("=== PATIENT CREATION ERROR ===");
       console.error("Error:", error);
@@ -194,7 +198,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error type:", typeof error);
       console.error("Error constructor:", error?.constructor?.name);
       
-      res.status(500).json({ message: "Failed to create patient", error: error?.message || "Unknown error" });
+      res.status(500).json({
+        message: "Registration not successful",
+        error: error?.message || "Unknown error"
+      });
     }
   });
 
